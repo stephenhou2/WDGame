@@ -52,19 +52,36 @@ public class MapBoard:IInputHandle
         return "MapBoard";
     }
 
-    public void OnTouchDown(Vector3 pos)
+    public void OnTouchDown(Vector3 touchPos)
     {
-        StartDraw(pos);
+        if (Camera.main == null)
+            return;
+
+        Vector3 worldPos = MapEditorHelper.TransformScreenPosToWorldPos(Camera.main, touchPos, -Camera.main.transform.position.z);
+        StartDraw(worldPos);
     }
 
-    public void OnTouchUp(Vector3 pos)
+    public void OnTouchUp(Vector3 touchPos)
     {
-        EndDraw(pos);
+
+        if (Camera.main == null)
+            return;
+
+        Vector3 worldPos = MapEditorHelper.TransformScreenPosToWorldPos(Camera.main, touchPos, -Camera.main.transform.position.z);
+        var clickAt =  GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        clickAt.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+        clickAt.transform.position = worldPos;
+
+        EndDraw(worldPos);
     }
 
-    public void OnDrag(Vector3 pos)
+    public void OnDrag(Vector3 deltaPos,Vector3 touchPos)
     {
-        Draw(pos);
+        if (Camera.main == null)
+            return;
+
+        Vector3 worldPos = MapEditorHelper.TransformScreenPosToWorldPos(Camera.main, touchPos, -Camera.main.transform.position.z);
+        Draw(worldPos);
     }
 
     public void OnZoom(float zoomChange)

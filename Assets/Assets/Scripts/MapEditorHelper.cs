@@ -40,13 +40,11 @@ public static class MapEditorHelper
 
     private static Vector2Int PointToHexCellPos_Horizontal(Vector2 pos)
     {
-        //function pixel_to_hex(x, y):
-        //    q = x * 2 / 3 / size
-        //    r = (-x / 3 + sqrt(3) / 3 * y) / size
-        //    return hex_round(Hex(q, r))
+        //x' = x + y / Mathf.Sqrt(3)
+        //y' = y * 2 / Mathf.Sqrt(3)
 
-        int col = Mathf.FloorToInt(pos.x * 2 / 3 / MapEditor.Ins.setting.MapCellSize);
-        int row = Mathf.FloorToInt((-pos.x / 3 + pos.y * Mathf.Sqrt(3) / 3) / MapEditor.Ins.setting.MapCellSize);
+        int col = Mathf.FloorToInt((pos.x  + pos.y / Mathf.Sqrt(3)) / MapEditor.Ins.setting.MapCellSize);
+        int row = Mathf.FloorToInt(pos.y * 2 / Mathf.Sqrt(3) / MapEditor.Ins.setting.MapCellSize);
         return new Vector2Int(col, row);
     }
 
@@ -92,5 +90,13 @@ public static class MapEditorHelper
     public static  bool IsValidMapPos(int x,int y)
     {
         return x >= 0 && x < MapEditor.Ins.setting.MapWidth && y >= 0 && y < MapEditor.Ins.setting.MapHeight;
+    }
+
+    public static Vector3 TransformScreenPosToWorldPos(Camera cam,Vector2 tousPos,float howfar)
+    {
+        if (cam == null)
+            return -Vector3.one;
+
+        return cam.ScreenToWorldPoint(new Vector3(tousPos.x, tousPos.y, howfar));
     }
 }

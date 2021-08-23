@@ -47,12 +47,12 @@ public class MapDrawer_Horizontal:IMapMeshRender
 
     protected float GetX(int col, int row)
     {
-        return (col / 2.0f * 3 + 1) * mMapCellSize;
+        return col / 2.0f * 3  * mMapCellSize;
     }
 
     protected float GetY(int col, int row)
     {
-        return (col % 2 + (row * 2 + 1)) * Tile_60;
+        return (col % 2 + row * 2) * Tile_60;
     }
 
     protected Vector3[,] mTileCenters;

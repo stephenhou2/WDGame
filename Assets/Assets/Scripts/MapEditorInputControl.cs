@@ -33,11 +33,11 @@ public class MapEditorInputControl
         }
     }
 
-    private Vector3 GetTouchWorldPos()
-    {
-        float camZ = Camera.main.transform.position.z;
-        return Camera.main.ScreenToWorldPoint(new Vector3(mTouchPos.x, mTouchPos.y, -camZ));
-    }
+    //private Vector3 GetTouchWorldPos()
+    //{
+    //    float camZ = Camera.main.transform.position.z;
+    //    return Camera.main.ScreenToWorldPoint(new Vector3(mTouchPos.x, mTouchPos.y, -camZ));
+    //}
 
     public void UpdateTouchDown(Vector2 touchPos)
     {
@@ -45,13 +45,13 @@ public class MapEditorInputControl
             return;
 
         mTouchPos = touchPos;
-        Vector3 pos = GetTouchWorldPos();
+        //Vector3 pos = GetTouchWorldPos();
         mDrag = false;
         mTouchCount = 1;
 
         foreach (KeyValuePair<string,IInputHandle> kv in mInputHandleDic)
         {
-            kv.Value.OnTouchDown(pos);
+            kv.Value.OnTouchDown(mTouchPos);
         }
 
         mDrag = false;
@@ -67,10 +67,10 @@ public class MapEditorInputControl
 
         if (!mDrag)
         {
-            Vector3 pos = GetTouchWorldPos();
+            //Vector3 pos = GetTouchWorldPos();
             foreach (KeyValuePair<string, IInputHandle> kv in mInputHandleDic)
             {
-                kv.Value.OnTouchUp(pos);
+                kv.Value.OnTouchUp(mTouchPos);
             }
         }
 
@@ -90,8 +90,7 @@ public class MapEditorInputControl
         mDrag = true;
         foreach (KeyValuePair<string, IInputHandle> kv in mInputHandleDic)
         {
-            Vector3 pos = GetTouchWorldPos();
-            kv.Value.OnDrag(pos);
+            kv.Value.OnDrag(deltaPos, mTouchPos);
         }
     }
 

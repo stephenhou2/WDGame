@@ -47,12 +47,12 @@ public class MapDrawer_Verticle:IMapMeshRender
 
     protected float GetX(int col,int row)
     {
-        return (col * 2 + 1 + row % 2) * Tile_60;
+        return (col * 2 + row % 2) * Tile_60;
     }
 
     protected float GetY (int row)
     {
-        return (1.5f * row + 1) * mMapCellSize;
+        return (1.5f * row ) * mMapCellSize;
     }
 
     protected Vector3[,] mTileCenters;

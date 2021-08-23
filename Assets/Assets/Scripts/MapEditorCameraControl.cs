@@ -48,14 +48,14 @@ public class MapEditorCameraControl: IInputHandle
         return "MapCamControl";
     }
 
-    public void OnDrag(Vector3 pos)
+    public void OnDrag(Vector3 deltaPos,Vector3 touchPos)
     {
-        CamMove(pos);
+        CamMove(deltaPos);
     }
 
-    public void OnTouchDown(Vector3 pos){}
+    public void OnTouchDown(Vector3 touchPos) {}
 
-    public void OnTouchUp(Vector3 pos){}
+    public void OnTouchUp(Vector3 touchPos) {}
 
     public void OnZoom(float zoomChange)
     {

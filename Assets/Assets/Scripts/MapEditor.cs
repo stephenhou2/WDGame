@@ -49,7 +49,6 @@ public class MapEditor : MonoBehaviour
 
     public void UpdateMapObstacle(int col,int row, byte data)
     {
-        Log.Error("UpdateMapObstacle--col:{0},row:{1},data:{2}", col, row, data);
         DataMgr.UpdateObstacleData(col, row, data);
     }
 
