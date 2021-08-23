@@ -24,7 +24,7 @@ public static class MapEditorHelper
     {
         //col = x
         //row = z + (x + (x & 1)) / 2
-
+        Log.Error("HexToProject-cellPos:{0},col:{1},row:{2}", cellPos, cellPos.x, cellPos.y + (cellPos.x + (cellPos.x & 1)) / 2);
         return new Vector2Int(cellPos.x, cellPos.y + (cellPos.x + (cellPos.x & 1)) / 2);
     }
 
@@ -42,21 +42,25 @@ public static class MapEditorHelper
     {
         //x' = x + y / Mathf.Sqrt(3)
         //y' = y * 2 / Mathf.Sqrt(3)
-
-        int col = Mathf.FloorToInt((pos.x  + pos.y / Mathf.Sqrt(3)) / MapEditor.Ins.setting.MapCellSize);
-        int row = Mathf.FloorToInt(pos.y * 2 / Mathf.Sqrt(3) / MapEditor.Ins.setting.MapCellSize);
-        return new Vector2Int(col, row);
+        // row = y' - x'/2
+        // col = x' * 2 / Mathf.Sqrt(3)
+        //float x = (pos.x + pos.y / Mathf.Sqrt(3)) / MapEditor.Ins.setting.MapCellSize;
+        //float y = pos.y * 2 / Mathf.Sqrt(3) / MapEditor.Ins.setting.MapCellSize;
+        //int col = Mathf.FloorToInt((x+1)/2);
+        //int row = Mathf.FloorToInt((y+1)/2);
+        float row = (pos.y * Mathf.Sqrt(3) / 2 - pos.x / 2) / MapEditor.Ins.setting.MapCellSize;
+        float col = (2 * (pos.x / Mathf.Sqrt(3) + pos.y / 3)) / MapEditor.Ins.setting.MapCellSize;
+        Log.Error("PointToHexCellPos_Horizontal-pos:{0},col:{1},row:{2}", pos,col,row);
+        return new Vector2Int(Mathf.FloorToInt((col+1)/2), Mathf.FloorToInt((row+1)/2));
     }
 
     private static Vector2Int PointToHexCellPos_Verticle(Vector3 pos)
     {
-        //function pixel_to_hex(x, y):
-        //    q = (x * sqrt(3) / 3 - y / 3) / size
-        //    r = y * 2 / 3 / size
-        //    return hex_round(Hex(q, r))
+        // x' = x * 2 / Mathf.Sqrt(3)
+        // y' = y + x / Mathf.Sqrt(3)
 
-        int col = Mathf.FloorToInt((pos.x * Mathf.Sqrt(3) / 3 - pos.y / 3) / MapEditor.Ins.setting.MapCellSize);
-        int row = Mathf.FloorToInt(pos.y * 2 / 3 / MapEditor.Ins.setting.MapCellSize);
+        int row = Mathf.FloorToInt((pos.y + pos.x / Mathf.Sqrt(3)) / MapEditor.Ins.setting.MapCellSize);
+        int col = Mathf.FloorToInt(pos.x * 2 / Mathf.Sqrt(3) / MapEditor.Ins.setting.MapCellSize);
         return new Vector2Int(col, row);
     }
 
