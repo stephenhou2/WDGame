@@ -6,3 +6,5 @@ obj/
 Packages/
 ProjectSettings/
 Temp/
+*.csproj
+*.suo
