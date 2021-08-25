@@ -40,18 +40,12 @@ public static class MapEditorHelper
 
     private static Vector2Int PointToHexCellPos_Horizontal(Vector2 pos)
     {
-        //x' = x + y / Mathf.Sqrt(3)
-        //y' = y * 2 / Mathf.Sqrt(3)
-        // row = y' - x'/2
-        // col = x' * 2 / Mathf.Sqrt(3)
-        //float x = (pos.x + pos.y / Mathf.Sqrt(3)) / MapEditor.Ins.setting.MapCellSize;
-        //float y = pos.y * 2 / Mathf.Sqrt(3) / MapEditor.Ins.setting.MapCellSize;
-        //int col = Mathf.FloorToInt((x+1)/2);
-        //int row = Mathf.FloorToInt((y+1)/2);
-        float row = (pos.y * Mathf.Sqrt(3) / 2 - pos.x / 2) / MapEditor.Ins.setting.MapCellSize;
-        float col = (2 * (pos.x / Mathf.Sqrt(3) + pos.y / 3)) / MapEditor.Ins.setting.MapCellSize;
-        Log.Error("PointToHexCellPos_Horizontal-pos:{0},col:{1},row:{2}", pos,col,row);
-        return new Vector2Int(Mathf.FloorToInt((col+1)/2), Mathf.FloorToInt((row+1)/2));
+        float col = Mathf.RoundToInt(pos.x * 2 / 3 / MapEditor.Ins.setting.MapCellSize);
+        float row = Mathf.RoundToInt((pos.y / Mathf.Sqrt(3) + pos.x / 3) / MapEditor.Ins.setting.MapCellSize);
+
+        Log.Error("PointToHexCellPos_Horizontal---pos:{0},col:{1},row:{2}", pos, col, row);
+
+        return Vector2Int.zero;
     }
 
     private static Vector2Int PointToHexCellPos_Verticle(Vector3 pos)
