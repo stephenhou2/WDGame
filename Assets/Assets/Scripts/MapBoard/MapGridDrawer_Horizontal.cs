@@ -15,18 +15,18 @@ public class MapGridDrawer_Horizontal : MapDrawer_Horizontal
         {
             for (int row = 0; row < mMapHeight; row++)
             {
-                Vector3 pos = new Vector3(GetX(col, row), GetY(col, row), 0);
-                mTileCenters[col, row] = pos;
+                Vector3 center = MapEditorHelper.GetCellCenter(col, row, MapCellDirection.Horizontal);
+                mTileCenters[col, row] = center;
 
                 // 顶点
                 int ver_index = (col + row * mMapWidth) * 7;
-                mTileVerts[ver_index] = pos;
-                mTileVerts[ver_index + 1] = pos + left;
-                mTileVerts[ver_index + 2] = pos + bottomLeft;
-                mTileVerts[ver_index + 3] = pos + bottomRight;
-                mTileVerts[ver_index + 4] = pos + right;
-                mTileVerts[ver_index + 5] = pos + topRight;
-                mTileVerts[ver_index + 6] = pos + topLeft;
+                mTileVerts[ver_index] = center;
+                mTileVerts[ver_index + 1] = center + left;
+                mTileVerts[ver_index + 2] = center + bottomLeft;
+                mTileVerts[ver_index + 3] = center + bottomRight;
+                mTileVerts[ver_index + 4] = center + right;
+                mTileVerts[ver_index + 5] = center + topRight;
+                mTileVerts[ver_index + 6] = center + topLeft;
 
                 //uv
                 mUvs[ver_index] = uv_center;

@@ -6,3 +6,6 @@ obj/
 Packages/
 ProjectSettings/
 Temp/
+.vs/MapEditor/
+*.suo
+*.csproj
