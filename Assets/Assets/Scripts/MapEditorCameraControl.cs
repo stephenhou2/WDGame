@@ -24,6 +24,9 @@ public class MapEditorCameraControl: IInputHandle
 
     public void CamMove(Vector3 deltaPos)
     {
+        if (!Input.GetKey(KeyCode.LeftControl))
+            return;
+
         if (mCam != null)
         {
             mCam.transform.position -= deltaPos * mMoveSpeed;

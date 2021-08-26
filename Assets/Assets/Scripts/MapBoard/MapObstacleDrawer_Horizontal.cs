@@ -16,7 +16,7 @@ public class MapObstacleDrawer_Horizontal : MapDrawer_Horizontal
         {
             for (int row = 0; row < mMapHeight; row++)
             {
-                Vector3 pos = new Vector3(GetX(col, row), GetY(col, row), 0);
+                Vector3 pos = MapEditorHelper.GetCellCenter(col,row,MapCellDirection.Horizontal);
                 mTileCenters[col, row] = pos;
 
                 // 顶点

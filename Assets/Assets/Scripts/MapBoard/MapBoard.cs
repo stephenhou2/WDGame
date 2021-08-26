@@ -7,6 +7,7 @@ public class MapBoard:IInputHandle
     private IMapBrush mCurBrush;
     private int mBrushWidth; // 笔刷宽度
 
+    private bool mCanBrush = true;
 
     public void SetMapBrush(IMapBrush brush)
     {
@@ -57,15 +58,26 @@ public class MapBoard:IInputHandle
         if (Camera.main == null)
             return;
 
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            mCanBrush = false;
+            return;
+        }
+
         Vector3 worldPos = MapEditorHelper.TransformScreenPosToWorldPos(Camera.main, touchPos, -Camera.main.transform.position.z);
         StartDraw(worldPos);
     }
 
     public void OnTouchUp(Vector3 touchPos)
     {
-
         if (Camera.main == null)
             return;
+
+        if (!mCanBrush)
+        {
+            mCanBrush = true;
+            return;
+        }
 
         Vector3 worldPos = MapEditorHelper.TransformScreenPosToWorldPos(Camera.main, touchPos, -Camera.main.transform.position.z);
         var clickAt =  GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -78,6 +90,9 @@ public class MapBoard:IInputHandle
     public void OnDrag(Vector3 deltaPos,Vector3 touchPos)
     {
         if (Camera.main == null)
+            return;
+
+        if (!mCanBrush)
             return;
 
         Vector3 worldPos = MapEditorHelper.TransformScreenPosToWorldPos(Camera.main, touchPos, -Camera.main.transform.position.z);

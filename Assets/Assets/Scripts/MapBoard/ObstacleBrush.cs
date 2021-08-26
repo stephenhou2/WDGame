@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class ObstacleBrush : IMapBrush
 {
-
     public MapDefine.MapBrushType GetBrushType()
     {
         return MapDefine.MapBrushType.Obstacle;
@@ -13,7 +12,7 @@ public class ObstacleBrush : IMapBrush
     public void Draw(Vector3 pos,int brushWidth)
     {
         Vector2Int cellPos = MapEditorHelper.GetCellPos(pos, MapEditor.Ins.setting.CellDirection);
-        //Log.Error("pos:{0},cellPos:{1}", pos, cellPos);
+
         if (!MapEditorHelper.IsValidMapPos(cellPos.x, cellPos.y))
             return;
 
