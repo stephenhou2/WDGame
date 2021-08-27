@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package GameMapData;
+
+message MapDecor
+{
+	int32 DecorType = 1;
+	float X = 2;
+	float Y = 3;
+}
+
+
+message MapTile
+{
+	int32 TileType = 1;
+	int32 X = 2;
+	int32 Y = 3;
+	repeated MapDecor Decors = 4;
+	
+}
+
+message MapData
+{
+	int32 MapId = 1;
+	int32 MapWidth = 2;
+	int32 MapHeight = 3;
+	float MapTileSideLength = 4;
+	repeated MapTile MapTiles = 5;
+}
+

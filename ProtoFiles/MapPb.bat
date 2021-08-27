@@ -1,8 +1,8 @@
 @echo off
 
-protoc --csharp_out=./output ./MapData.proto
+protoc --csharp_out=./output ./GameMapData.proto
 echo proto文件生成成功
 
-copy .\output\MapData.cs ..\Assets\Scripts\Proto
+move .\output\GameMapData.cs ..\Assets\Scripts\Proto
 
 pause
