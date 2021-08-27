@@ -90,8 +90,6 @@ public class Panel_MapEditor : UIPanel
     private void InitializeStageLoad()
     {
         UIInterface.SetInputFieldString(_Node_InputField_Stage, "-1");
-        UIInterface.AddButtonAction(_Node_Button_LoadStage, OnLoadMapButtonClick);
-        UIInterface.AddButtonAction(_Node_Button_SaveStage, OnLoadMapButtonClick);
     }
 
     private void OnLoadMapButtonClick()
@@ -117,7 +115,6 @@ public class Panel_MapEditor : UIPanel
         InitializeBrushSlider();
         InitializeStageLoad();
 
-        UIInterface.AddButtonAction(_Node_Button_DrawGrids, OnDrawGridsButtonClick);
         UIInterface.SetInputFieldString(_Node_InputField_MapWidth, GameMapEditor.Ins.setting.MapWidth.ToString());
         UIInterface.SetInputFieldString(_Node_InputField_MapHeight, GameMapEditor.Ins.setting.MapHeight.ToString());
         UIInterface.SetInputFieldString(_Node_InputField_CellSize, GameMapEditor.Ins.setting.MapCellSize.ToString());
@@ -146,14 +143,14 @@ public class Panel_MapEditor : UIPanel
         BindNode(ref _Node_InputField_MapHeight,"_InputField_MapHeight");
         BindNode(ref _Node_InputField_CellSize, "_InputField_CellSize");
         BindNode(ref _Node_Selection_Direction, "_Selection_Direction");
-        BindNode(ref _Node_Button_DrawGrids, "_Button_DrawGrids");
+        BindButtonNode(ref _Node_Button_DrawGrids, "_Button_DrawGrids",OnDrawGridsButtonClick);
         BindNode(ref _Node_Selection_Brush, "_Selection_Brush");
         BindNode(ref _Node_Slider_Brush, "_Slider_Brush");
         BindNode(ref _Node_Image_BrushSize, "_Image_BrushSize");
         BindNode(ref _Node_Text_BrushSize, "_Text_BrushSize");
         BindNode(ref _Node_InputField_Stage, "_InputField_Stage");
-        BindNode(ref _Node_Button_LoadStage, "_Button_LoadStage");
-        BindNode(ref _Node_Button_SaveStage, "_Button_SaveStage");
+        BindButtonNode(ref _Node_Button_LoadStage, "_Button_LoadStage",OnLoadMapButtonClick);
+        BindButtonNode(ref _Node_Button_SaveStage, "_Button_SaveStage",OnSaveMapButtonClick);
 
         InitializeUI();
     }
