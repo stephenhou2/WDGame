@@ -6,6 +6,7 @@ using TMPro;
 
 public class Panel_MapEditor : UIPanel
 {
+
     private GameObject _Node_InputField_MapWidth;
     private GameObject _Node_InputField_MapHeight;
     private GameObject _Node_InputField_CellSize;
@@ -18,6 +19,7 @@ public class Panel_MapEditor : UIPanel
     private GameObject _Node_InputField_Stage;
     private GameObject _Node_Button_LoadStage;
     private GameObject _Node_Button_SaveStage;
+
 
     public override void OnClose()
     {
@@ -140,18 +142,18 @@ public class Panel_MapEditor : UIPanel
 
     protected override void BindUINodes()
     {
-        _Node_InputField_MapWidth = UIInterface.FindChildNode(mPanelRoot.transform,"_InputField_MapWidth").gameObject;
-        _Node_InputField_MapHeight = UIInterface.FindChildNode(mPanelRoot.transform, "_InputField_MapHeight").gameObject;
-        _Node_InputField_CellSize = UIInterface.FindChildNode(mPanelRoot.transform, "_InputField_CellSize").gameObject;
-        _Node_Selection_Direction = UIInterface.FindChildNode(mPanelRoot.transform, "_Selection_Direction").gameObject;
-        _Node_Button_DrawGrids = UIInterface.FindChildNode(mPanelRoot.transform, "_Button_DrawGrids").gameObject;
-        _Node_Selection_Brush = UIInterface.FindChildNode(mPanelRoot.transform, "_Selection_Brush").gameObject;
-        _Node_Slider_Brush = UIInterface.FindChildNode(mPanelRoot.transform, "_Slider_Brush").gameObject;
-        _Node_Image_BrushSize = UIInterface.FindChildNode(mPanelRoot.transform, "_Image_BrushSize").gameObject;
-        _Node_Text_BrushSize = UIInterface.FindChildNode(mPanelRoot.transform, "_Text_BrushSize").gameObject;
-        _Node_InputField_Stage = UIInterface.FindChildNode(mPanelRoot.transform, "_InputField_Stage").gameObject;
-        _Node_Button_LoadStage = UIInterface.FindChildNode(mPanelRoot.transform, "_Button_LoadStage").gameObject;
-        _Node_Button_SaveStage = UIInterface.FindChildNode(mPanelRoot.transform, "_Button_SaveStage").gameObject;
+        BindNode(ref _Node_InputField_MapWidth,"_InputField_MapWidth");
+        BindNode(ref _Node_InputField_MapHeight,"_InputField_MapHeight");
+        BindNode(ref _Node_InputField_CellSize, "_InputField_CellSize");
+        BindNode(ref _Node_Selection_Direction, "_Selection_Direction");
+        BindNode(ref _Node_Button_DrawGrids, "_Button_DrawGrids");
+        BindNode(ref _Node_Selection_Brush, "_Selection_Brush");
+        BindNode(ref _Node_Slider_Brush, "_Slider_Brush");
+        BindNode(ref _Node_Image_BrushSize, "_Image_BrushSize");
+        BindNode(ref _Node_Text_BrushSize, "_Text_BrushSize");
+        BindNode(ref _Node_InputField_Stage, "_InputField_Stage");
+        BindNode(ref _Node_Button_LoadStage, "_Button_LoadStage");
+        BindNode(ref _Node_Button_SaveStage, "_Button_SaveStage");
 
         InitializeUI();
     }
