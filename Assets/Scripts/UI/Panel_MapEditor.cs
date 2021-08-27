@@ -19,23 +19,17 @@ public class Panel_MapEditor : UIPanel
     private GameObject _Node_Button_LoadStage;
     private GameObject _Node_Button_SaveStage;
 
-    public Panel_MapEditor(GameObject panelGo)
-    {
-        mPanelRoot = panelGo;
-        if (mPanelRoot != null)
-        {
-            BindUINodes();
-        }
-    }
-
     public override void OnClose()
     {
         
     }
 
-    public override void OnOpen(PanelOpenArgs openArgs)
+    public override void OnOpen(object[] openArgs)
     {
-        
+        if (mPanelRoot != null)
+        {
+            BindUINodes();
+        }
     }
 
     private void InitializeCellDirSelection()

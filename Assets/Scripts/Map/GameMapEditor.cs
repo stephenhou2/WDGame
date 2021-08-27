@@ -38,11 +38,12 @@ public class GameMapEditor : MonoBehaviour
 
         IntializeDrawers();
 
-
         mMapBorad.SetMapBrush(new ObstacleBrush());
 
         mInputControl.RegisterInputHandle(mCamControl);
         mInputControl.RegisterInputHandle(mMapBorad);
+
+        UIManager.Ins.OpenPanel<Panel_MapEditor>("UI/MapEditor/Panel_MapEditor");
     }
 
     private void IntializeDrawers()

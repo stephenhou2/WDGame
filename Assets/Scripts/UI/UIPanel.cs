@@ -6,11 +6,18 @@ using UnityEngine.UI;
 public abstract class UIPanel
 {
     protected abstract void BindUINodes();
-    public abstract void OnOpen(PanelOpenArgs openArgs);
+    public abstract void OnOpen(object[] openArgs);
     public abstract void OnClose();
 
     private List<IEnumerator> mEnumerators = new List<IEnumerator>(); // 后面自己实现协程
     protected GameObject mPanelRoot;
+
+    protected UIPanel() { }
+
+    public void BindPanelRootNode(GameObject panelRoot)
+    {
+        mPanelRoot = panelRoot;
+    }
 
     public virtual void Awake() { }
     public virtual void Start() { }
