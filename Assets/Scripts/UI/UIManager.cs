@@ -19,27 +19,43 @@ public class UIManager
     }
 
     private List<UIPanel> mAllPanels;
+    private GameObject mUIRoot;
 
 
     private UIManager()
     {
         mAllPanels = new List<UIPanel>();
+        mUIRoot = GameObject.Find(GameDefine._UI_ROOT).gameObject;
     }
 
+    //public void 
 
-    public void PushPanel(UIPanel panel)
+    private T LoadPanel<T>(string panelPath) where T:UIPanel
     {
-        if (panel == null)
+        if (string.IsNullOrEmpty(panelPath))
         {
-            return;
+            return null;
         }
 
-        if(mAllPanels.Contains(panel))
+        T panel = null;
+        if(FileHelper.FileExist(panelPath))
         {
-            return;
+            GameObject panelGo = ResourceMgr.Load<GameObject>(panelPath, "Load UIPanel");
+            if (panelGo != null)
+            {
+                panel = panelGo.GetComponent<T>();
+            }
+            else
+            {
+                Log.Error("LoadPanel Failed,panel go load failed,panelPath:{0}", panelPath);
+            }
+        }
+        else
+        {
+            Log.Error("LoadPanel Failed,panel path dont exist,panelPath:{0}", panelPath);
         }
 
-
+        return panel;
     }
 
     public void RemovePanel(UIPanel panel)

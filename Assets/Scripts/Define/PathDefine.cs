@@ -13,5 +13,10 @@ public static class PathDefine
 
     public static string MAP_DATA_DIR_PATH = Path.Combine(DATA_DIR_PATH, "MapData");
 
+    public const string ASSETBUNDLES_ROOT_DIR = "Assets/AssetBundles/";
+
+    public const string INTERNAL_ASSETBUNDLES_DIR = "AssetBundles";
+
+    public static string ASSET_DIR = PathHelper.GetMacroPath(Path.Combine(Application.streamingAssetsPath, INTERNAL_ASSETBUNDLES_DIR));
 
 }

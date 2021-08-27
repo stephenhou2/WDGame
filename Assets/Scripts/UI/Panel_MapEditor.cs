@@ -94,11 +94,11 @@ public class Panel_MapEditor : UIPanel
     private void InitializeStageLoad()
     {
         UIInterface.SetInputFieldString(_Node_InputField_Stage, "-1");
-        UIInterface.AddButtonAction(_Node_Button_LoadStage, OnLoadStageButtonClick);
-        UIInterface.AddButtonAction(_Node_Button_SaveStage, OnLoadStageButtonClick);
+        UIInterface.AddButtonAction(_Node_Button_LoadStage, OnLoadMapButtonClick);
+        UIInterface.AddButtonAction(_Node_Button_SaveStage, OnLoadMapButtonClick);
     }
 
-    private void OnLoadStageButtonClick()
+    private void OnLoadMapButtonClick()
     {
         string stageStr = UIInterface.GetInputFieldString(_Node_InputField_Stage);
         int stageId = int.Parse(stageStr);
@@ -106,7 +106,7 @@ public class Panel_MapEditor : UIPanel
         OnDrawGridsButtonClick();
     }
 
-    private void OnSaveStageButtonClick()
+    private void OnSaveMapButtonClick()
     {
         string stageStr = UIInterface.GetInputFieldString(_Node_InputField_Stage);
         int stageId = int.Parse(stageStr);
@@ -136,7 +136,6 @@ public class Panel_MapEditor : UIPanel
         int mapHeight = int.Parse(mapHeightStr);
         float cellSize = float.Parse(cellSizeStr);
         int selection = UIInterface.GetDropDownSelection(_Node_Selection_Direction);
-
 
         GameMapEditor.Ins.setting.SetMapWidth(mapWidth);
         GameMapEditor.Ins.setting.SetMapHeight(mapHeight);

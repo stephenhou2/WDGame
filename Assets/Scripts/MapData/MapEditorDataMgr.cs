@@ -1,7 +1,7 @@
 ﻿public class MapEditorDataMgr
 {
     private MapObstacleData mObstacleData;
-    //private GameMapData mMapData;
+    private GameMapData.MapData mMapData;
 
     public MapEditorDataMgr()
     {
@@ -9,11 +9,16 @@
         
     }
 
-    public void LoadMapData(int mapId)
+    public bool LoadMapData(int mapId)
     {
+        mMapData = ProtoDataHandler.LoadProtoData<GameMapData.MapData>(PathHelper.GetMapDataFilePath(mapId));
+        if (mMapData == null)
+            return false;
 
-
-        mObstacleData.InitializeMapObstacleData(mapId, 10, 10);
+        int mapWidth = mMapData.MapWidth;
+        int mapHeight = mMapData.MapHeight;
+        mObstacleData.InitializeMapObstacleData(mapId, mapWidth, mapHeight);
+        return true;
     }
 
     public void SaveMapData(int mapId)

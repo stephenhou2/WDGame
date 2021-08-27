@@ -21,7 +21,7 @@ public static class ProtoDataHandler
         return DATA_HANDLE_RET_OK;
     }
 
-    public static T GetProtoData<T>(string path) where T:IMessage,new()
+    public static T LoadProtoData<T>(string path) where T:IMessage,new()
     {
         T target = new T();
         if (File.Exists(path))

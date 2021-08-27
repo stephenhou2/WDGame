@@ -33,6 +33,11 @@ public class MapObstacleData
         mMapObstacleData[x, y] = data;
     }
 
+    public void CreateNewObstacleData(int mapId,int mapWidth,int mapHeight)
+    {
+        mMapObstacleData = new byte[GameMapEditor.Ins.setting.MapWidth, GameMapEditor.Ins.setting.MapHeight];
+    }
+
     public void InitializeMapObstacleData(int mapId,int mapWidth,int mapHeight)
     {
         string filePath = PathHelper.GetMapObsFilePath(mapId);
@@ -40,10 +45,6 @@ public class MapObstacleData
         if(FileHelper.FileExist(filePath))
         {
             mMapObstacleData = LoadObsDataWithData(FileHelper.ReadAllBytes(filePath),mapWidth,mapHeight);
-        }
-        else
-        {
-              mMapObstacleData = new byte[GameMapEditor.Ins.setting.MapWidth, GameMapEditor.Ins.setting.MapHeight];
         }
     }
 
