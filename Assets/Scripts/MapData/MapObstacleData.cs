@@ -38,7 +38,7 @@ public class MapObstacleData
         mMapObstacleData = new byte[GameMapEditor.Ins.setting.MapWidth, GameMapEditor.Ins.setting.MapHeight];
     }
 
-    public void InitializeMapObstacleData(int mapId,int mapWidth,int mapHeight)
+    public void InitializeMapObstacleData(string mapId,int mapWidth,int mapHeight)
     {
         string filePath = PathHelper.GetMapObsFilePath(mapId);
 

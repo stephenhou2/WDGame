@@ -23,6 +23,9 @@ public static class ProtoDataHandler
 
     public static T LoadProtoData<T>(string path) where T:IMessage,new()
     {
+        if (!FileHelper.FileExist(path))
+            return default(T);
+
         T target = new T();
         if (File.Exists(path))
         {

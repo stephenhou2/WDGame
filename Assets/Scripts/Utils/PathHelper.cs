@@ -3,12 +3,12 @@ using UnityEngine;
 
 public static class PathHelper
 {
-    public static string GetMapObsFilePath(int mapId)
+    public static string GetMapObsFilePath(string mapId)
     {
         return Path.Combine(PathDefine.MAP_OBS_DIR_PATH, string.Format("{0}_obs.bin", mapId));
     }
 
-    public static string GetMapDataFilePath(int mapId)
+    public static string GetMapDataFilePath(string mapId)
     {
         return Path.Combine(PathDefine.MAP_DATA_DIR_PATH, string.Format("{0}_map.bin", mapId));
     }

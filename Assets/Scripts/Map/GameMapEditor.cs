@@ -43,7 +43,7 @@ public class GameMapEditor : MonoBehaviour
         mInputControl.RegisterInputHandle(mCamControl);
         mInputControl.RegisterInputHandle(mMapBorad);
 
-        UIManager.Ins.OpenPanel<Panel_MapEditor>("UI/MapEditor/Panel_MapEditor");
+        UIManager.Ins.OpenPanel<Panel_MapEditor>();
     }
 
     private void IntializeDrawers()
@@ -77,9 +77,9 @@ public class GameMapEditor : MonoBehaviour
             mDrawerDic.Add(type, drawer);
     }
 
-    public void LoadStageMap(int stageId)
+    public void LoadStageMap(string mapId)
     {
-        DataMgr.LoadMapData(stageId);
+        DataMgr.LoadMapData(mapId);
     }
 
     public void UpdateMapObstacle(int col,int row, byte data)

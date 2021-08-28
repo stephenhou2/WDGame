@@ -9,7 +9,7 @@
         
     }
 
-    public bool LoadMapData(int mapId)
+    public bool LoadMapData(string mapId)
     {
         mMapData = ProtoDataHandler.LoadProtoData<GameMapData.MapData>(PathHelper.GetMapDataFilePath(mapId));
         if (mMapData == null)
@@ -21,7 +21,7 @@
         return true;
     }
 
-    public void SaveMapData(int mapId)
+    public void SaveMapData(string mapId)
     {
         if (mObstacleData != null)
         {
