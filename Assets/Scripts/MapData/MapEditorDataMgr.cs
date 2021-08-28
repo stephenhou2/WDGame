@@ -9,6 +9,11 @@
         
     }
 
+    public void CreateMapData(string mapId)
+    {
+        //mObstacleData = 
+    }
+
     public bool LoadMapData(string mapId)
     {
         mMapData = ProtoDataHandler.LoadProtoData<GameMapData.MapData>(PathHelper.GetMapDataFilePath(mapId));

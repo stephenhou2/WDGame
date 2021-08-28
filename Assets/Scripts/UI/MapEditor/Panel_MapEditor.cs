@@ -43,7 +43,7 @@ public class Panel_MapEditor : UIPanel
 
     public override void OnOpen(object[] openArgs)
     {
-        base.OnOpen(openArgs);
+
     }
 
     /// <summary>
@@ -136,6 +136,12 @@ public class Panel_MapEditor : UIPanel
         {
             Log.Error("OnSaveMapButtonClick Error,empty mapId is invalid");
         }
+    }
+
+    public override void Clear()
+    {
+        base.Clear();
+
     }
 
     public override void OnClose()

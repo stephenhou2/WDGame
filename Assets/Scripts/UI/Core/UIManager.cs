@@ -21,8 +21,10 @@ public class UIManager
     private List<UIPanel> mAllPanels;
     private GameObject mUIRoot;
 
+    /// <summary>
+    /// panel对象缓存池
+    /// </summary>
     private Dictionary<System.Type, UIPanel> mPanelPool;
-
 
     private UIManager()
     {
@@ -51,22 +53,37 @@ public class UIManager
 
     public void OpenPanel<T>(object[] openArgs = null) where T:UIPanel,new()
     {
+        T panel = GetPanel<T>();
+        if(!panel.CheckOpenArgs(openArgs))
+            return;
+
         string panelPath = UIPathDef.GetUIPath<T>();
         if(string.IsNullOrEmpty(panelPath))
         {
             Log.Error("OpenPanel Failed, panel {0} does not registered!",typeof(T));
             return;
         }
-
-        T panel = GetPanel<T>();
-        if(!panel.CheckOpenArgs(openArgs))
-            return;
-
         GameObject panelGo = LoadPanel(panelPath);
-        panel.BindPanelRootNode(panelGo);
+        panel.BindPanelNodes(panelGo);
 
         mAllPanels.Add(panel);
         panel.OnOpen(openArgs);
+    }
+
+    private void OpenPanel<T>(GameObject parentNode,object[] openArgs = null)
+    {
+
+    }
+
+    public void AddControl<T>(GameObject parentNode, object[] openArgs = null) where T : UIPanel, new()
+    {
+        if (parentNode == null)
+        {
+            Log.Error("AddControl Error,parentNode is null !!!");
+            return;
+        }
+
+
     }
 
     public void ClosePanel<T>(T panel)
@@ -91,7 +108,7 @@ public class UIManager
         RemovePanel(targetIndex);
     }
 
-    private GameObject LoadPanel(string panelPath)
+    private GameObject LoadPanel(string panelPath,GameObject parentNode)
     {
         if (string.IsNullOrEmpty(panelPath))
         {
@@ -132,4 +149,15 @@ public class UIManager
         mAllPanels.RemoveAt(targetIndex);
     }
 
+    public void Update(float deltaTime)
+    {
+        for(int i = 0;i<mAllPanels.Count;i++)
+        {
+            UIPanel panel = mAllPanels[i];
+            if(panel != null)
+            {
+                panel.Update(deltaTime);
+            }
+        }
+    }
 }

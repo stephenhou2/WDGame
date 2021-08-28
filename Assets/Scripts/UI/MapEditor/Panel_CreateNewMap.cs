@@ -13,6 +13,8 @@ public class Panel_CreateNewMap : UIPanel
     private GameObject _Node_Button_CreateMap;
     private GameObject _Node_Button_Back;
 
+    private string mMapId;
+
     public override void OnClose()
     {
         
@@ -20,7 +22,7 @@ public class Panel_CreateNewMap : UIPanel
 
     public override void OnOpen(object[] openArgs)
     {
-        base.OnOpen(openArgs);
+        mMapId = (string)openArgs[0];
     }
 
     private void InitializeCellDirSelection()
@@ -53,6 +55,8 @@ public class Panel_CreateNewMap : UIPanel
         GameMapEditor.Ins.setting.SetMapCellSize(cellSize);
         GameMapEditor.Ins.setting.SetMapCellDirection((MapCellDirection)selection);
         GameMapEditor.Ins.DoDraw(MapDefine.MapDrawer_Ground);
+
+        GameMapEditor.Ins.DataMgr.CreateMapData(mMapId);
     }
 
     private void InitializeUI()
@@ -87,5 +91,12 @@ public class Panel_CreateNewMap : UIPanel
             return false;
 
         return true;
+    }
+
+    public override void Clear()
+    {
+        base.Clear();
+
+        mMapId = string.Empty;
     }
 }

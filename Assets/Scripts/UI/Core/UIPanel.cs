@@ -16,12 +16,22 @@ public abstract partial class UIPanel
         mUIEvents = new List<UnityEvent>();
     } // 构造函数
 
-    //public void AddUIEvent(unti)
-
     /// <summary>
     /// 绑定UI
     /// </summary>
     protected abstract void BindUINodes();
+    public abstract string GetPanelRootPath();
+
+    /// <summary>
+    /// panel 打开时调用
+    /// </summary>
+    /// <param name="openArgs"></param>
+    public abstract void OnOpen(object[] openArgs);
+
+    /// <summary>
+    /// panel关闭前调用
+    /// </summary>
+    public abstract void OnClose();
 
     /// <summary>
     /// panel 参数检查
@@ -29,6 +39,12 @@ public abstract partial class UIPanel
     /// <param name="openArgs"></param>
     /// <returns></returns>
     public abstract bool CheckOpenArgs(object[] openArgs);
+
+    ///// <summary>
+    ///// UI类型
+    ///// </summary>
+    ///// <returns></returns>
+    //public abstract int GetUIType();
 
     /// <summary>
     /// close时,panel对象会被放入缓存池中复用，这里用来清理原来面板里的无用缓存
@@ -40,14 +56,7 @@ public abstract partial class UIPanel
             evt.RemoveAllListeners();
         }
     }
-
-    public virtual void OnOpen(object[] openArgs)
-    {
-        if (mPanelRoot != null)
-        {
-            BindUINodes();
-        }
-    }
+    
 
     public void DestroyPanelObj()
     {
@@ -55,18 +64,23 @@ public abstract partial class UIPanel
             GameObject.Destroy(mPanelRoot);
     }
 
-    public virtual void OnClose()
-    {
 
-    }
     protected void Close<T>(T panel)
     {
         UIManager.Ins.ClosePanel<T>(panel);
     }
 
-    public void BindPanelRootNode(GameObject panelRoot)
+    public void BindPanelNodes(GameObject panelRoot)
     {
         mPanelRoot = panelRoot;
+        if(mPanelRoot != null)
+        {
+            BindUINodes();
+        }
+        else
+        {
+            Log.Error("BindPanelNodes Error,panel root is null !!!");
+        }
     }
 
     protected void StartCoroutine(IEnumerator coroutine)
@@ -79,11 +93,10 @@ public abstract partial class UIPanel
 
     }
 
-    protected virtual void OnUpdate() { }
+    protected virtual void OnUpdate(float deltaTime) { }
 
-    public void Update()
+    public void Update(float deltaTime)
     {
-        OnUpdate();
-
+        OnUpdate(deltaTime);
     }
 }
