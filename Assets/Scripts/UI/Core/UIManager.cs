@@ -13,29 +13,61 @@ public class UIManager
             {
                 mIns = new UIManager();
             }
-
             return mIns;
         }
     }
 
     private List<UIPanel> mAllPanels;
-    private GameObject mUIRoot;
+
+    Dictionary<string, GameObject> mLayers;
 
     /// <summary>
     /// panel对象缓存池
     /// </summary>
-    private Dictionary<System.Type, UIPanel> mPanelPool;
+    private Dictionary<System.Type, UIObject> mPanelPool;
 
+    private void RegisterLayer(string layerPath)
+    {
+        if (string.IsNullOrEmpty(layerPath))
+            return;
+
+        var layer = GameObject.Find(layerPath);
+        if (layer != null)
+            mLayers.Add(layerPath, layer);
+    }
+
+    private GameObject GetLayer(string layerPath)
+    {
+        if(mLayers.TryGetValue(layerPath,out GameObject layer))
+        {
+            return layer;
+        }
+
+        return null;
+    }
+
+    private void InitUILayers()
+    {
+         RegisterLayer(UIPathDef.UI_LAYER_BOTTOM_STATIC);
+         RegisterLayer(UIPathDef.UI_LAYER_BOTTOM_DYNAMIC);
+         RegisterLayer(UIPathDef.UI_LAYER_NORMAL_STATIC);
+         RegisterLayer(UIPathDef.UI_LAYER_NORMAL_DYNAMIC);
+         RegisterLayer(UIPathDef.UI_LAYER_MSG_STATIC);
+         RegisterLayer(UIPathDef.UI_LAYER_MSG_DYNAMIC);
+         RegisterLayer(UIPathDef.UI_LAYER_TOP_STATIC);
+         RegisterLayer(UIPathDef.UI_LAYER_TOP_DYNAMIC);
+    }
     private UIManager()
     {
         mAllPanels = new List<UIPanel>();
-        mUIRoot = GameObject.Find(GameDefine._UI_ROOT).gameObject;
-        mPanelPool = new Dictionary<System.Type, UIPanel>();
+        mPanelPool = new Dictionary<System.Type, UIObject>();
+        mLayers = new Dictionary<string, GameObject>();
+        InitUILayers();
     }
 
-    private T GetPanel<T>() where T : UIPanel,new()
+    private T GetPanel<T>() where T : UIObject,new()
     {
-        UIPanel panel = null;
+        UIObject panel = null;
         if(!mPanelPool.TryGetValue(typeof(T),out panel))
         {
             panel = new T();
@@ -43,7 +75,7 @@ public class UIManager
         return panel as T;
     }
 
-    private void PushPanel<T>(UIPanel panel)
+    private void PushPanel<T>(UIObject panel)
     {
         if(!mPanelPool.ContainsKey(typeof(T)))
         {
@@ -54,32 +86,34 @@ public class UIManager
     public void OpenPanel<T>(object[] openArgs = null) where T:UIPanel,new()
     {
         T panel = GetPanel<T>();
-        if(!panel.CheckOpenArgs(openArgs))
+        if(!panel.CheckArgs(openArgs))
             return;
 
         string panelPath = UIPathDef.GetUIPath<T>();
+        string UILayerPath = panel.GetPanelLayerPath();
         if(string.IsNullOrEmpty(panelPath))
         {
-            Log.Error("OpenPanel Failed, panel {0} does not registered!",typeof(T));
+            Log.Error(ErrorLevel.Critical, "OpenPanel Failed, panel {0} does not registered!",typeof(T));
             return;
         }
-        GameObject panelGo = LoadPanel(panelPath);
-        panel.BindPanelNodes(panelGo);
+
+        var layer = GetLayer(UILayerPath);
+        GameObject panelGo = LoadPanel(panelPath, layer);
+        if(panelGo != null)
+        {
+            panel.BindUIObjectNodes(panelGo);
+        }
 
         mAllPanels.Add(panel);
         panel.OnOpen(openArgs);
     }
 
-    private void OpenPanel<T>(GameObject parentNode,object[] openArgs = null)
-    {
 
-    }
-
-    public void AddControl<T>(GameObject parentNode, object[] openArgs = null) where T : UIPanel, new()
+    public void AddControl<T>(GameObject parentNode, object[] openArgs = null) where T : UIObject, new()
     {
         if (parentNode == null)
         {
-            Log.Error("AddControl Error,parentNode is null !!!");
+            Log.Error(ErrorLevel.Critical, "AddControl Error,parentNode is null !!!");
             return;
         }
 
@@ -112,6 +146,13 @@ public class UIManager
     {
         if (string.IsNullOrEmpty(panelPath))
         {
+            Log.Error(ErrorLevel.Critical, "LoadPanel Error,panel path null or empty!");
+            return null;
+        }
+
+        if(parentNode == null)
+        {
+            Log.Error(ErrorLevel.Critical, "LoadPanel Error,parentNode null!");
             return null;
         }
 
@@ -120,14 +161,14 @@ public class UIManager
         if (obj != null)
         {
             panelGo = GameObject.Instantiate(obj);
-            if(mUIRoot != null)
+            if(parentNode != null)
             {
-                panelGo.transform.SetParent(mUIRoot.transform,false);
+                panelGo.transform.SetParent(parentNode.transform,false);
             }
         }
         else
         {
-            Log.Error("LoadPanel Failed,panel go load failed,panelPath:{0}", panelPath);
+            Log.Error(ErrorLevel.Critical, "LoadPanel Failed,panel go load failed,panelPath:{0}", panelPath);
         }
 
         return panelGo;
@@ -142,8 +183,8 @@ public class UIManager
         if(panel != null)
         {
             panel.OnClose();
-            panel.Clear();
-            panel.DestroyPanelObj();
+            panel.ClearAll();
+            panel.DestroyUIObject();
         }    
 
         mAllPanels.RemoveAt(targetIndex);
@@ -153,7 +194,7 @@ public class UIManager
     {
         for(int i = 0;i<mAllPanels.Count;i++)
         {
-            UIPanel panel = mAllPanels[i];
+            UIObject panel = mAllPanels[i];
             if(panel != null)
             {
                 panel.Update(deltaTime);

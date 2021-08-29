@@ -15,9 +15,20 @@ public class Panel_CreateNewMap : UIPanel
 
     private string mMapId;
 
-    public override void OnClose()
+    public override string GetPanelLayerPath()
     {
-        
+        return UIPathDef.UI_LAYER_NORMAL_STATIC;
+    }
+
+    public override bool CheckArgs(object[] openArgs)
+    {
+        if (openArgs == null)
+            return false;
+
+        if (openArgs.Length != 1)
+            return false;
+
+        return true;
     }
 
     public override void OnOpen(object[] openArgs)
@@ -56,7 +67,9 @@ public class Panel_CreateNewMap : UIPanel
         GameMapEditor.Ins.setting.SetMapCellDirection((MapCellDirection)selection);
         GameMapEditor.Ins.DoDraw(MapDefine.MapDrawer_Ground);
 
-        GameMapEditor.Ins.DataMgr.CreateMapData(mMapId);
+        GameMapEditor.Ins.DataMgr.CreateMapData(mMapId,mapWidth,mapHeight,selection,cellSize);
+
+        Close<Panel_CreateNewMap>(this);
     }
 
     private void InitializeUI()
@@ -78,25 +91,23 @@ public class Panel_CreateNewMap : UIPanel
         BindButtonNode(ref _Node_Button_CreateMap, "_Button_CreateMap", OnCreateNewMapButtonClick);
         BindButtonNode<Panel_CreateNewMap>(ref _Node_Button_Back, "_Button_Back",this,Close<Panel_CreateNewMap>);
 
-
         InitializeUI();
     }
 
-    public override bool CheckOpenArgs(object[] openArgs)
+    public override void CustomClear()
     {
-        if (openArgs == null)
-            return false;
+        mMapId = string.Empty;
 
-        if (openArgs.Length != 1)
-            return false;
-
-        return true;
+        _Node_InputField_MapWidth = null;
+        _Node_InputField_MapHeight = null;
+        _Node_InputField_CellSize = null;
+        _Node_Selection_Direction = null;
+        _Node_Button_CreateMap = null;
+        _Node_Button_Back = null;
     }
 
-    public override void Clear()
+    public override void OnClose()
     {
-        base.Clear();
 
-        mMapId = string.Empty;
     }
 }

@@ -15,7 +15,13 @@ public class MapObstacleData
     {
         if(!MapEditorHelper.IsValidMapPos(x,y))
         {
-            Log.Error("CheckIsObstacle Error, invalid pos,x={0},y={1}", x, y);
+            Log.Error(ErrorLevel.Critical, "CheckIsObstacle Error, invalid pos,x={0},y={1}", x, y);
+            return MapDefine.OBSTACLE_TYPE_EMPTY;
+        }
+
+        if (mMapObstacleData == null)
+        {
+            Log.Error(ErrorLevel.Critical, "GetObstacleDataAt Error,obstacle data is null!!!");
             return MapDefine.OBSTACLE_TYPE_EMPTY;
         }
 
@@ -26,43 +32,51 @@ public class MapObstacleData
     {
         if (!MapEditorHelper.IsValidMapPos(x, y))
         {
-            Log.Error("SetMapObstacleDataAt Error, invalid pos,x={0},y={1}", x, y);
+            Log.Error(ErrorLevel.Fatal, "SetMapObstacleDataAt Error, invalid pos,x={0},y={1}", x, y);
             return;
         }
 
         mMapObstacleData[x, y] = data;
     }
 
-    public void CreateNewObstacleData(int mapId,int mapWidth,int mapHeight)
+    public void CreateNewObstacleData(int mapWidth,int mapHeight)
     {
-        mMapObstacleData = new byte[GameMapEditor.Ins.setting.MapWidth, GameMapEditor.Ins.setting.MapHeight];
+        mMapObstacleData = new byte[mapWidth, mapHeight];
     }
 
-    public void InitializeMapObstacleData(string mapId,int mapWidth,int mapHeight)
+    public void InitializeMapObstacleData(byte[] obsData,int mapWidth,int mapHeight)
     {
-        string filePath = PathHelper.GetMapObsFilePath(mapId);
-
-        if(FileHelper.FileExist(filePath))
+        if(obsData == null)
         {
-            mMapObstacleData = LoadObsDataWithData(FileHelper.ReadAllBytes(filePath),mapWidth,mapHeight);
+            Log.Error(ErrorLevel.Critical, "InitializeMapObstacleData Error,obsData is null!!!");
+            return;
         }
+
+        mMapObstacleData = LoadObsDataWithData(obsData, mapWidth,mapHeight);
     }
 
     private byte[,] LoadObsDataWithData(byte[] data,int mapWidth,int mapHeight)
     {
         if(data.Length < mapWidth * mapHeight)
         {
-            Log.Error("LoadObsDataWithData Failed,data length not equal! data length:{0},mapWidth:{1},mapHeight:{2}", data.Length, mapWidth, mapHeight);
+            Log.Error(ErrorLevel.Critical, "LoadObsDataWithData Failed,data length not equal! data length:{0},mapWidth:{1},mapHeight:{2}", data.Length, mapWidth, mapHeight);
             return null;
         }
 
         byte[,] obsData = new byte[mapWidth, mapHeight];
-        for(int col = 0;col < mapWidth;col++)
+        for (int row = 0; row < mapHeight; row++)
         {
-            for(int row = 0;row < mapHeight;row ++)
+            for (int col = 0; col < mapWidth; col++)
             {
                 int index = col + row * mapWidth;
-                obsData[col, row] = data[index];
+                if (index >= 0 && index < obsData.Length)
+                {
+                    obsData[col, row] = data[col + row * mapWidth];
+                }
+                else
+                {
+                    Log.Error(ErrorLevel.Fatal, "LoadObsDataWithData Error,index out of range!col={0},row={1},mapWidth={2},mapHeigh={3}", col, row, mapWidth, mapHeight);
+                }
             }
         }
 

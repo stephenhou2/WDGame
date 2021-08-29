@@ -36,7 +36,7 @@ public class AssetBundleManager : MonoBehaviour
     {
         if (Ins != null)
         {
-            Log.Error("AssetBundleManager Recreate!!");
+            Log.Error(ErrorLevel.Fatal, "AssetBundleManager Recreate!!");
         }
 
         Ins = this;
@@ -138,7 +138,7 @@ public class AssetBundleManager : MonoBehaviour
     {
         if (mName2Bundle.TryGetValue(bundleName, out AssetBundle ab))
         {
-            Log.Error("unload AssetBundle = {0}", bundleName);
+            Log.Logic("unload AssetBundle = {0}", bundleName);
             ab.Unload(enable);
             mName2Bundle.Remove(bundleName);
         }

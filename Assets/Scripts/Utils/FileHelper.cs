@@ -11,7 +11,7 @@ public static class FileHelper
     {
         if(!FileExist(fullPath))
         {
-            Log.Error("ReadAllBytes Error,File does not exit,fullPath:{0}", fullPath);
+            Log.Error(ErrorLevel.Critical, "ReadAllBytes Error,File does not exit,fullPath:{0}", fullPath);
             return null;
         }
 

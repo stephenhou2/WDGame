@@ -11,7 +11,7 @@ public static class UIInterface
     {
         if (rootNode == null)
         {
-            Log.Error("FindChildNode Error,rootNode is null!");
+            Log.Error(ErrorLevel.Critical, "FindChildNode Error,rootNode is null!");
             return null;
         }
 
@@ -39,14 +39,14 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("GetInputFieldString Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "GetInputFieldString Error, go is null!");
             return string.Empty;
         }
 
         var inputField = go.GetComponent<TMP_InputField>();
         if(inputField == null)
         {
-            Log.Error("GetInputFieldString Error, InputField component is required!");
+            Log.Error(ErrorLevel.Critical, "GetInputFieldString Error, InputField component is required!");
             return string.Empty;
         }
 
@@ -57,14 +57,14 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("SetInputFieldString Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "SetInputFieldString Error, go is null!");
             return;
         }
 
         var inputField = go.GetComponent<TMP_InputField>();
         if (inputField == null)
         {
-            Log.Error("SetInputFieldString Error, InputField component is required!");
+            Log.Error(ErrorLevel.Critical, "SetInputFieldString Error, InputField component is required!");
             return;
         }
 
@@ -75,14 +75,14 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("GetDropDownSelection Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "GetDropDownSelection Error, go is null!");
             return 0;
         }
 
         var dropDown = go.GetComponent<TMP_Dropdown>();
         if (dropDown == null)
         {
-            Log.Error("GetDropDownSelection Error, Dropdown component is required!");
+            Log.Error(ErrorLevel.Critical, "GetDropDownSelection Error, Dropdown component is required!");
             return 0;
         }
 
@@ -93,14 +93,14 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("SetDropDownSelection Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "SetDropDownSelection Error, go is null!");
             return;
         }
 
         var dropDown = go.GetComponent<TMP_Dropdown>();
         if (dropDown == null)
         {
-            Log.Error("SetDropDownSelection Error, Dropdown component is required!");
+            Log.Error(ErrorLevel.Critical, "SetDropDownSelection Error, Dropdown component is required!");
             return;
         }
 
@@ -111,14 +111,14 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("AddButtonAction Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "AddButtonAction Error, go is null!");
             return;
         }
 
         var btn = go.GetComponent<Button>();
         if (btn == null)
         {
-            Log.Error("AddButtonAction Error, Button component is required!");
+            Log.Error(ErrorLevel.Critical, "AddButtonAction Error, Button component is required!");
             return;
         }
 
@@ -129,14 +129,14 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("SetSilderValue Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "SetSilderValue Error, go is null!");
             return;
         }
 
         var slider = go.GetComponent<Slider>();
         if (slider == null)
         {
-            Log.Error("SetSilderValue Error, Slider component is required!");
+            Log.Error(ErrorLevel.Critical, "SetSilderValue Error, Slider component is required!");
             return;
         }
 
@@ -147,14 +147,14 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("AddSilderChangeAction Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "AddSilderChangeAction Error, go is null!");
             return;
         }
 
         var slider = go.GetComponent<Slider>();
         if (slider == null)
         {
-            Log.Error("AddSilderChangeAction Error, Slider component is required!");
+            Log.Error(ErrorLevel.Critical, "AddSilderChangeAction Error, Slider component is required!");
             return;
         }
 
@@ -166,7 +166,7 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("SetGraphicSize Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "SetGraphicSize Error, go is null!");
             return;
         }
 
@@ -182,14 +182,14 @@ public static class UIInterface
     {
         if (go == null)
         {
-            Log.Error("SetTextString Error, go is null!");
+            Log.Error(ErrorLevel.Critical, "SetTextString Error, go is null!");
             return;
         }
 
         var text = go.GetComponent<TMP_Text>();
         if (text == null)
         {
-            Log.Error("SetTextString Error, TMP_Text component is required!");
+            Log.Error(ErrorLevel.Critical, "SetTextString Error, TMP_Text component is required!");
             return;
         }
 

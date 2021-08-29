@@ -69,7 +69,7 @@ public class GameMapEditor : MonoBehaviour
     {
         if(drawer == null)
         {
-            Log.Error("RegisterDrawer Error,drawer is null!");
+            Log.Error(ErrorLevel.Critical, "RegisterDrawer Error,drawer is null!");
             return;
         }
 

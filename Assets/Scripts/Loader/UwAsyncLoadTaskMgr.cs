@@ -45,7 +45,7 @@ public class UwAsyncLoadTask
             }
             catch(System.Exception e)
             {
-                Log.Error(e.ToString());
+                Log.Error(ErrorLevel.Fatal, e.ToString());
             }
             return true;
         }
@@ -107,7 +107,7 @@ public class UwAsyncLoadTaskMgr
             }
             else
             {
-                Log.Error("Alt-Internal");
+                Log.Error(ErrorLevel.Fatal,"Alt-Internal");
             }
         }
 
@@ -118,7 +118,7 @@ public class UwAsyncLoadTaskMgr
         }
         else
         {
-            Log.Error("LoadFail:{0}", assetPath);
+            Log.Error(ErrorLevel.Fatal, "LoadFail:{0}", assetPath);
         }
     }
 }

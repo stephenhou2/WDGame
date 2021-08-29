@@ -27,16 +27,18 @@ namespace GameMapData {
             "ChFHYW1lTWFwRGF0YS5wcm90bxILR2FtZU1hcERhdGEiMwoITWFwRGVjb3IS",
             "EQoJRGVjb3JUeXBlGAEgASgFEgkKAVgYAiABKAISCQoBWRgDIAEoAiJYCgdN",
             "YXBUaWxlEhAKCFRpbGVUeXBlGAEgASgFEgkKAVgYAiABKAUSCQoBWRgDIAEo",
-            "BRIlCgZEZWNvcnMYBCADKAsyFS5HYW1lTWFwRGF0YS5NYXBEZWNvciKAAQoH",
-            "TWFwRGF0YRINCgVNYXBJZBgBIAEoBRIQCghNYXBXaWR0aBgCIAEoBRIRCglN",
-            "YXBIZWlnaHQYAyABKAUSGQoRTWFwVGlsZVNpZGVMZW5ndGgYBCABKAISJgoI",
-            "TWFwVGlsZXMYBSADKAsyFC5HYW1lTWFwRGF0YS5NYXBUaWxlYgZwcm90bzM="));
+            "BRIlCgZEZWNvcnMYBCADKAsyFS5HYW1lTWFwRGF0YS5NYXBEZWNvciKvAQoH",
+            "TWFwRGF0YRINCgVNYXBJZBgBIAEoCRIQCghNYXBXaWR0aBgCIAEoDRIRCglN",
+            "YXBIZWlnaHQYAyABKA0SEQoJRGlyZWN0aW9uGAQgASgNEhAKCENlbGxTaXpl",
+            "GAUgASgCEhAKCFRpbGVTaXplGAYgASgCEhEKCU9ic3RhY2xlcxgHIAEoDBIm",
+            "CghNYXBUaWxlcxgIIAMoCzIULkdhbWVNYXBEYXRhLk1hcFRpbGViBnByb3Rv",
+            "Mw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::GameMapData.MapDecor), global::GameMapData.MapDecor.Parser, new[]{ "DecorType", "X", "Y" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::GameMapData.MapTile), global::GameMapData.MapTile.Parser, new[]{ "TileType", "X", "Y", "Decors" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::GameMapData.MapData), global::GameMapData.MapData.Parser, new[]{ "MapId", "MapWidth", "MapHeight", "MapTileSideLength", "MapTiles" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::GameMapData.MapData), global::GameMapData.MapData.Parser, new[]{ "MapId", "MapWidth", "MapHeight", "Direction", "CellSize", "TileSize", "Obstacles", "MapTiles" }, null, null, null, null)
           }));
     }
     #endregion
@@ -632,7 +634,10 @@ namespace GameMapData {
       mapId_ = other.mapId_;
       mapWidth_ = other.mapWidth_;
       mapHeight_ = other.mapHeight_;
-      mapTileSideLength_ = other.mapTileSideLength_;
+      direction_ = other.direction_;
+      cellSize_ = other.cellSize_;
+      tileSize_ = other.tileSize_;
+      obstacles_ = other.obstacles_;
       mapTiles_ = other.mapTiles_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -645,22 +650,22 @@ namespace GameMapData {
 
     /// <summary>Field number for the "MapId" field.</summary>
     public const int MapIdFieldNumber = 1;
-    private int mapId_;
+    private string mapId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int MapId {
+    public string MapId {
       get { return mapId_; }
       set {
-        mapId_ = value;
+        mapId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
     /// <summary>Field number for the "MapWidth" field.</summary>
     public const int MapWidthFieldNumber = 2;
-    private int mapWidth_;
+    private uint mapWidth_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int MapWidth {
+    public uint MapWidth {
       get { return mapWidth_; }
       set {
         mapWidth_ = value;
@@ -669,32 +674,68 @@ namespace GameMapData {
 
     /// <summary>Field number for the "MapHeight" field.</summary>
     public const int MapHeightFieldNumber = 3;
-    private int mapHeight_;
+    private uint mapHeight_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int MapHeight {
+    public uint MapHeight {
       get { return mapHeight_; }
       set {
         mapHeight_ = value;
       }
     }
 
-    /// <summary>Field number for the "MapTileSideLength" field.</summary>
-    public const int MapTileSideLengthFieldNumber = 4;
-    private float mapTileSideLength_;
+    /// <summary>Field number for the "Direction" field.</summary>
+    public const int DirectionFieldNumber = 4;
+    private uint direction_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float MapTileSideLength {
-      get { return mapTileSideLength_; }
+    public uint Direction {
+      get { return direction_; }
       set {
-        mapTileSideLength_ = value;
+        direction_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "CellSize" field.</summary>
+    public const int CellSizeFieldNumber = 5;
+    private float cellSize_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float CellSize {
+      get { return cellSize_; }
+      set {
+        cellSize_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "TileSize" field.</summary>
+    public const int TileSizeFieldNumber = 6;
+    private float tileSize_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float TileSize {
+      get { return tileSize_; }
+      set {
+        tileSize_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "Obstacles" field.</summary>
+    public const int ObstaclesFieldNumber = 7;
+    private pb::ByteString obstacles_ = pb::ByteString.Empty;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pb::ByteString Obstacles {
+      get { return obstacles_; }
+      set {
+        obstacles_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
     /// <summary>Field number for the "MapTiles" field.</summary>
-    public const int MapTilesFieldNumber = 5;
+    public const int MapTilesFieldNumber = 8;
     private static readonly pb::FieldCodec<global::GameMapData.MapTile> _repeated_mapTiles_codec
-        = pb::FieldCodec.ForMessage(42, global::GameMapData.MapTile.Parser);
+        = pb::FieldCodec.ForMessage(66, global::GameMapData.MapTile.Parser);
     private readonly pbc::RepeatedField<global::GameMapData.MapTile> mapTiles_ = new pbc::RepeatedField<global::GameMapData.MapTile>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -720,7 +761,10 @@ namespace GameMapData {
       if (MapId != other.MapId) return false;
       if (MapWidth != other.MapWidth) return false;
       if (MapHeight != other.MapHeight) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(MapTileSideLength, other.MapTileSideLength)) return false;
+      if (Direction != other.Direction) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(CellSize, other.CellSize)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(TileSize, other.TileSize)) return false;
+      if (Obstacles != other.Obstacles) return false;
       if(!mapTiles_.Equals(other.mapTiles_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -729,10 +773,13 @@ namespace GameMapData {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (MapId != 0) hash ^= MapId.GetHashCode();
+      if (MapId.Length != 0) hash ^= MapId.GetHashCode();
       if (MapWidth != 0) hash ^= MapWidth.GetHashCode();
       if (MapHeight != 0) hash ^= MapHeight.GetHashCode();
-      if (MapTileSideLength != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(MapTileSideLength);
+      if (Direction != 0) hash ^= Direction.GetHashCode();
+      if (CellSize != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(CellSize);
+      if (TileSize != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(TileSize);
+      if (Obstacles.Length != 0) hash ^= Obstacles.GetHashCode();
       hash ^= mapTiles_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -752,21 +799,33 @@ namespace GameMapData {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (MapId != 0) {
-        output.WriteRawTag(8);
-        output.WriteInt32(MapId);
+      if (MapId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(MapId);
       }
       if (MapWidth != 0) {
         output.WriteRawTag(16);
-        output.WriteInt32(MapWidth);
+        output.WriteUInt32(MapWidth);
       }
       if (MapHeight != 0) {
         output.WriteRawTag(24);
-        output.WriteInt32(MapHeight);
+        output.WriteUInt32(MapHeight);
       }
-      if (MapTileSideLength != 0F) {
-        output.WriteRawTag(37);
-        output.WriteFloat(MapTileSideLength);
+      if (Direction != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Direction);
+      }
+      if (CellSize != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(CellSize);
+      }
+      if (TileSize != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(TileSize);
+      }
+      if (Obstacles.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteBytes(Obstacles);
       }
       mapTiles_.WriteTo(output, _repeated_mapTiles_codec);
       if (_unknownFields != null) {
@@ -779,21 +838,33 @@ namespace GameMapData {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (MapId != 0) {
-        output.WriteRawTag(8);
-        output.WriteInt32(MapId);
+      if (MapId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(MapId);
       }
       if (MapWidth != 0) {
         output.WriteRawTag(16);
-        output.WriteInt32(MapWidth);
+        output.WriteUInt32(MapWidth);
       }
       if (MapHeight != 0) {
         output.WriteRawTag(24);
-        output.WriteInt32(MapHeight);
+        output.WriteUInt32(MapHeight);
       }
-      if (MapTileSideLength != 0F) {
-        output.WriteRawTag(37);
-        output.WriteFloat(MapTileSideLength);
+      if (Direction != 0) {
+        output.WriteRawTag(32);
+        output.WriteUInt32(Direction);
+      }
+      if (CellSize != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(CellSize);
+      }
+      if (TileSize != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(TileSize);
+      }
+      if (Obstacles.Length != 0) {
+        output.WriteRawTag(58);
+        output.WriteBytes(Obstacles);
       }
       mapTiles_.WriteTo(ref output, _repeated_mapTiles_codec);
       if (_unknownFields != null) {
@@ -806,17 +877,26 @@ namespace GameMapData {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (MapId != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MapId);
+      if (MapId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(MapId);
       }
       if (MapWidth != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MapWidth);
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(MapWidth);
       }
       if (MapHeight != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MapHeight);
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(MapHeight);
       }
-      if (MapTileSideLength != 0F) {
+      if (Direction != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Direction);
+      }
+      if (CellSize != 0F) {
         size += 1 + 4;
+      }
+      if (TileSize != 0F) {
+        size += 1 + 4;
+      }
+      if (Obstacles.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeBytesSize(Obstacles);
       }
       size += mapTiles_.CalculateSize(_repeated_mapTiles_codec);
       if (_unknownFields != null) {
@@ -831,7 +911,7 @@ namespace GameMapData {
       if (other == null) {
         return;
       }
-      if (other.MapId != 0) {
+      if (other.MapId.Length != 0) {
         MapId = other.MapId;
       }
       if (other.MapWidth != 0) {
@@ -840,8 +920,17 @@ namespace GameMapData {
       if (other.MapHeight != 0) {
         MapHeight = other.MapHeight;
       }
-      if (other.MapTileSideLength != 0F) {
-        MapTileSideLength = other.MapTileSideLength;
+      if (other.Direction != 0) {
+        Direction = other.Direction;
+      }
+      if (other.CellSize != 0F) {
+        CellSize = other.CellSize;
+      }
+      if (other.TileSize != 0F) {
+        TileSize = other.TileSize;
+      }
+      if (other.Obstacles.Length != 0) {
+        Obstacles = other.Obstacles;
       }
       mapTiles_.Add(other.mapTiles_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -859,23 +948,35 @@ namespace GameMapData {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            MapId = input.ReadInt32();
+          case 10: {
+            MapId = input.ReadString();
             break;
           }
           case 16: {
-            MapWidth = input.ReadInt32();
+            MapWidth = input.ReadUInt32();
             break;
           }
           case 24: {
-            MapHeight = input.ReadInt32();
+            MapHeight = input.ReadUInt32();
             break;
           }
-          case 37: {
-            MapTileSideLength = input.ReadFloat();
+          case 32: {
+            Direction = input.ReadUInt32();
             break;
           }
-          case 42: {
+          case 45: {
+            CellSize = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            TileSize = input.ReadFloat();
+            break;
+          }
+          case 58: {
+            Obstacles = input.ReadBytes();
+            break;
+          }
+          case 66: {
             mapTiles_.AddEntriesFrom(input, _repeated_mapTiles_codec);
             break;
           }
@@ -894,23 +995,35 @@ namespace GameMapData {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 8: {
-            MapId = input.ReadInt32();
+          case 10: {
+            MapId = input.ReadString();
             break;
           }
           case 16: {
-            MapWidth = input.ReadInt32();
+            MapWidth = input.ReadUInt32();
             break;
           }
           case 24: {
-            MapHeight = input.ReadInt32();
+            MapHeight = input.ReadUInt32();
             break;
           }
-          case 37: {
-            MapTileSideLength = input.ReadFloat();
+          case 32: {
+            Direction = input.ReadUInt32();
             break;
           }
-          case 42: {
+          case 45: {
+            CellSize = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            TileSize = input.ReadFloat();
+            break;
+          }
+          case 58: {
+            Obstacles = input.ReadBytes();
+            break;
+          }
+          case 66: {
             mapTiles_.AddEntriesFrom(ref input, _repeated_mapTiles_codec);
             break;
           }

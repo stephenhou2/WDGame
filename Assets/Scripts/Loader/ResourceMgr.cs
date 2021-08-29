@@ -81,7 +81,7 @@ public partial class ResourceMgr
     {
         if (string.IsNullOrEmpty(url))
         {
-            Log.Error("Load Empty Res! reason:{0}", reason);
+            Log.Error(ErrorLevel.Fatal, "Load Empty Res! reason:{0}", reason);
             return null;
         }
 
@@ -182,7 +182,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
 #endif
         if (string.IsNullOrEmpty(url))
         {
-            Log.Error("Load Empty sprite! reason:{0}", reason);
+            Log.Error(ErrorLevel.Critical, "Load Empty sprite! reason:{0}", reason);
             return null;
         }
 
@@ -192,7 +192,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
             return sprite;
         }
 
-        Log.Error("Load Sprite Fail:{0},load reason:{1}", url, reason);
+        Log.Error(ErrorLevel.Critical, "Load Sprite Fail:{0},load reason:{1}", url, reason);
         return null;
     }
 
@@ -207,7 +207,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
     {
         if (string.IsNullOrEmpty(url))
         {
-            Log.Error("Load Empty sprite! reason:{0}", reason);
+            Log.Error(ErrorLevel.Critical, "Load Empty sprite! reason:{0}", reason);
             return null;
         }
         Sprite sprite = LoadRes<Sprite>(url, false, reason);
@@ -228,7 +228,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
 #endif
         if (string.IsNullOrEmpty(url))
         {
-            Log.Error("Load Empty Texture! reason:{0}", reason);
+            Log.Error(ErrorLevel.Critical, "Load Empty Texture! reason:{0}", reason);
             return null;
         }
 
@@ -236,7 +236,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
         Sprite sprite = LoadRes<Sprite>(url, false, reason);
         if (sprite != null)
         {
-            Log.Error("Load Texture fail, Type is Sprite: {0}, reason:{1}", url, reason);
+            Log.Error(ErrorLevel.Critical, "Load Texture fail, Type is Sprite: {0}, reason:{1}", url, reason);
             return null;
         }
 #endif
@@ -247,7 +247,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
             return tex;
         }
 
-        Log.Error("Load Texture Fail:{0},load reason:{1}", url, reason);
+        Log.Error(ErrorLevel.Critical, "Load Texture Fail:{0},load reason:{1}", url, reason);
         return null;
     }
 
@@ -319,7 +319,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
 
             if (logError)
             {
-                Log.Error(string.Format("[PAB]LoadFail[{0}], reason={1}, ret={2}", url, reason, ret));
+                Log.Error(ErrorLevel.Critical, string.Format("[PAB]LoadFail[{0}], reason={1}, ret={2}", url, reason, ret));
             }
         }
         else
@@ -332,7 +332,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
 
             if (logError)
             {
-                Log.Error(string.Format("[EditPAB]LoadFail[{0}],load reason:{1}", url, reason));
+                Log.Error(ErrorLevel.Critical, string.Format("[EditPAB]LoadFail[{0}],load reason:{1}", url, reason));
             }
         }
         return null;
@@ -348,7 +348,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
 #endif
         if (string.IsNullOrEmpty(url))
         {
-            Log.Error("Load Empty Res!,reason:{0}", reason);
+            Log.Error(ErrorLevel.Critical, "Load Empty Res!,reason:{0}", reason);
             return false;
         }
 
@@ -366,7 +366,7 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
             }
             else
             {
-                Log.Error(string.Format("Load Fail[{0}],load reason:{1}", url, reason));
+                Log.Error(ErrorLevel.Critical, string.Format("Load Fail[{0}],load reason:{1}", url, reason));
                 return false;
             }
         }

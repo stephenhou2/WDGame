@@ -28,13 +28,13 @@ public class GameMapDrawer
     {
         if (!Application.isPlaying)
         {
-            Log.Error("DrawGridMesh-please call draw mesh in playing mode!");
+            Log.Error(ErrorLevel.Critical,"DrawGridMesh-please call draw mesh in playing mode!");
             return;
         }
 
         if (mMf == null)
         {
-            Log.Error("DrawGridMesh-Target drawer does not has component MeshFilter");
+            Log.Error(ErrorLevel.Critical,"DrawGridMesh-Target drawer does not has component MeshFilter");
             return;
         }
 

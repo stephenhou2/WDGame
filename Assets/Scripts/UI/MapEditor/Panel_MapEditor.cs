@@ -14,9 +14,18 @@ public class Panel_MapEditor : UIPanel
     private GameObject _Node_Button_LoadStage;
     private GameObject _Node_Button_SaveStage;
 
-    public override bool CheckOpenArgs(object[] openArgs)
+    public override string GetPanelLayerPath()
+    {
+        return UIPathDef.UI_LAYER_BOTTOM_STATIC;
+    }
+
+    public override bool CheckArgs(object[] openArgs)
     {
         return true;
+    }
+    public override void OnOpen(object[] openArgs)
+    {
+
     }
 
     /// <summary>
@@ -41,10 +50,6 @@ public class Panel_MapEditor : UIPanel
         InitializeBrushSlider();
     }
 
-    public override void OnOpen(object[] openArgs)
-    {
-
-    }
 
     /// <summary>
     /// 初始化笔刷UI
@@ -118,7 +123,7 @@ public class Panel_MapEditor : UIPanel
         }
         else
         {
-            Log.Error("OnLoadMapButtonClick Error,empty mapId is invalid");
+            Log.Error(ErrorLevel.Normal, "OnLoadMapButtonClick Error,empty mapId is invalid");
         }
     }
 
@@ -134,14 +139,19 @@ public class Panel_MapEditor : UIPanel
         }
         else
         {
-            Log.Error("OnSaveMapButtonClick Error,empty mapId is invalid");
+            Log.Error(ErrorLevel.Normal, "OnSaveMapButtonClick Error,empty mapId is invalid");
         }
     }
 
-    public override void Clear()
+    public override void CustomClear()
     {
-        base.Clear();
-
+        _Node_Selection_Brush = null;
+        _Node_Slider_Brush = null;
+        _Node_Image_BrushSize = null;
+        _Node_Text_BrushSize = null;
+        _Node_InputField_Stage = null;
+        _Node_Button_LoadStage = null;
+        _Node_Button_SaveStage = null;
     }
 
     public override void OnClose()

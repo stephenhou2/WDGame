@@ -4,20 +4,22 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-public partial class UIPanel
+public partial class UIObject
 {
+
+
     protected int BindNode(ref GameObject go, string node)
     {
-        if (mPanelRoot == null) // 没有panel根节点
+        if (mRoot == null) // 没有根节点
         {
-            Log.Error("BindNode failed,panel root node is null!");
+            Log.Error(ErrorLevel.Critical, "BindNode failed,ui root node is null!");
             return -1;
         }
 
-        Transform targetNode = UIInterface.FindChildNode(mPanelRoot.transform, node);
+        Transform targetNode = UIInterface.FindChildNode(mRoot.transform, node);
         if (targetNode == null)// 找不到要绑定的节点
         {
-            Log.Error("BindNode failed,does not has target node,node={0}", node);
+            Log.Error(ErrorLevel.Critical, "BindNode failed,does not has target node,node={0}", node);
             return -2;
         }
         go = targetNode.gameObject; // 绑定成功
@@ -33,7 +35,7 @@ public partial class UIPanel
         Button btn = go.GetComponent<Button>();
         if (btn == null) //没有Button组件
         {
-            Log.Error("BindButtonNode failed,Button component is Required! node={0}", node);
+            Log.Error(ErrorLevel.Critical, "BindButtonNode failed,Button component is Required! node={0}", node);
             return -3;
         }
 
@@ -55,7 +57,7 @@ public partial class UIPanel
         Button btn = go.GetComponent<Button>();
         if (btn == null) //没有Button组件
         {
-            Log.Error("BindButtonNode failed,Button component is Required! node={0}", node);
+            Log.Error(ErrorLevel.Critical, "BindButtonNode failed,Button component is Required! node={0}", node);
             return -3;
         }
 
@@ -80,7 +82,7 @@ public partial class UIPanel
         TMP_InputField field = go.GetComponent<TMP_InputField>();
         if (field == null) //没有TMP_InputField组件
         {
-            Log.Error("BindInputFieldNode failed,TMP_InputField component is Required! node={0}", node);
+            Log.Error(ErrorLevel.Critical, "BindInputFieldNode failed,TMP_InputField component is Required! node={0}", node);
             return -3;
         }
 

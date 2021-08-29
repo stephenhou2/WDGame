@@ -2,6 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ErrorLevel
+{    
+    Fatal = 0,  //致命错误
+    Critical = 1, // 严重错误
+    Normal = 2, // 一般错误
+    Hint = 3, // 提示性错误
+}
+
 public static class Log
 {
     public static void Logic(string str)
@@ -14,12 +22,17 @@ public static class Log
         Debug.LogFormat(str,args);
     }
 
-    public static void Error(string str)
+    /// <summary>
+    /// log error
+    /// </summary>
+    /// <param name="str"></param>
+    /// <param name="level">0级:致命错误  1:严重错误  2:一般错误  3: 提示性错误</param>
+    public static void Error(ErrorLevel level, string str)
     {
         Debug.LogError(str);
     }
 
-    public static void Error(string str, params object[] args)
+    public static void Error(ErrorLevel level, string str, params object[] args)
     {
         Debug.LogErrorFormat(str,args);
     }

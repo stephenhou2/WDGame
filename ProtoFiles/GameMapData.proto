@@ -21,10 +21,13 @@ message MapTile
 
 message MapData
 {
-	int32 MapId = 1;
-	int32 MapWidth = 2;
-	int32 MapHeight = 3;
-	float MapTileSideLength = 4;
-	repeated MapTile MapTiles = 5;
+	string MapId = 1;
+	uint32 MapWidth = 2;
+	uint32 MapHeight = 3;
+	uint32 Direction = 4;
+	float CellSize = 5;
+	float TileSize = 6;
+	bytes Obstacles = 7;
+	repeated MapTile MapTiles = 8;
 }
 
