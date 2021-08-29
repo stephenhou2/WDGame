@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class MapObstacleData
 {
-    private byte[,] mMapObstacleData;
+    private int mWidth;
+    private int mHeight;
 
+    private byte[,] mMapObstacleData;
     public byte[,] GetAllObstacleData()
     {
         return mMapObstacleData;
@@ -41,6 +43,8 @@ public class MapObstacleData
 
     public void CreateNewObstacleData(int mapWidth,int mapHeight)
     {
+        mWidth = mapWidth;
+        mHeight = mapHeight;
         mMapObstacleData = new byte[mapWidth, mapHeight];
     }
 
@@ -52,10 +56,29 @@ public class MapObstacleData
             return;
         }
 
-        mMapObstacleData = LoadObsDataWithData(obsData, mapWidth,mapHeight);
+        mWidth = mapWidth;
+        mHeight = mapHeight;
+        mMapObstacleData = LoadFromFormatData(obsData, mapWidth,mapHeight);
     }
 
-    private byte[,] LoadObsDataWithData(byte[] data,int mapWidth,int mapHeight)
+    public byte[] GetFormatObsData()
+    {
+        if (mMapObstacleData == null)
+            return null;
+
+        byte[] fmtData = new byte[mWidth * mHeight];
+        for (int row = 0; row < mHeight; row++)
+        {
+            for(int col = 0;col < mWidth;col++)
+            {
+                int index = col + row * mWidth;
+                fmtData[index] = mMapObstacleData[col, row];
+            }
+        }
+        return fmtData;        
+    }
+
+    private byte[,] LoadFromFormatData(byte[] data,int mapWidth,int mapHeight)
     {
         if(data.Length < mapWidth * mapHeight)
         {

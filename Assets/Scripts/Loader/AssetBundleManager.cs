@@ -138,7 +138,7 @@ public class AssetBundleManager : MonoBehaviour
     {
         if (mName2Bundle.TryGetValue(bundleName, out AssetBundle ab))
         {
-            Log.Logic("unload AssetBundle = {0}", bundleName);
+            Log.Logic(LogLevel.Critical,"unload AssetBundle = {0}", bundleName);
             ab.Unload(enable);
             mName2Bundle.Remove(bundleName);
         }
@@ -152,7 +152,7 @@ public class AssetBundleManager : MonoBehaviour
         }
 
         var ret = LoadInternalAssetBundle(bundleName);
-        Log.Logic("Load Dynamic bundleName = {0}, ret={1}", bundleName, ret);
+        Log.Logic(LogLevel.Critical,"Load Dynamic bundleName = {0}, ret={1}", bundleName, ret);
     }
     public (int ret, T obj) LoadPreloadAsset<T>(string assetPathSource) where T : UnityEngine.Object
     {

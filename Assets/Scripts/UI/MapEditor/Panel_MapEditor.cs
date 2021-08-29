@@ -111,7 +111,7 @@ public class Panel_MapEditor : UIPanel
         string mapId = UIInterface.GetInputFieldString(_Node_InputField_Stage);
         if (!string.IsNullOrEmpty(mapId))
         {
-            bool ret = GameMapEditor.Ins.DataMgr.LoadMapData(mapId);
+            bool ret = GameMapEditor.Ins.DataMgr.HasMapData(mapId);
             if(!ret)
             {
                 UIManager.Ins.OpenPanel<Panel_CreateNewMap>(new object[] { mapId });

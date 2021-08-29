@@ -61,13 +61,7 @@ public class Panel_CreateNewMap : UIPanel
         float cellSize = float.Parse(cellSizeStr);
         int selection = UIInterface.GetDropDownSelection(_Node_Selection_Direction);
 
-        GameMapEditor.Ins.setting.SetMapWidth(mapWidth);
-        GameMapEditor.Ins.setting.SetMapHeight(mapHeight);
-        GameMapEditor.Ins.setting.SetMapCellSize(cellSize);
-        GameMapEditor.Ins.setting.SetMapCellDirection((MapCellDirection)selection);
-        GameMapEditor.Ins.DoDraw(MapDefine.MapDrawer_Ground);
-
-        GameMapEditor.Ins.DataMgr.CreateMapData(mMapId,mapWidth,mapHeight,selection,cellSize);
+        GameMapEditor.Ins.CreateNewMap(mMapId, mapWidth, mapHeight, selection, cellSize);
 
         Close<Panel_CreateNewMap>(this);
     }

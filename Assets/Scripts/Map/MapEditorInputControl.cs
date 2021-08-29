@@ -33,19 +33,12 @@ public class MapEditorInputControl
         }
     }
 
-    //private Vector3 GetTouchWorldPos()
-    //{
-    //    float camZ = Camera.main.transform.position.z;
-    //    return Camera.main.ScreenToWorldPoint(new Vector3(mTouchPos.x, mTouchPos.y, -camZ));
-    //}
-
     public void UpdateTouchDown(Vector2 touchPos)
     {
         if (mTouchDownOnUI)
             return;
 
         mTouchPos = touchPos;
-        //Vector3 pos = GetTouchWorldPos();
         mDrag = false;
         mTouchCount = 1;
 
@@ -67,7 +60,6 @@ public class MapEditorInputControl
 
         if (!mDrag)
         {
-            //Vector3 pos = GetTouchWorldPos();
             foreach (KeyValuePair<string, IInputHandle> kv in mInputHandleDic)
             {
                 kv.Value.OnTouchUp(mTouchPos);

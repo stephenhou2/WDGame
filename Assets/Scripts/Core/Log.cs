@@ -10,6 +10,13 @@ public enum ErrorLevel
     Hint = 3, // 提示性错误
 }
 
+public enum LogLevel
+{
+    Critical = 0, 
+    Normal = 1, 
+    Hint = 2, 
+}
+
 public static class Log
 {
     public static void Logic(string str)
@@ -17,7 +24,7 @@ public static class Log
         Debug.Log(str);
     }    
     
-    public static void Logic(string str, params object[] args)
+    public static void Logic(LogLevel level,string str, params object[] args)
     {
         Debug.LogFormat(str,args);
     }

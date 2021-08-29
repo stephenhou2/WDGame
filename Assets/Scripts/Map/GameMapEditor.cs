@@ -77,9 +77,22 @@ public class GameMapEditor : MonoBehaviour
             mDrawerDic.Add(type, drawer);
     }
 
+    public void CreateNewMap(string mapId, int mapWidth, int mapHeight, int direction, float cellSize)
+    {
+        GameMapEditor.Ins.setting.SetMapWidth(mapWidth);
+        GameMapEditor.Ins.setting.SetMapHeight(mapHeight);
+        GameMapEditor.Ins.setting.SetMapCellSize(cellSize);
+        GameMapEditor.Ins.setting.SetMapCellDirection((MapCellDirection)direction);
+
+        DataMgr.CreateMapData(mapId, mapWidth, mapHeight, direction, cellSize);
+        DoDraw(MapDefine.MapDrawer_Ground);
+    }
+
     public void LoadStageMap(string mapId)
     {
         DataMgr.LoadMapData(mapId);
+        DoDraw(MapDefine.MapDrawer_Ground);
+        DoDraw(MapDefine.MapDrawer_Obstacle);
     }
 
     public void UpdateMapObstacle(int col,int row, byte data)

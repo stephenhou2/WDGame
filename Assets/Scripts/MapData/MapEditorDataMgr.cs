@@ -21,25 +21,40 @@
         mMapHeight = mapHeight;
         mDirection = direction;
         mCellSize = cellSize;
-
         mObstacleData.CreateNewObstacleData(mapWidth, mapHeight);
     }
 
-    public bool LoadMapData(string mapId)
+    public bool HasMapData(string mapId)
     {
-        mMapData = ProtoDataHandler.LoadProtoData<GameMapData.MapData>(PathHelper.GetMapDataFilePath(mapId));
+        string filePath = PathHelper.GetMapDataFilePath(mapId);
+
+        return FileHelper.FileExist(filePath);
+    }
+
+    public void LoadMapData(string mapId)
+    {
+        if (!HasMapData(mapId))
+        {
+            Log.Error(ErrorLevel.Critical, "LoadMapData Faild,map:{0} dont exist!", mapId);
+            return;
+        }
+
+        string filePath = PathHelper.GetMapDataFilePath(mapId);
+        mMapData = ProtoDataHandler.LoadProtoData<GameMapData.MapData>(filePath);
         if (mMapData == null)
         {
-            Log.Logic("LoadMapData Faild,map:{0} dont exist!",mapId);
-            return false;
+            Log.Error(ErrorLevel.Critical,"LoadMapData Faild,map:{0} decode failed!", mapId);
+            return;
         }
 
         mMapId = mapId;
-        uint mapWidth = mMapData.MapWidth;
-        uint mapHeight = mMapData.MapHeight;
+        mMapWidth = (int)mMapData.MapWidth;
+        mMapHeight = (int)mMapData.MapHeight;
+        mDirection = (int)mMapData.Direction;
+        mCellSize = mMapData.CellSize;
         byte[] obsData = mMapData.Obstacles.ToByteArray();
-        mObstacleData.InitializeMapObstacleData(obsData, (int)mapWidth, (int)mapHeight);
-        return true;
+
+        mObstacleData.InitializeMapObstacleData(obsData, mMapWidth, mMapHeight);
     }
 
     public void SaveMapData(string mapId)
@@ -50,7 +65,10 @@
         mapData.MapHeight = (uint)mMapHeight;
         mapData.Direction = (uint)mDirection;
         mapData.CellSize = mCellSize;
+        mapData.Obstacles = Google.Protobuf.ByteString.CopyFrom(mObstacleData.GetFormatObsData());
+
         ProtoDataHandler.SaveProtoData<GameMapData.MapData>(mapData,PathHelper.GetMapDataFilePath(mapId));
+        Log.Logic(LogLevel.Hint, "SaveMapData success,MapId:{0},MapWidth:{1},MapHeight:{2},Direction:{3},CellSize:{4},obsLen:{5}", mMapId,mMapWidth, mMapHeight, mDirection, mCellSize, mapData.Obstacles.Length);
     }
 
     public void UpdateObstacleData(int col,int row, byte data)
