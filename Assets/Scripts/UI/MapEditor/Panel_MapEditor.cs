@@ -73,7 +73,7 @@ public class Panel_MapEditor : UIPanel
     /// </summary>
     private void InitializeBrushSlider()
     {
-        RefreshSliderValue(GameMapEditor.Ins.setting.BrushWidth);
+        RefreshSliderValue(GameMapEditor.Ins.MapConfig.BrushWidth);
 
         UIInterface.AddSilderChangeAction(_Node_Slider_Brush, OnSliderValueChanged);
     }
@@ -96,9 +96,9 @@ public class Panel_MapEditor : UIPanel
     private void OnSliderValueChanged(float value)
     {
         int v = Mathf.FloorToInt(value);
-        if(v != GameMapEditor.Ins.setting.BrushWidth)
+        if(v != GameMapEditor.Ins.MapConfig.BrushWidth)
         {
-            GameMapEditor.Ins.setting.SetBrushWidth((int)value);
+            GameMapEditor.Ins.MapConfig.SetBrushWidth((int)value);
             RefreshSliderValue((int)value);
         }
     }

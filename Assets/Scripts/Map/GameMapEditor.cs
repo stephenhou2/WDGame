@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameMapEditor : MonoBehaviour
 {
     public static GameMapEditor Ins;
-    public MapEditorSettings setting;
+    public MapEditorConfigs MapConfig;
 
     private GameMapDrawer mGridDrawer;  // 网格绘制
     private GameMapDrawer mObstacleDrawer; //阻挡格绘制
@@ -28,7 +28,7 @@ public class GameMapEditor : MonoBehaviour
     {
         GameMapEditor.Ins = this;
         mDrawerDic = new Dictionary<int, GameMapDrawer>();
-        setting = new MapEditorSettings(); // 下面的组件初始化之前必须先初始化配置
+        MapConfig = new MapEditorConfigs(); // 下面的组件初始化之前必须先初始化配置
 
         mCamControl = new MapEditorCameraControl(Camera.main,camMaxHeight,camMinHeight,zoomSpeed,moveSpeed);
         mInputControl = new MapEditorInputControl();
@@ -79,18 +79,24 @@ public class GameMapEditor : MonoBehaviour
 
     public void CreateNewMap(string mapId, int mapWidth, int mapHeight, int direction, float cellSize)
     {
-        GameMapEditor.Ins.setting.SetMapWidth(mapWidth);
-        GameMapEditor.Ins.setting.SetMapHeight(mapHeight);
-        GameMapEditor.Ins.setting.SetMapCellSize(cellSize);
-        GameMapEditor.Ins.setting.SetMapCellDirection((MapCellDirection)direction);
-
         DataMgr.CreateMapData(mapId, mapWidth, mapHeight, direction, cellSize);
         DoDraw(MapDefine.MapDrawer_Ground);
+        RefreshMapConfig();
+    }
+
+    private void RefreshMapConfig()
+    {
+        MapConfig.SetMapWidth(DataMgr.GetMapWidth());
+        MapConfig.SetMapHeight(DataMgr.GetMapHeight());
+        MapConfig.SetMapCellSize(DataMgr.GetCellSize());
+        MapConfig.SetMapCellDirection(DataMgr.GetMapDirection());
     }
 
     public void LoadStageMap(string mapId)
     {
         DataMgr.LoadMapData(mapId);
+        RefreshMapConfig();
+
         DoDraw(MapDefine.MapDrawer_Ground);
         DoDraw(MapDefine.MapDrawer_Obstacle);
     }

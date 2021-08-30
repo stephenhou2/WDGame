@@ -48,7 +48,7 @@ public class Panel_CreateNewMap : UIPanel
 
         cellDirSelect.options = options;
 
-        UIInterface.SetDropDownSelection(_Node_Selection_Direction, (int)GameMapEditor.Ins.setting.CellDirection);
+        UIInterface.SetDropDownSelection(_Node_Selection_Direction, (int)GameMapEditor.Ins.MapConfig.CellDirection);
     }
 
     private void OnCreateNewMapButtonClick()
@@ -77,9 +77,9 @@ public class Panel_CreateNewMap : UIPanel
         BindNode(ref _Node_Selection_Direction, "_Selection_Direction");
 
         // input field
-        BindInputFieldNode(ref _Node_InputField_MapWidth, "_InputField_MapWidth", GameMapEditor.Ins.setting.MapWidth.ToString());
-        BindInputFieldNode(ref _Node_InputField_MapHeight, "_InputField_MapHeight", GameMapEditor.Ins.setting.MapHeight.ToString());
-        BindInputFieldNode(ref _Node_InputField_CellSize, "_InputField_CellSize", GameMapEditor.Ins.setting.MapCellSize.ToString());
+        BindInputFieldNode(ref _Node_InputField_MapWidth, "_InputField_MapWidth", GameMapEditor.Ins.MapConfig.MapWidth.ToString());
+        BindInputFieldNode(ref _Node_InputField_MapHeight, "_InputField_MapHeight", GameMapEditor.Ins.MapConfig.MapHeight.ToString());
+        BindInputFieldNode(ref _Node_InputField_CellSize, "_InputField_CellSize", GameMapEditor.Ins.MapConfig.MapCellSize.ToString());
 
         // button
         BindButtonNode(ref _Node_Button_CreateMap, "_Button_CreateMap", OnCreateNewMapButtonClick);

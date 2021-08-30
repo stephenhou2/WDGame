@@ -6,7 +6,7 @@ public enum MapCellDirection
     Horizontal = 1,
 }
 
-public class MapEditorSettings 
+public class MapEditorConfigs 
 {
     public int BrushWidth { get; private set; }
     public int MapWidth { get; private set; }
@@ -23,15 +23,8 @@ public class MapEditorSettings
     private string _KCellSize = "MapEditor_CellSize";
     private string _KCellDirection = "MapEditor_CellDirection";
 
-    public MapEditorSettings()
+    public MapEditorConfigs()
     {
-        BrushWidth = PlayerPrefs.GetInt(_KBrushWidth, 1);
-        MapWidth = PlayerPrefs.GetInt(_KMapWidth, 10);
-        MapHeight = PlayerPrefs.GetInt(_KMapHeight, 10);
-        MapCellSize = PlayerPrefs.GetFloat(_KCellSize, 1.0f);
-        MapCellSize_60 = MapCellSize * Mathf.Sqrt(3) / 2;
-        MapCellSize_30 = MapCellSize / 2; 
-        CellDirection = (MapCellDirection)PlayerPrefs.GetInt(_KCellDirection, 1);
         BrushWidth = PlayerPrefs.GetInt(_KBrushWidth, 1);
     }
 

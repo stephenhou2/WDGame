@@ -9,7 +9,7 @@ public class CoordHelper : MonoBehaviour
 
     private void DrawHorizontalGrid()
     {
-        float size = GameMapEditor.Ins.setting.MapCellSize;
+        float size = GameMapEditor.Ins.MapConfig.MapCellSize;
 
         for (int col = 0; col < 10; col++)
         {
@@ -39,7 +39,7 @@ public class CoordHelper : MonoBehaviour
 
     private void DrawVerticleGrid()
     {
-        float size = GameMapEditor.Ins.setting.MapCellSize;
+        float size = GameMapEditor.Ins.MapConfig.MapCellSize;
 
         for (int col = 0; col < 10; col++)
         {
@@ -79,11 +79,11 @@ public class CoordHelper : MonoBehaviour
         if (!SHOW_COORD)
             return;
 
-        if(GameMapEditor.Ins.setting.CellDirection == MapCellDirection.Horizontal)
+        if(GameMapEditor.Ins.MapConfig.CellDirection == MapCellDirection.Horizontal)
         {
             DrawHorizontalGrid();
         }
-        else if(GameMapEditor.Ins.setting.CellDirection == MapCellDirection.Verticle)
+        else if(GameMapEditor.Ins.MapConfig.CellDirection == MapCellDirection.Verticle)
         {
             DrawVerticleGrid();
         }

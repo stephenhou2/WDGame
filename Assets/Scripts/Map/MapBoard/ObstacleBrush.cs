@@ -11,7 +11,7 @@ public class ObstacleBrush : IMapBrush
 
     public void Draw(Vector3 pos,int brushWidth)
     {
-        Vector2Int cellPos = MapEditorHelper.GetCellPos(pos, GameMapEditor.Ins.setting.CellDirection);
+        Vector2Int cellPos = MapEditorHelper.GetCellPos(pos, GameMapEditor.Ins.MapConfig.CellDirection);
 
         if (!MapEditorHelper.IsValidMapPos(cellPos.x, cellPos.y))
             return;

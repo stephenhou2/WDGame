@@ -38,11 +38,11 @@ public class GameMapDrawer
             return;
         }
 
-        if (GameMapEditor.Ins.setting.CellDirection == MapCellDirection.Horizontal)
+        if (GameMapEditor.Ins.MapConfig.CellDirection == MapCellDirection.Horizontal)
         {
             mDrawer = mHorizontalDrawer;
         }
-        else if (GameMapEditor.Ins.setting.CellDirection == MapCellDirection.Verticle)
+        else if (GameMapEditor.Ins.MapConfig.CellDirection == MapCellDirection.Verticle)
         {
             mDrawer = mVerticleDrawer;
         }
@@ -50,7 +50,7 @@ public class GameMapDrawer
         if (mDrawer == null)
             return;
 
-        mDrawer.InitializeMapGridDrawer(GameMapEditor.Ins.setting.MapWidth, GameMapEditor.Ins.setting.MapHeight, GameMapEditor.Ins.setting.MapCellSize);
+        mDrawer.InitializeMapGridDrawer(GameMapEditor.Ins.MapConfig.MapWidth, GameMapEditor.Ins.MapConfig.MapHeight, GameMapEditor.Ins.MapConfig.MapCellSize);
 
         mDrawer.DrawGridMesh(mMf);
     }

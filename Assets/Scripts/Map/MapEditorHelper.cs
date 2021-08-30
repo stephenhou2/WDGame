@@ -51,8 +51,8 @@ public static class MapEditorHelper
     /// <returns></returns>
     private static Vector2Int PointToHexCellPos_Horizontal(Vector2 pos)
     {
-        float x = pos.x * 2 / 3 / GameMapEditor.Ins.setting.MapCellSize;
-        float y = (pos.y / Mathf.Sqrt(3) + pos.x / 3) / GameMapEditor.Ins.setting.MapCellSize;
+        float x = pos.x * 2 / 3 / GameMapEditor.Ins.MapConfig.MapCellSize;
+        float y = (pos.y / Mathf.Sqrt(3) + pos.x / 3) / GameMapEditor.Ins.MapConfig.MapCellSize;
 
         int col = Mathf.FloorToInt(x);
         int row = Mathf.FloorToInt(y);
@@ -85,8 +85,8 @@ public static class MapEditorHelper
 
     private static Vector2Int PointToHexCellPos_Verticle(Vector3 pos)
     {
-        float x = (pos.x / Mathf.Sqrt(3) + pos.y / 3) / GameMapEditor.Ins.setting.MapCellSize;
-        float y = pos.y * 2 / 3 / GameMapEditor.Ins.setting.MapCellSize;
+        float x = (pos.x / Mathf.Sqrt(3) + pos.y / 3) / GameMapEditor.Ins.MapConfig.MapCellSize;
+        float y = pos.y * 2 / 3 / GameMapEditor.Ins.MapConfig.MapCellSize;
 
         int col = Mathf.FloorToInt(x);
         int row = Mathf.FloorToInt(y);
@@ -131,21 +131,21 @@ public static class MapEditorHelper
 
     private static Vector2 GetCellCenterHorizontal(int col,int row)
     {
-        float x = col / 2.0f * 3 * GameMapEditor.Ins.setting.MapCellSize;
-        float y = (row * 2 - col % 2) * GameMapEditor.Ins.setting.MapCellSize_60;
+        float x = col / 2.0f * 3 * GameMapEditor.Ins.MapConfig.MapCellSize;
+        float y = (row * 2 - col % 2) * GameMapEditor.Ins.MapConfig.MapCellSize_60;
         return new Vector2(x, y);
     }
 
     private static Vector2 GetCellCenterVerticle(int col, int row)
     {
-        float x = (col * 2 - row % 2) * GameMapEditor.Ins.setting.MapCellSize_60;
-        float y = row / 2.0f * 3 * GameMapEditor.Ins.setting.MapCellSize;
+        float x = (col * 2 - row % 2) * GameMapEditor.Ins.MapConfig.MapCellSize_60;
+        float y = row / 2.0f * 3 * GameMapEditor.Ins.MapConfig.MapCellSize;
         return new Vector2(x, y);
     }   
 
     public static  bool IsValidMapPos(int x,int y)
     {
-        return x >= 0 && x < GameMapEditor.Ins.setting.MapWidth && y >= 0 && y < GameMapEditor.Ins.setting.MapHeight;
+        return x >= 0 && x < GameMapEditor.Ins.MapConfig.MapWidth && y >= 0 && y < GameMapEditor.Ins.MapConfig.MapHeight;
     }
 
     public static Vector3 TransformScreenPosToWorldPos(Camera cam,Vector2 tousPos,float howfar)

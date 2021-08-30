@@ -14,6 +14,12 @@
         mObstacleData = new MapObstacleData();
     }
 
+    public string GetMapId() { return mMapId; }
+    public int GetMapWidth() { return mMapWidth; }
+    public int GetMapHeight() { return mMapHeight; }
+    public MapCellDirection GetMapDirection() { return (MapCellDirection)mDirection; }
+    public float GetCellSize() { return mCellSize; }
+
     public void CreateMapData(string mapId,int mapWidth,int mapHeight,int direction,float cellSize)
     {
         mMapId = mapId;
@@ -53,8 +59,12 @@
         mDirection = (int)mMapData.Direction;
         mCellSize = mMapData.CellSize;
         byte[] obsData = mMapData.Obstacles.ToByteArray();
-
         mObstacleData.InitializeMapObstacleData(obsData, mMapWidth, mMapHeight);
+
+        GameMapEditor.Ins.MapConfig.SetMapWidth(mMapWidth);
+        GameMapEditor.Ins.MapConfig.SetMapHeight(mMapHeight);
+        GameMapEditor.Ins.MapConfig.SetMapCellSize(mDirection);
+        GameMapEditor.Ins.MapConfig.SetMapCellDirection((MapCellDirection)mDirection);
     }
 
     public void SaveMapData(string mapId)
