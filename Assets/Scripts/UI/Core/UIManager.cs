@@ -21,7 +21,7 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// panel对象缓存池，面板关闭时，所用的UI脚本可以复用，减少GC
     /// </summary>
-    private Dictionary<System.Type, UIObject> mPanelPool;
+    private Dictionary<System.Type, UIPanel> mPanelPool;
 
     /// TODO:UI gameobject 复用
     ///  难点：怎么在复用的时候将所有节点还原回原始状态
@@ -55,43 +55,36 @@ public class UIManager: Singleton<UIManager>
         return null;
     }
 
-    private void InitUILayers()
-    {
-         RegisterLayer(UIPathDef.UI_LAYER_BOTTOM_STATIC);
-         RegisterLayer(UIPathDef.UI_LAYER_BOTTOM_DYNAMIC);
-         RegisterLayer(UIPathDef.UI_LAYER_NORMAL_STATIC);
-         RegisterLayer(UIPathDef.UI_LAYER_NORMAL_DYNAMIC);
-         RegisterLayer(UIPathDef.UI_LAYER_MSG_STATIC);
-         RegisterLayer(UIPathDef.UI_LAYER_MSG_DYNAMIC);
-         RegisterLayer(UIPathDef.UI_LAYER_TOP_STATIC);
-         RegisterLayer(UIPathDef.UI_LAYER_TOP_DYNAMIC);
-    }
-    private UIManager()
+    public UIManager()
     {
         mAllPanels = new List<UIPanel>();
-        mPanelPool = new Dictionary<System.Type, UIObject>();
+        mPanelPool = new Dictionary<System.Type, UIPanel>();
         mLayers = new Dictionary<string, GameObject>();
         mToOpenPanels = new GameQueue<UIPanelOpenData>();
         mToClosePanels = new GameQueue<UIPanel>();
-        InitUILayers();
+
+        foreach (string layerPath in UIPathDef.UI_ALL_LAYERS)
+        {
+            RegisterLayer(layerPath);
+        }
     }
 
-    private T GetPanel<T>() where T : UIPanel,new()
+    private UIPanel GetPanel<T>() where T : UIPanel,new()
     {
-        UIObject panel = null;
+        UIPanel panel = null;
         if(!mPanelPool.TryGetValue(typeof(T),out panel))
         {
             panel = new T();
         }
-        return panel as T;
+        return panel;
     }
 
     private void PushPanel(UIPanel panel)
     {
-        if(!mPanelPool.ContainsKey(typeof(T)))
-        {
-            mPanelPool.Add(typeof(T), panel);
-        }
+        //if(!mPanelPool.ContainsKey(typeof(T)))
+        //{
+        //    mPanelPool.Add(typeof(T), panel);
+        //}
     }
 
     private void HandleToOpenPanels()
@@ -160,9 +153,9 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="openArgs"></param>
-    public void OpenPanel<T>(object[] openArgs = null) where T:UIPanel
+    public void OpenPanel<T>(object[] openArgs = null) where T:UIPanel,new()
     {
-        T panel = GetPanel<T>(); // 这里获得的panel一定不会为空
+        UIPanel panel = GetPanel<T>(); // 这里获得的panel一定不会为空
         if(!panel.CheckArgs(openArgs))
             return;
 
@@ -188,9 +181,8 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// close panel
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="panel"></param>
-    public void ClosePanel<T>(T panel) where T:UIPanel
+    public void ClosePanel(UIPanel panel)
     {
         if (panel == null)
         {

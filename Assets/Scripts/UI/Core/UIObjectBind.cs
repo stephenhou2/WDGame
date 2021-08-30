@@ -48,7 +48,7 @@ public partial class UIObject
         return 0;
     }
 
-    protected int BindButtonNode<T>(ref GameObject go, string node, T panel, UnityAction<T> call = null)
+    protected int BindButtonNode(ref GameObject go, string node, UIPanel panel, UnityAction call = null)
     {
         int ret = BindNode(ref go, node);
         if (ret < 0) // 节点绑定失败
@@ -63,10 +63,7 @@ public partial class UIObject
 
         if (call != null) //没有绑定回调（可以不绑）
         {
-            btn.onClick.AddListener(() =>
-            {
-                call(panel);
-            });
+            btn.onClick.AddListener(call);
             mUIEvents.Add(btn.onClick);
         }
 

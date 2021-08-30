@@ -17,9 +17,9 @@ public abstract class UIPanel : UIObject
     /// </summary>
     public abstract void OnClose();
 
-    protected void Close<T>(T panel)
+    protected void Close()
     {
-        UIManager.Ins.ClosePanel<T>(panel);
+        UIManager.Ins.ClosePanel(this);
     }
 
 
