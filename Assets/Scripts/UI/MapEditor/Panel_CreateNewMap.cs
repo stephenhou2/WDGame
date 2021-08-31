@@ -62,7 +62,8 @@ public class Panel_CreateNewMap : UIPanel
         int selection = UIInterface.GetDropDownSelection(_Node_Selection_Direction);
 
         GameMapEditor.Ins.CreateNewMap(mMapId, mapWidth, mapHeight, selection, cellSize);
-        Close();
+
+        Close<Panel_CreateNewMap>(this);
     }
 
     private void InitializeUI()
@@ -82,7 +83,7 @@ public class Panel_CreateNewMap : UIPanel
 
         // button
         BindButtonNode(ref _Node_Button_CreateMap, "_Button_CreateMap", OnCreateNewMapButtonClick);
-        BindButtonNode(ref _Node_Button_Back, "_Button_Back",this,Close);
+        BindButtonNode<Panel_CreateNewMap>(ref _Node_Button_Back, "_Button_Back",this,Close<Panel_CreateNewMap>);
 
         InitializeUI();
     }

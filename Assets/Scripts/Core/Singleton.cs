@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
-public class Singleton<T> where T : new()
+public class Singleton<T>
 {
     private static T mIns;
     public static T Ins
@@ -12,7 +11,7 @@ public class Singleton<T> where T : new()
         {
             if(mIns == null)
             {
-                mIns = (default(T)  == null) ? Activator.CreateInstance<T>() : default(T) ;
+                mIns = default(T);
             }
 
             return mIns;

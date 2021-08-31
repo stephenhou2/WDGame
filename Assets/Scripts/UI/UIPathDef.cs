@@ -13,18 +13,6 @@ public static class UIPathDef
     public const string UI_LAYER_TOP_STATIC = "_UI_ROOT/_LAYER_TOP/_STATIC";
     public const string UI_LAYER_TOP_DYNAMIC = "_UI_ROOT/_LAYER_TOP/_DYNAMIC";
 
-    public static List<string> UI_ALL_LAYERS = new List<string>()
-    {
-        UI_LAYER_BOTTOM_STATIC,
-        UI_LAYER_BOTTOM_DYNAMIC,
-        UI_LAYER_NORMAL_STATIC,
-        UI_LAYER_NORMAL_DYNAMIC,
-        UI_LAYER_MSG_STATIC,
-        UI_LAYER_MSG_DYNAMIC,
-        UI_LAYER_TOP_STATIC,
-        UI_LAYER_TOP_DYNAMIC
-    };
-
     public static string GetUIPath<T>()
     {
         if (mUIPathDict == null)
