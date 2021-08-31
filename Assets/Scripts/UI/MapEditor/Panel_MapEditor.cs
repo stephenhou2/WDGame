@@ -21,7 +21,7 @@ public class Panel_MapEditor : UIPanel
 
     public override string GetPanelResPath()
     {
-        return "UI / MapEditor / Panel_MapEditor";
+        return "UI/MapEditor/Panel_MapEditor";
     }
 
     public override bool CheckArgs(object[] openArgs)

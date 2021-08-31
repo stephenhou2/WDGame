@@ -58,9 +58,12 @@ public class GameQueue<T>
             return default(T);
 
         T obj = Head.GetObj();
-        Head = Head.GetNext();
-        Head.SetLast(null);
-
+        var next = Head.GetNext();
+        if (next != null)
+        {
+            next.SetLast(null);
+        }
+        Head = next;
         return obj;
     }
 }

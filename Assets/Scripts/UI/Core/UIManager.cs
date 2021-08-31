@@ -70,7 +70,7 @@ public class UIManager: Singleton<UIManager>
          RegisterLayer(UIPathDef.UI_LAYER_TOP_STATIC);
          RegisterLayer(UIPathDef.UI_LAYER_TOP_DYNAMIC);
     }
-    private UIManager()
+    public UIManager()
     {
         mAllOpenPanels = new Dictionary<string, UIPanel>();
         mPanelPool = new Dictionary<string, UIPanel>();
@@ -82,7 +82,6 @@ public class UIManager: Singleton<UIManager>
 
     private void OnOpenPanel(UIPanel panel)
     {
-
         string panelType = panel.GetType().ToString();
         if (!mAllOpenPanels.ContainsKey(panelType))
             mAllOpenPanels.Add(panelType,panel);
@@ -154,13 +153,6 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
-    private void _ClosePanel(UIPanel panel)
-    {
-        OnClosePanel(panel);
-
-        PushPanel(panel);
-    }
-
     private void HandleToClosePanels()
     {
         while (mToClosePanels.HasItem())
@@ -169,7 +161,8 @@ public class UIManager: Singleton<UIManager>
 
             if(panel != null)
             {
-                _ClosePanel(panel);
+                OnClosePanel(panel);
+                PushPanel(panel);
             }
         }
     }
@@ -182,8 +175,6 @@ public class UIManager: Singleton<UIManager>
     public void OpenPanel<T>(object[] openArgs = null) where T:UIPanel,new()
     {
         UIPanel panel = PopPanel<T>(); // 这里获得的panel一定不会为空
-        //if (panel == null)
-        //    return;
 
         if(!panel.CheckArgs(openArgs))
             return;

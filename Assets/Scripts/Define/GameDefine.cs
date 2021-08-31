@@ -5,6 +5,7 @@ using UnityEngine;
 public static class GameDefine
 {
     public static string _UI_ROOT = "_UI_ROOT";
+    public static string _MAP_EDITOR = "_MAP_EDITOR";
 
 }
 
