@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class UIManager: Singleton<UIManager>
 {
-    private List<UIPanel> mAllPanels;
     /// <summary>
     /// 所有要打开的面板，都先加到队列中
     /// </summary>
@@ -21,7 +20,12 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// panel对象缓存池，面板关闭时，所用的UI脚本可以复用，减少GC
     /// </summary>
-    private Dictionary<System.Type, UIObject> mPanelPool;
+    private Dictionary<string, UIPanel> mPanelPool;
+
+    /// <summary>
+    /// 所有已经打开的面板 
+    /// </summary>
+    private Dictionary<string,UIPanel> mAllOpenPanels;
 
     /// TODO:UI gameobject 复用
     ///  难点：怎么在复用的时候将所有节点还原回原始状态
@@ -68,29 +72,60 @@ public class UIManager: Singleton<UIManager>
     }
     private UIManager()
     {
-        mAllPanels = new List<UIPanel>();
-        mPanelPool = new Dictionary<System.Type, UIObject>();
+        mAllOpenPanels = new Dictionary<string, UIPanel>();
+        mPanelPool = new Dictionary<string, UIPanel>();
         mLayers = new Dictionary<string, GameObject>();
         mToOpenPanels = new GameQueue<UIPanelOpenData>();
         mToClosePanels = new GameQueue<UIPanel>();
         InitUILayers();
     }
 
-    private T GetPanel<T>() where T : UIPanel,new()
+    private void OnOpenPanel(UIPanel panel)
     {
-        UIObject panel = null;
-        if(!mPanelPool.TryGetValue(typeof(T),out panel))
+
+        string panelType = panel.GetType().ToString();
+        if (!mAllOpenPanels.ContainsKey(panelType))
+            mAllOpenPanels.Add(panelType,panel);
+    }
+
+    private void OnClosePanel(UIPanel panel)
+    {
+        panel.OnClose();
+        panel.ClearAll();
+        panel.DestroyUIObject();
+
+        string panelType = panel.GetType().ToString();
+        if(mAllOpenPanels.ContainsKey(panelType))
+            mAllOpenPanels.Remove(panelType);
+    }
+
+    private UIPanel PopPanel<T>() where T : UIPanel,new()
+    {
+        UIPanel panel = null;
+        string panelType = typeof(T).ToString();
+        if (!mPanelPool.TryGetValue(panelType, out panel))
         {
             panel = new T();
         }
-        return panel as T;
+        else
+        {
+            mPanelPool.Remove(panelType);
+        }
+
+        return panel;
     }
 
     private void PushPanel(UIPanel panel)
     {
-        if(!mPanelPool.ContainsKey(typeof(T)))
+        if (panel == null)
         {
-            mPanelPool.Add(typeof(T), panel);
+            Log.Error(ErrorLevel.Critical,"Push Panel Failed,panel is null!");
+            return;
+        }
+
+        if(!mPanelPool.ContainsKey(panel.panelType))
+        {
+            mPanelPool.Add(panel.panelType, panel);
         }
     }
 
@@ -111,7 +146,9 @@ public class UIManager: Singleton<UIManager>
                     panel.BindUIObjectNodes(panelGo);
                 }
 
-                mAllPanels.Add(panelData.panel);
+                PushPanel(panelData.panel);
+
+                OnOpenPanel(panel);
                 panel.OnOpen(panelData.openArgs);
             }
         }
@@ -119,27 +156,9 @@ public class UIManager: Singleton<UIManager>
 
     private void _ClosePanel(UIPanel panel)
     {
-        int targetIndex = -1;
-        for (int i = 0; i < mAllPanels.Count; i++)
-        {
-            if (mAllPanels[i].GetType().Equals(panel.GetType()))
-            {
-                targetIndex = i;
-                break;
-            }
-        }
+        OnClosePanel(panel);
 
-        if (targetIndex == -1)
-        {
-            Log.Error(ErrorLevel.Critical, "ClosePanel Error,close panel not in panel list,panel:{0}", panel.ToString());
-            return;
-        }
-
-        panel.OnClose();
-        panel.ClearAll();
-        panel.DestroyUIObject();
         PushPanel(panel);
-        mAllPanels.RemoveAt(targetIndex);
     }
 
     private void HandleToClosePanels()
@@ -160,14 +179,18 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="openArgs"></param>
-    public void OpenPanel<T>(object[] openArgs = null) where T:UIPanel
+    public void OpenPanel<T>(object[] openArgs = null) where T:UIPanel,new()
     {
-        T panel = GetPanel<T>(); // 这里获得的panel一定不会为空
+        UIPanel panel = PopPanel<T>(); // 这里获得的panel一定不会为空
+        //if (panel == null)
+        //    return;
+
         if(!panel.CheckArgs(openArgs))
             return;
 
-        string panelPath = UIPathDef.GetUIPath<T>();
         string UILayerPath = panel.GetPanelLayerPath();
+        string panelPath = panel.GetPanelResPath();
+
         if(string.IsNullOrEmpty(panelPath))
         {
             Log.Error(ErrorLevel.Critical, "OpenPanel Failed, panel {0} does not registered!",typeof(T));
@@ -190,17 +213,12 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="panel"></param>
-    public void ClosePanel<T>(T panel) where T:UIPanel
+    public void ClosePanel(string panelType)
     {
-        if (panel == null)
+        UIPanel panel;
+        if (mAllOpenPanels.TryGetValue(panelType,out panel))
         {
-            Log.Error(ErrorLevel.Critical, "ClosePanel Error,panel is null!");
-            return;
-        }
-
-        if (mAllPanels.Count == 0)
-        {
-            Log.Error(ErrorLevel.Critical, "ClosePanel Error,close panel when there is no panel in panel list", panel.ToString());
+            Log.Error(ErrorLevel.Normal, "ClosePanel Error,close not opened panel,panel Type:{0}", panelType);
             return;
         }
 
@@ -262,13 +280,14 @@ public class UIManager: Singleton<UIManager>
     /// <param name="deltaTime"></param>
     public void Update(float deltaTime)
     {
-        for(int i = 0;i<mAllPanels.Count;i++)
+        HandleToClosePanels();
+        HandleToOpenPanels();
+
+        foreach(var kv in mAllOpenPanels)
         {
-            UIObject panel = mAllPanels[i];
-            if(panel != null)
-            {
+            UIPanel panel = kv.Value;
+            if (panel != null)
                 panel.Update(deltaTime);
-            }
         }
     }
 }

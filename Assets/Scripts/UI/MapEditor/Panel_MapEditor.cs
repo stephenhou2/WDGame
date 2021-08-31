@@ -19,6 +19,11 @@ public class Panel_MapEditor : UIPanel
         return UIPathDef.UI_LAYER_BOTTOM_STATIC;
     }
 
+    public override string GetPanelResPath()
+    {
+        return "UI / MapEditor / Panel_MapEditor";
+    }
+
     public override bool CheckArgs(object[] openArgs)
     {
         return true;
