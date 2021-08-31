@@ -5,6 +5,12 @@ using UnityEngine;
 public abstract class UIPanel : UIObject
 {
     public abstract string GetPanelLayerPath();
+    public abstract string GetPanelResPath();
+
+    public string panelType
+    {
+        get { return GetType().ToString(); }
+    }
 
     /// <summary>
     /// panel 打开时调用
@@ -17,9 +23,9 @@ public abstract class UIPanel : UIObject
     /// </summary>
     public abstract void OnClose();
 
-    protected void Close<T>(T panel)
+    protected void Close(string panelType)
     {
-        UIManager.Ins.ClosePanel<T>(panel);
+        UIManager.Ins.ClosePanel(panelType);
     }
 
 

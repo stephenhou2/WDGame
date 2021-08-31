@@ -9,18 +9,24 @@ public class GameQueue<T>
 
     public GameQueueNode<T> Current;
 
-    public GameQueueNode<T> MoveNext()
+    public bool MoveNext()
     {
         if(Current == null)
-            return null;
+            return false;
 
-        return Current.GetNext();
+        var next = Current.GetNext();
+        if (next == null)
+            return false;
+
+        Current = next;
+        return true;
     }
 
     public void Reset()
     {
         Current = Head;
     }
+    public int Count = 0;
 
     public void Enqueue(T obj)
     {
@@ -29,15 +35,15 @@ public class GameQueue<T>
         if(Tail == null)
         {
             Head = node;
-            Head.SetNext(node);
-            node.SetLast(Head);
             Tail = Head;
+            Count = 1;
             return;
         }
 
         // 队列内有元素，加到队尾
         Tail.SetNext(node);
         node.SetLast(Tail);
+        Tail = node;
     }
 
     public bool HasItem()
@@ -53,6 +59,7 @@ public class GameQueue<T>
 
         T obj = Head.GetObj();
         Head = Head.GetNext();
+        Head.SetLast(null);
 
         return obj;
     }

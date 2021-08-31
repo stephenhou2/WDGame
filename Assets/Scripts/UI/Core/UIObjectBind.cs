@@ -6,8 +6,6 @@ using System.Collections.Generic;
 
 public partial class UIObject
 {
-
-
     protected int BindNode(ref GameObject go, string node)
     {
         if (mRoot == null) // 没有根节点
@@ -42,31 +40,6 @@ public partial class UIObject
         if (call != null) //没有绑定回调（可以不绑）
         {
             btn.onClick.AddListener(call);
-            mUIEvents.Add(btn.onClick);
-        }
-
-        return 0;
-    }
-
-    protected int BindButtonNode<T>(ref GameObject go, string node, T panel, UnityAction<T> call = null)
-    {
-        int ret = BindNode(ref go, node);
-        if (ret < 0) // 节点绑定失败
-            return ret;
-
-        Button btn = go.GetComponent<Button>();
-        if (btn == null) //没有Button组件
-        {
-            Log.Error(ErrorLevel.Critical, "BindButtonNode failed,Button component is Required! node={0}", node);
-            return -3;
-        }
-
-        if (call != null) //没有绑定回调（可以不绑）
-        {
-            btn.onClick.AddListener(() =>
-            {
-                call(panel);
-            });
             mUIEvents.Add(btn.onClick);
         }
 
