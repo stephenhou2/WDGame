@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+
 public class Panel_MapEditor : UIPanel
 {
     private GameObject _Node_Selection_Brush;
@@ -24,11 +25,7 @@ public class Panel_MapEditor : UIPanel
         return "UI/MapEditor/Panel_MapEditor";
     }
 
-    public override bool CheckArgs(object[] openArgs)
-    {
-        return true;
-    }
-    public override void OnOpen(object[] openArgs)
+    public override void OnOpen()
     {
 
     }
@@ -119,7 +116,7 @@ public class Panel_MapEditor : UIPanel
             bool ret = GameMapEditor.Ins.DataMgr.HasMapData(mapId);
             if(!ret)
             {
-                UIManager.Ins.OpenPanel<Panel_CreateNewMap>(new object[] { mapId });
+                UIManager.Ins.OpenPanel<Panel_CreateNewMap>();
             }
             else
             {

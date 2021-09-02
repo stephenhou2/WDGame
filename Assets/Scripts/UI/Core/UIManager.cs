@@ -7,7 +7,7 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// 所有要打开的面板，都先加到队列中
     /// </summary>
-    private GameQueue<UIPanelOpenData> mToOpenPanels;
+    private GameQueue<UIPanel> mToOpenPanels;
 
     /// <summary>
     /// 所有要关闭的面板，都先加到队列中
@@ -20,12 +20,12 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// panel对象缓存池，面板关闭时，所用的UI脚本可以复用，减少GC
     /// </summary>
-    private Dictionary<string, UIPanel> mPanelPool;
+    private Dictionary<System.Type, UIPanel> mPanelPool;
 
     /// <summary>
     /// 所有已经打开的面板 
     /// </summary>
-    private Dictionary<string,UIPanel> mAllOpenPanels;
+    private Dictionary<System.Type, UIPanel> mAllOpenPanels;
 
     /// TODO:UI gameobject 复用
     ///  难点：怎么在复用的时候将所有节点还原回原始状态
@@ -61,30 +61,25 @@ public class UIManager: Singleton<UIManager>
 
     private void InitUILayers()
     {
-         RegisterLayer(UIPathDef.UI_LAYER_BOTTOM_STATIC);
-         RegisterLayer(UIPathDef.UI_LAYER_BOTTOM_DYNAMIC);
-         RegisterLayer(UIPathDef.UI_LAYER_NORMAL_STATIC);
-         RegisterLayer(UIPathDef.UI_LAYER_NORMAL_DYNAMIC);
-         RegisterLayer(UIPathDef.UI_LAYER_MSG_STATIC);
-         RegisterLayer(UIPathDef.UI_LAYER_MSG_DYNAMIC);
-         RegisterLayer(UIPathDef.UI_LAYER_TOP_STATIC);
-         RegisterLayer(UIPathDef.UI_LAYER_TOP_DYNAMIC);
+        foreach(string layer in UIPathDef.ALL_UI_LAYER)
+        {
+             RegisterLayer(layer);
+        }
     }
     public UIManager()
     {
-        mAllOpenPanels = new Dictionary<string, UIPanel>();
-        mPanelPool = new Dictionary<string, UIPanel>();
+        mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
+        mPanelPool = new Dictionary<System.Type, UIPanel>();
         mLayers = new Dictionary<string, GameObject>();
-        mToOpenPanels = new GameQueue<UIPanelOpenData>();
+        mToOpenPanels = new GameQueue<UIPanel>();
         mToClosePanels = new GameQueue<UIPanel>();
         InitUILayers();
     }
 
     private void OnOpenPanel(UIPanel panel)
     {
-        string panelType = panel.GetType().ToString();
-        if (!mAllOpenPanels.ContainsKey(panelType))
-            mAllOpenPanels.Add(panelType,panel);
+        if (!mAllOpenPanels.ContainsKey(panel.GetType()))
+            mAllOpenPanels.Add(panel.GetType(), panel);
     }
 
     private void OnClosePanel(UIPanel panel)
@@ -93,22 +88,20 @@ public class UIManager: Singleton<UIManager>
         panel.ClearAll();
         panel.DestroyUIObject();
 
-        string panelType = panel.GetType().ToString();
-        if(mAllOpenPanels.ContainsKey(panelType))
-            mAllOpenPanels.Remove(panelType);
+        if(mAllOpenPanels.ContainsKey(panel.GetType()))
+            mAllOpenPanels.Remove(panel.GetType());
     }
 
     private UIPanel PopPanel<T>() where T : UIPanel,new()
     {
         UIPanel panel = null;
-        string panelType = typeof(T).ToString();
-        if (!mPanelPool.TryGetValue(panelType, out panel))
+        if (!mPanelPool.TryGetValue(typeof(T), out panel))
         {
             panel = new T();
         }
         else
         {
-            mPanelPool.Remove(panelType);
+            mPanelPool.Remove(typeof(T));
         }
 
         return panel;
@@ -122,9 +115,9 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        if(!mPanelPool.ContainsKey(panel.panelType))
+        if(!mPanelPool.ContainsKey(panel.GetType()))
         {
-            mPanelPool.Add(panel.panelType, panel);
+            mPanelPool.Add(panel.GetType(), panel);
         }
     }
 
@@ -135,20 +128,18 @@ public class UIManager: Singleton<UIManager>
 
         while(mToOpenPanels.HasItem())
         {
-            UIPanelOpenData panelData  = mToOpenPanels.Dequeue();
-            if(panelData != null)
+            UIPanel panel  = mToOpenPanels.Dequeue();
+            if(panel != null)
             {
-                GameObject panelGo = LoadPanel(panelData.panelPath, panelData.layer);
-                UIPanel panel = panelData.panel;
+                GameObject panelGo = LoadPanel(panel.GetPanelResPath(), panel.GetPanelLayerPath());
                 if (panelGo != null)
                 {
                     panel.BindUIObjectNodes(panelGo);
                 }
 
-                PushPanel(panelData.panel);
-
+                PushPanel(panel);
                 OnOpenPanel(panel);
-                panel.OnOpen(panelData.openArgs);
+                panel.OnOpen();
             }
         }
     }
@@ -172,12 +163,9 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="openArgs"></param>
-    public void OpenPanel<T>(object[] openArgs = null) where T:UIPanel,new()
+    public void OpenPanel<T>() where T:UIPanel,new()
     {
         UIPanel panel = PopPanel<T>(); // 这里获得的panel一定不会为空
-
-        if(!panel.CheckArgs(openArgs))
-            return;
 
         string UILayerPath = panel.GetPanelLayerPath();
         string panelPath = panel.GetPanelResPath();
@@ -195,8 +183,7 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        UIPanelOpenData data = new UIPanelOpenData(panel, panelPath, layer, openArgs);
-        mToOpenPanels.Enqueue(data);
+        mToOpenPanels.Enqueue(panel);
     }
 
     /// <summary>
@@ -204,12 +191,12 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="panel"></param>
-    public void ClosePanel(string panelType)
+    public void ClosePanel<T>()
     {
         UIPanel panel;
-        if (mAllOpenPanels.TryGetValue(panelType,out panel))
+        if (mAllOpenPanels.TryGetValue(typeof(T),out panel))
         {
-            Log.Error(ErrorLevel.Normal, "ClosePanel Error,close not opened panel,panel Type:{0}", panelType);
+            Log.Error(ErrorLevel.Normal, "ClosePanel Error,close not opened panel,panel Type:{0}", typeof(T));
             return;
         }
 
@@ -222,7 +209,7 @@ public class UIManager: Singleton<UIManager>
     /// <param name="panelPath"></param>
     /// <param name="parentNode"></param>
     /// <returns></returns>
-    private GameObject LoadPanel(string panelPath,GameObject parentNode)
+    private GameObject LoadPanel(string panelPath,string panelLayerPath)
     {
         if (string.IsNullOrEmpty(panelPath))
         {
@@ -230,7 +217,8 @@ public class UIManager: Singleton<UIManager>
             return null;
         }
 
-        if(parentNode == null)
+        GameObject layerObj = GetLayer(panelLayerPath);
+        if (layerObj == null)
         {
             Log.Error(ErrorLevel.Critical, "LoadPanel Error,parentNode null!");
             return null;
@@ -241,9 +229,9 @@ public class UIManager: Singleton<UIManager>
         if (obj != null)
         {
             panelGo = GameObject.Instantiate(obj);
-            if(parentNode != null)
+            if(layerObj != null)
             {
-                panelGo.transform.SetParent(parentNode.transform,false);
+                panelGo.transform.SetParent(layerObj.transform,false);
             }
         }
         else

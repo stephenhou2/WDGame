@@ -20,13 +20,6 @@ public abstract partial class UIObject
     /// </summary>
     protected abstract void BindUINodes();
 
-    /// <summary>
-    /// panel 参数检查
-    /// </summary>
-    /// <param name="openArgs"></param>
-    /// <returns></returns>
-    public abstract bool CheckArgs(object[] openArgs);
-
     public void ClearAll()
     {
         ClearUIEvents();

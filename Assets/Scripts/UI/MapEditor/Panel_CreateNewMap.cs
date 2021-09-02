@@ -25,20 +25,9 @@ public class Panel_CreateNewMap : UIPanel
         return "UI/MapEditor/Panel_CreateNewMap";
     }
 
-    public override bool CheckArgs(object[] openArgs)
+    public override void OnOpen()
     {
-        if (openArgs == null)
-            return false;
-
-        if (openArgs.Length != 1)
-            return false;
-
-        return true;
-    }
-
-    public override void OnOpen(object[] openArgs)
-    {
-        mMapId = (string)openArgs[0];
+        
     }
 
     private void InitializeCellDirSelection()
@@ -68,7 +57,7 @@ public class Panel_CreateNewMap : UIPanel
 
         GameMapEditor.Ins.CreateNewMap(mMapId, mapWidth, mapHeight, selection, cellSize);
 
-        Close(panelType);
+        UIManager.Ins.ClosePanel<Panel_CreateNewMap>();
     }
 
     private void InitializeUI()
@@ -90,7 +79,7 @@ public class Panel_CreateNewMap : UIPanel
         BindButtonNode(ref _Node_Button_CreateMap, "_Button_CreateMap", OnCreateNewMapButtonClick);
         BindButtonNode(ref _Node_Button_Back, "_Button_Back",()=>
         {
-            Close(panelType);
+            UIManager.Ins.ClosePanel<Panel_CreateNewMap>();
         });
 
         InitializeUI();
