@@ -116,7 +116,11 @@ public class Panel_MapEditor : UIPanel
             bool ret = GameMapEditor.Ins.DataMgr.HasMapData(mapId);
             if(!ret)
             {
-                UIManager.Ins.OpenPanel<Panel_CreateNewMap>();
+                Panel_CreateNewMap panel = UIManager.Ins.OpenPanel<Panel_CreateNewMap>();
+                if(panel != null)
+                {
+                    panel.Initialize(mapId);
+                }
             }
             else
             {

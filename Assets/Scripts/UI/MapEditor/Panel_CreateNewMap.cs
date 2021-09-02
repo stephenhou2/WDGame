@@ -30,6 +30,11 @@ public class Panel_CreateNewMap : UIPanel
         
     }
 
+    public void Initialize(string mapId)
+    {
+        mMapId = mapId;
+    }
+
     private void InitializeCellDirSelection()
     {
         TMP_Dropdown cellDirSelect = _Node_Selection_Direction.GetComponent<TMP_Dropdown>();

@@ -92,7 +92,7 @@ public class UIManager: Singleton<UIManager>
             mAllOpenPanels.Remove(panel.GetType());
     }
 
-    private UIPanel PopPanel<T>() where T : UIPanel,new()
+    private T PopPanel<T>() where T : UIPanel,new()
     {
         UIPanel panel = null;
         if (!mPanelPool.TryGetValue(typeof(T), out panel))
@@ -104,7 +104,7 @@ public class UIManager: Singleton<UIManager>
             mPanelPool.Remove(typeof(T));
         }
 
-        return panel;
+        return panel as T;
     }
 
     private void PushPanel(UIPanel panel)
@@ -163,9 +163,9 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="openArgs"></param>
-    public void OpenPanel<T>() where T:UIPanel,new()
+    public T OpenPanel<T>() where T:UIPanel,new()
     {
-        UIPanel panel = PopPanel<T>(); // 这里获得的panel一定不会为空
+        T panel = PopPanel<T>(); // 这里获得的panel一定不会为空
 
         string UILayerPath = panel.GetPanelLayerPath();
         string panelPath = panel.GetPanelResPath();
@@ -173,17 +173,19 @@ public class UIManager: Singleton<UIManager>
         if(string.IsNullOrEmpty(panelPath))
         {
             Log.Error(ErrorLevel.Critical, "OpenPanel Failed, panel {0} does not registered!",typeof(T));
-            return;
+            return null;
         }
 
         GameObject layer = GetLayer(UILayerPath);
         if (layer == null)
         {
             Log.Error(ErrorLevel.Critical, "OpenPanel Failed, panel layer not find,UILayerPath:{0}", UILayerPath);
-            return;
+            return null;
         }
 
         mToOpenPanels.Enqueue(panel);
+
+        return panel;
     }
 
     /// <summary>
