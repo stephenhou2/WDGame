@@ -120,10 +120,10 @@ public class Panel_MapEditor : UIPanel
         bool ret = GameMapEditor.Ins.DataMgr.HasMapData(mapId);
         if(!ret) // 没有地图数据，弹出创建地图面板
         {
-            UIManager.Ins.OpenPanel<Panel_CreateNewMap>((UIPanel panel) =>
+            UIManager.Ins.OpenPanel<Panel_CreateNewMap>((UIObject obj) =>
             {
-                Panel_CreateNewMap p = panel as Panel_CreateNewMap;
-                p.Initialize(mapId);
+                Panel_CreateNewMap panel = obj as Panel_CreateNewMap;
+                panel.Initialize(mapId);
             });
             return;
         }

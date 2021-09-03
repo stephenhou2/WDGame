@@ -8,7 +8,7 @@ public abstract class UIControl : UIObject
     /// Control 加载时调用
     /// </summary>
     /// <param name="openArgs"></param>
-    public abstract void OnAdd(object[] openArgs);
+    public abstract void OnAdd();
 
 
     /// <summary>

@@ -8,7 +8,7 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// 所有要打开的面板，都先加到队列中
     /// </summary>
-    private GameQueue<PanelLoadAction> mToOpenPanels;
+    private GameQueue<UILoadAction> mToOpenPanels;
 
     /// <summary>
     /// 所有要关闭的面板，都先加到队列中
@@ -20,19 +20,19 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     Dictionary<string, GameObject> mLayers;
 
-
-    /// <summary>
-    /// panel对象缓存池，面板关闭时，所用的UI脚本可以复用，减少GC
-    /// </summary>
-    private Dictionary<System.Type, UIPanel> mPanelPool;
-
     /// <summary>
     /// 所有已经打开的面板 
     /// </summary>
     private Dictionary<System.Type, UIPanel> mAllOpenPanels;
 
-    /// TODO:UI gameobject 复用
-    ///  难点：怎么在复用的时候将所有节点还原回原始状态
+    // TODO:UI gameobject 复用
+    //  难点：怎么在复用的时候将所有节点还原回原始状态
+
+
+    /// <summary>
+    /// 所有要加载的control
+    /// </summary>
+    private GameQueue<UILoadAction> mToAddControls;
 
     /// <summary>
     /// 注册UI面板的挂载层
@@ -72,130 +72,159 @@ public class UIManager: Singleton<UIManager>
     }
     public UIManager()
     {
-        mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
-        mPanelPool = new Dictionary<System.Type, UIPanel>();
         mLayers = new Dictionary<string, GameObject>();
-        mToOpenPanels = new GameQueue<PanelLoadAction>();
+        mToOpenPanels = new GameQueue<UILoadAction>();
         mToClosePanels = new GameQueue<UIPanel>();
+        mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
+
+        mToAddControls = new GameQueue<UILoadAction>();
+
         InitUILayers();
     }
 
-    private void OnOpenPanel(UIPanel panel)
+    private void InstantiateUI(UIObject uiObj, GameObject template, GameObject layerGo)
     {
-        panel.OnOpen();
-
-        if (!mAllOpenPanels.ContainsKey(panel.GetType()))
-            mAllOpenPanels.Add(panel.GetType(), panel);
-    }
-
-    private void OnClosePanel(UIPanel panel)
-    {
-        panel.OnClose();
-        panel.ClearAll();
-        panel.DestroyUIObject();
-
-        if(mAllOpenPanels.ContainsKey(panel.GetType()))
-            mAllOpenPanels.Remove(panel.GetType());
-    }
-
-    private T PopPanel<T>() where T : UIPanel,new()
-    {
-        UIPanel panel = null;
-        if (!mPanelPool.TryGetValue(typeof(T), out panel))
+        if(template == null)
         {
-            panel = new T();
-        }
-        else
-        {
-            mPanelPool.Remove(typeof(T));
-        }
-
-        return panel as T;
-    }
-
-    private void PushPanel(UIPanel panel)
-    {
-        if (panel == null)
-        {
-            Log.Error(ErrorLevel.Critical,"Push Panel Failed,panel is null!");
+            Log.Error(ErrorLevel.Critical, "InstantiateUI Failed, type:{0}",uiObj.GetType());
             return;
         }
 
-        if(!mPanelPool.ContainsKey(panel.GetType()))
+        GameObject uiGo = GameObject.Instantiate(template);
+        uiObj.BindUIObjectNodes(uiGo);
+        if (layerGo != null)
         {
-            mPanelPool.Add(panel.GetType(), panel);
+            uiGo.transform.SetParent(layerGo.transform, false);
         }
     }
 
-    private void OnUIPanelLoadFinish(UIPanel panel,GameObject template,GameObject layerGo,PanelLoadFinishCall call)
+    private void OnUIPanelLoadFinish(UIPanel panel,GameObject template,GameObject layerGo,UILoadFinishCall call)
     {
-        if (template != null)
-        {
-            GameObject panelGo = GameObject.Instantiate(template);
+        InstantiateUI(panel, template, layerGo);
+        panel.OnOpen();
 
-            panel.BindUIObjectNodes(panelGo);
-            if(layerGo != null)
-            {
-                panelGo.transform.SetParent(layerGo.transform,false);
-            }
-        }
-
-        OnOpenPanel(panel);
         if (call != null)
         {
             call(panel);
         }
+
+        if (!mAllOpenPanels.ContainsKey(panel.GetType()))
+        {
+            mAllOpenPanels.Add(panel.GetType(), panel);
+        }
     }
 
-    private void HandleToOpenPanels()
+    private void ExcutePanelLoadAction(UILoadAction action)
     {
-        if (mToClosePanels.HasItem()) // 还有UI没有完成关闭动作
-            return;
-
-        while(mToOpenPanels.HasItem())
+        UIPanel panel = action.uiObj as UIPanel;
+        if(panel == null)
         {
-            PanelLoadAction action  = mToOpenPanels.Dequeue();
-            UIPanel panel = action.panel;
-            if(panel == null)
-            {
-                Log.Error(ErrorLevel.Normal, "HandleToOpenPanels Error,panel is null in to open queue!");
-                continue;
-            }
-            string layerPath = panel.GetPanelLayerPath();
-            string pathResPath = panel.GetPanelResPath();
-            GameObject layer = GetLayer(panel.GetPanelLayerPath());
-            if (layer == null)
-            {
-                Log.Error(ErrorLevel.Critical, "HandleToOpenPanels Failed, panel layer not find,UILayerPath:{0}", panel.GetPanelLayerPath());
-                return;
-            }
+            Log.Error(ErrorLevel.Normal, "ExcutePanelLoadAction Error,Load null UIPanel!");
+        }
 
-            if (action.isAsync)
+        if (action.isAsync)
+        {
+            ResourceMgr.AsyncLoadRes<GameObject> (action.uiPath, "Load UI Panel", (Object obj) =>
             {
-                ResourceMgr.AsyncLoadRes<GameObject> (pathResPath, "Load UI Panel", (Object obj) =>
+                if(obj != null)
                 {
                     GameObject template = obj as GameObject;
-                    OnUIPanelLoadFinish(panel, template, layer, action.call);
-                });
-            }
-            else
+                    OnUIPanelLoadFinish(panel, template, action.parent, action.call);
+                }
+            });
+        }
+        else
+        {
+            GameObject template = ResourceMgr.Load<GameObject>(action.uiPath, "Load UI Panel");
+            OnUIPanelLoadFinish(panel, template,action.parent, action.call);
+        }
+    }
+
+    private void UpdateOpenPanels()
+    {
+        int cnt = Mathf.Min(UIDefine.Panel_Load_Per_Frame, mToOpenPanels.Count);
+        for (int i = 0; i < cnt; i++)
+        {
+            UILoadAction action = mToOpenPanels.Dequeue();
+            if (action != null)
             {
-                GameObject template = ResourceMgr.Load<GameObject>(pathResPath, "Load UI Panel");
-                OnUIPanelLoadFinish(panel, template,layer, action.call);
+                ExcutePanelLoadAction(action);
             }
         }
     }
 
-    private void HandleToClosePanels()
+    private void ExcutePanelCloseAction(UIPanel panel)
+    {
+        if(panel != null)
+        {
+            panel.OnClose();
+            panel.ClearAll();
+            panel.DestroyUIObject();
+
+            if (mAllOpenPanels.ContainsKey(panel.GetType()))
+                mAllOpenPanels.Remove(panel.GetType());
+        }
+    }
+
+    private void UpdateClosePanels()
     {
         while (mToClosePanels.HasItem())
         {
             UIPanel panel = mToClosePanels.Dequeue();
 
-            if(panel != null)
+            if (panel != null)
             {
-                OnClosePanel(panel);
-                PushPanel(panel);
+                ExcutePanelCloseAction(panel);
+            }
+        }
+    }
+
+    private void OnUIControlLoadFinish(UIControl ctl, GameObject template, GameObject parent, UILoadFinishCall call)
+    {
+        InstantiateUI(ctl, template, parent);
+        ctl.OnAdd();
+
+        if (call != null)
+        {
+            call(ctl);
+        }
+    }
+
+    private void ExcuteControlLoadAction(UILoadAction action)
+    {
+        UIControl ctl = action.uiObj as UIControl;
+        if (ctl == null)
+        {
+            Log.Error(ErrorLevel.Normal, "ExcuteControlLoadAction Error,Load null UIControl!");
+        }
+
+        if (action.isAsync)
+        {
+            ResourceMgr.AsyncLoadRes<GameObject>(action.uiPath, "Load UI Control", (Object obj) =>
+            {
+                if (obj != null)
+                {
+                    GameObject template = obj as GameObject;
+                    OnUIControlLoadFinish(ctl, template, action.parent, action.call);
+                }
+            });
+        }
+        else
+        {
+            GameObject template = ResourceMgr.Load<GameObject>(action.uiPath, "Load UI Panel");
+            OnUIControlLoadFinish(ctl, template, action.parent, action.call);
+        }
+    }
+
+    private void UpdateAddControls()
+    {
+        int cnt = Mathf.Min(UIDefine.Control_Load_Per_Frame, mToAddControls.Count);
+        for (int i = 0; i < cnt; i++)
+        {
+            UILoadAction action = mToAddControls.Dequeue();
+            if (action != null)
+            {
+                ExcutePanelLoadAction(action);
             }
         }
     }
@@ -205,9 +234,9 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="openArgs"></param>
-    public void OpenPanel<T>(PanelLoadFinishCall call = null,bool isAsync = true) where T:UIPanel,new()
+    public void OpenPanel<T>(UILoadFinishCall call = null,bool isAsync = true) where T:UIPanel,new()
     {
-        T panel = PopPanel<T>(); // 这里获得的panel一定不会为空
+        T panel = new T();
 
         string UILayerPath = panel.GetPanelLayerPath();
         string panelPath = panel.GetPanelResPath();
@@ -225,7 +254,7 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        PanelLoadAction action = new PanelLoadAction(panel, call, isAsync);
+        UILoadAction action = new UILoadAction(panel, panelPath, layer, call, isAsync);
         mToOpenPanels.Enqueue(action);
     }
 
@@ -246,6 +275,43 @@ public class UIManager: Singleton<UIManager>
         mToClosePanels.Enqueue(panel);
     }
 
+    public void AddControl<T>(string uiPath, GameObject parent, UILoadFinishCall call = null, bool isAsync = true)
+        where T:UIControl,new()
+    {
+        T control = new T();
+
+        if (string.IsNullOrEmpty(uiPath))
+        {
+            Log.Error(ErrorLevel.Critical, "AddControl Failed, load {0} with empty path! ", typeof(T));
+            return;
+        }
+
+        if (parent == null)
+        {
+            Log.Error(ErrorLevel.Critical, "AddControl Failed, load {0} with null parent", typeof(T));
+            return;
+        }
+
+        UILoadAction action = new UILoadAction(control, uiPath, parent, call, isAsync);
+        mToAddControls.Enqueue(action);
+    }
+
+    private void UpdateAllOpenPanels(float deltaTime)
+    {
+        foreach (var kv in mAllOpenPanels)
+        {
+            UIPanel panel = kv.Value;
+            if (panel != null)
+                panel.Update(deltaTime);
+        }
+    }
+
+    // TBD: control 附属于panel
+    // panel删除时要将子节点的control也删除（onRemove())
+    // control 通过uimanager来删除
+    // uimanager 记录当前存在的control，驱动update
+
+    // 考虑是否又复用的需求
 
     /// <summary>
     ///  UI Root Update...
@@ -253,14 +319,12 @@ public class UIManager: Singleton<UIManager>
     /// <param name="deltaTime"></param>
     public void Update(float deltaTime)
     {
-        HandleToClosePanels();
-        HandleToOpenPanels();
+        UpdateClosePanels();        // close panels
 
-        foreach(var kv in mAllOpenPanels)
-        {
-            UIPanel panel = kv.Value;
-            if (panel != null)
-                panel.Update(deltaTime);
-        }
+        UpdateOpenPanels();       // open panels
+
+        UpdateAddControls();      // add controls 
+
+        UpdateAllOpenPanels(deltaTime);  // common panel update
     }
 }
