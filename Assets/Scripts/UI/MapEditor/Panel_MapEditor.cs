@@ -111,26 +111,24 @@ public class Panel_MapEditor : UIPanel
     private void OnLoadMapButtonClick()
     {
         string mapId = UIInterface.GetInputFieldString(_Node_InputField_Stage);
-        if (!string.IsNullOrEmpty(mapId))
-        {
-            bool ret = GameMapEditor.Ins.DataMgr.HasMapData(mapId);
-            if(!ret)
-            {
-                Panel_CreateNewMap panel = UIManager.Ins.OpenPanel<Panel_CreateNewMap>();
-                if(panel != null)
-                {
-                    panel.Initialize(mapId);
-                }
-            }
-            else
-            {
-                GameMapEditor.Ins.LoadStageMap(mapId);
-            }
-        }
-        else
+        if (string.IsNullOrEmpty(mapId))
         {
             Log.Error(ErrorLevel.Normal, "OnLoadMapButtonClick Error,empty mapId is invalid");
+            return;
         }
+
+        bool ret = GameMapEditor.Ins.DataMgr.HasMapData(mapId);
+        if(!ret) // 没有地图数据，弹出创建地图面板
+        {
+            UIManager.Ins.OpenPanel<Panel_CreateNewMap>((UIPanel panel) =>
+            {
+                Panel_CreateNewMap p = panel as Panel_CreateNewMap;
+                p.Initialize(mapId);
+            });
+            return;
+        }
+
+        GameMapEditor.Ins.LoadStageMap(mapId);
     }
 
     /// <summary>

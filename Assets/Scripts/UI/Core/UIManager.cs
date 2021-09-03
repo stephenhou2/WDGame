@@ -4,16 +4,20 @@ using UnityEngine;
 
 public class UIManager: Singleton<UIManager>
 {
+
     /// <summary>
     /// 所有要打开的面板，都先加到队列中
     /// </summary>
-    private GameQueue<UIPanel> mToOpenPanels;
+    private GameQueue<PanelLoadAction> mToOpenPanels;
 
     /// <summary>
     /// 所有要关闭的面板，都先加到队列中
     /// </summary>
     private GameQueue<UIPanel> mToClosePanels;
 
+    /// <summary>
+    /// 所有UI挂载的layer root
+    /// </summary>
     Dictionary<string, GameObject> mLayers;
 
 
@@ -71,13 +75,15 @@ public class UIManager: Singleton<UIManager>
         mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
         mPanelPool = new Dictionary<System.Type, UIPanel>();
         mLayers = new Dictionary<string, GameObject>();
-        mToOpenPanels = new GameQueue<UIPanel>();
+        mToOpenPanels = new GameQueue<PanelLoadAction>();
         mToClosePanels = new GameQueue<UIPanel>();
         InitUILayers();
     }
 
     private void OnOpenPanel(UIPanel panel)
     {
+        panel.OnOpen();
+
         if (!mAllOpenPanels.ContainsKey(panel.GetType()))
             mAllOpenPanels.Add(panel.GetType(), panel);
     }
@@ -121,6 +127,26 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
+    private void OnUIPanelLoadFinish(UIPanel panel,GameObject template,GameObject layerGo,PanelLoadFinishCall call)
+    {
+        if (template != null)
+        {
+            GameObject panelGo = GameObject.Instantiate(template);
+
+            panel.BindUIObjectNodes(panelGo);
+            if(layerGo != null)
+            {
+                panelGo.transform.SetParent(layerGo.transform,false);
+            }
+        }
+
+        OnOpenPanel(panel);
+        if (call != null)
+        {
+            call(panel);
+        }
+    }
+
     private void HandleToOpenPanels()
     {
         if (mToClosePanels.HasItem()) // 还有UI没有完成关闭动作
@@ -128,18 +154,34 @@ public class UIManager: Singleton<UIManager>
 
         while(mToOpenPanels.HasItem())
         {
-            UIPanel panel  = mToOpenPanels.Dequeue();
-            if(panel != null)
+            PanelLoadAction action  = mToOpenPanels.Dequeue();
+            UIPanel panel = action.panel;
+            if(panel == null)
             {
-                GameObject panelGo = LoadPanel(panel.GetPanelResPath(), panel.GetPanelLayerPath());
-                if (panelGo != null)
-                {
-                    panel.BindUIObjectNodes(panelGo);
-                }
+                Log.Error(ErrorLevel.Normal, "HandleToOpenPanels Error,panel is null in to open queue!");
+                continue;
+            }
+            string layerPath = panel.GetPanelLayerPath();
+            string pathResPath = panel.GetPanelResPath();
+            GameObject layer = GetLayer(panel.GetPanelLayerPath());
+            if (layer == null)
+            {
+                Log.Error(ErrorLevel.Critical, "HandleToOpenPanels Failed, panel layer not find,UILayerPath:{0}", panel.GetPanelLayerPath());
+                return;
+            }
 
-                PushPanel(panel);
-                OnOpenPanel(panel);
-                panel.OnOpen();
+            if (action.isAsync)
+            {
+                ResourceMgr.AsyncLoadRes<GameObject> (pathResPath, "Load UI Panel", (Object obj) =>
+                {
+                    GameObject template = obj as GameObject;
+                    OnUIPanelLoadFinish(panel, template, layer, action.call);
+                });
+            }
+            else
+            {
+                GameObject template = ResourceMgr.Load<GameObject>(pathResPath, "Load UI Panel");
+                OnUIPanelLoadFinish(panel, template,layer, action.call);
             }
         }
     }
@@ -163,29 +205,28 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="openArgs"></param>
-    public T OpenPanel<T>() where T:UIPanel,new()
+    public void OpenPanel<T>(PanelLoadFinishCall call = null,bool isAsync = true) where T:UIPanel,new()
     {
         T panel = PopPanel<T>(); // 这里获得的panel一定不会为空
 
         string UILayerPath = panel.GetPanelLayerPath();
         string panelPath = panel.GetPanelResPath();
 
-        if(string.IsNullOrEmpty(panelPath))
+        if (string.IsNullOrEmpty(panelPath))
         {
-            Log.Error(ErrorLevel.Critical, "OpenPanel Failed, panel {0} does not registered!",typeof(T));
-            return null;
+            Log.Error(ErrorLevel.Critical, "OpenPanel Failed, panel {0} does not registered!", typeof(T));
+            return;
         }
 
         GameObject layer = GetLayer(UILayerPath);
         if (layer == null)
         {
             Log.Error(ErrorLevel.Critical, "OpenPanel Failed, panel layer not find,UILayerPath:{0}", UILayerPath);
-            return null;
+            return;
         }
 
-        mToOpenPanels.Enqueue(panel);
-
-        return panel;
+        PanelLoadAction action = new PanelLoadAction(panel, call, isAsync);
+        mToOpenPanels.Enqueue(action);
     }
 
     /// <summary>
@@ -205,55 +246,6 @@ public class UIManager: Singleton<UIManager>
         mToClosePanels.Enqueue(panel);
     }
 
-    /// <summary>
-    /// 加载Panel go
-    /// </summary>
-    /// <param name="panelPath"></param>
-    /// <param name="parentNode"></param>
-    /// <returns></returns>
-    private GameObject LoadPanel(string panelPath,string panelLayerPath)
-    {
-        if (string.IsNullOrEmpty(panelPath))
-        {
-            Log.Error(ErrorLevel.Critical, "LoadPanel Error,panel path null or empty!");
-            return null;
-        }
-
-        GameObject layerObj = GetLayer(panelLayerPath);
-        if (layerObj == null)
-        {
-            Log.Error(ErrorLevel.Critical, "LoadPanel Error,parentNode null!");
-            return null;
-        }
-
-        GameObject panelGo = null;
-        GameObject obj = ResourceMgr.Load<GameObject>(panelPath, "Load UIPanel");
-        if (obj != null)
-        {
-            panelGo = GameObject.Instantiate(obj);
-            if(layerObj != null)
-            {
-                panelGo.transform.SetParent(layerObj.transform,false);
-            }
-        }
-        else
-        {
-            Log.Error(ErrorLevel.Critical, "LoadPanel Failed,panel go load failed,panelPath:{0}", panelPath);
-        }
-
-        return panelGo;
-    }
-
-    public void AddControl<T>(GameObject parentNode, object[] openArgs = null) where T : UIObject, new()
-    {
-        if (parentNode == null)
-        {
-            Log.Error(ErrorLevel.Critical, "AddControl Error,parentNode is null !!!");
-            return;
-        }
-
-
-    }
 
     /// <summary>
     ///  UI Root Update...
