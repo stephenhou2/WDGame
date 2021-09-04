@@ -2,16 +2,16 @@
 ///  简单队列
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class GameQueue<T>
+public class SimpleQueue<T>
 {
-    private GameQueueNode<T> Head;
-    private GameQueueNode<T> Tail;
+    private SimpleQueueNode<T> Head;
+    private SimpleQueueNode<T> Tail;
 
-    public GameQueueNode<T> Current;
+    public SimpleQueueNode<T> Current;
 
     public bool MoveNext()
     {
-        if(Current == null)
+        if (Current == null)
             return false;
 
         var next = Current.GetNext();
@@ -26,11 +26,11 @@ public class GameQueue<T>
     {
         Current = Head;
     }
-    public int Count = 0;
+    public int Count { get; private set; } = 0;
 
     public void Enqueue(T obj)
     {
-        GameQueueNode<T> node = new GameQueueNode<T>(obj);
+        SimpleQueueNode<T> node = new SimpleQueueNode<T>(obj);
         // 队列内没有元素
         if(Tail == null)
         {
@@ -44,6 +44,7 @@ public class GameQueue<T>
         Tail.SetNext(node);
         node.SetLast(Tail);
         Tail = node;
+        Count++;
     }
 
     public bool HasItem()
@@ -54,28 +55,41 @@ public class GameQueue<T>
     public T Dequeue()
     {
         // 队列内没有元素
-        if (!HasItem())
+        if (Count == 0)
+        {
             return default(T);
+        }
 
+        // 队列内只有一个元素
         T obj = Head.GetObj();
+        if(Count == 1)
+        {
+            Head = null;
+            Tail = null;
+            Count = 0;
+            return obj;
+        }
+
+        // 队列内有多个元素
         var next = Head.GetNext();
         if (next != null)
         {
             next.SetLast(null);
         }
         Head = next;
+        Count--;
         return obj;
     }
 }
 
-public class GameQueueNode<T>
+public class SimpleQueueNode<T>
 {
-    private GameQueueNode<T> mLast;
-    private GameQueueNode<T> mNext;
+    private SimpleQueueNode<T> mLast;
+    private SimpleQueueNode<T> mNext;
 
     private T mObj;
 
-    public GameQueueNode(T obj)
+    public SimpleQueueNode(T obj)
     {
         mObj = obj;
     }
@@ -85,22 +99,22 @@ public class GameQueueNode<T>
         return mObj;
     }
 
-    public void SetLast(GameQueueNode<T> node)
+    public void SetLast(SimpleQueueNode<T> node)
     {
         mLast = node;
     }
 
-    public GameQueueNode<T> GetLast()
+    public SimpleQueueNode<T> GetLast()
     {
         return mLast;
     }
 
-    public void SetNext(GameQueueNode<T> node)
+    public void SetNext(SimpleQueueNode<T> node)
     {
         mNext = node;
     }
 
-    public GameQueueNode<T> GetNext()
+    public SimpleQueueNode<T> GetNext()
     {
         return mNext;
     }

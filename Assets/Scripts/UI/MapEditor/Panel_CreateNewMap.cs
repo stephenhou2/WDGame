@@ -25,7 +25,7 @@ public class Panel_CreateNewMap : UIPanel
         return "UI/MapEditor/Panel_CreateNewMap";
     }
 
-    public override void OnOpen()
+    protected override void OnOpen()
     {
         
     }
@@ -102,7 +102,7 @@ public class Panel_CreateNewMap : UIPanel
         _Node_Button_Back = null;
     }
 
-    public override void OnClose()
+    protected override void OnClose()
     {
 
     }

@@ -14,6 +14,8 @@ public class Panel_MapEditor : UIPanel
     private GameObject _Node_InputField_Stage;
     private GameObject _Node_Button_LoadStage;
     private GameObject _Node_Button_SaveStage;
+    private GameObject _Node_Button_ControlTest;
+    private GameObject Node_Test;
 
     public override string GetPanelLayerPath()
     {
@@ -25,7 +27,7 @@ public class Panel_MapEditor : UIPanel
         return "UI/MapEditor/Panel_MapEditor";
     }
 
-    public override void OnOpen()
+    protected override void OnOpen()
     {
 
     }
@@ -40,6 +42,7 @@ public class Panel_MapEditor : UIPanel
         BindNode(ref _Node_Slider_Brush, "_Slider_Brush");
         BindNode(ref _Node_Image_BrushSize, "_Image_BrushSize");
         BindNode(ref _Node_Text_BrushSize, "_Text_BrushSize");
+        BindNode(ref Node_Test, "Node_Test");
 
         // input field
         BindInputFieldNode(ref _Node_InputField_Stage, "_InputField_Stage", "0");
@@ -47,6 +50,7 @@ public class Panel_MapEditor : UIPanel
         // button
         BindButtonNode(ref _Node_Button_LoadStage, "_Button_LoadStage", OnLoadMapButtonClick);
         BindButtonNode(ref _Node_Button_SaveStage, "_Button_SaveStage", OnSaveMapButtonClick);
+        BindButtonNode(ref _Node_Button_ControlTest, "_Button_ControlTest", OnControlTestButtonClick);
 
         InitializeBrushSelection();
         InitializeBrushSlider();
@@ -147,6 +151,15 @@ public class Panel_MapEditor : UIPanel
         }
     }
 
+    private void OnControlTestButtonClick()
+    {
+        UIManager.Ins.AddControl<Control_Test>(this, "UI/MapEditor/Control_Test", Node_Test, (UIObject obj) =>
+        {
+            Log.Logic(LogLevel.Hint,"On load control finish:{0}", obj.GetType());
+        });
+
+    }
+
     public override void CustomClear()
     {
         _Node_Selection_Brush = null;
@@ -156,9 +169,11 @@ public class Panel_MapEditor : UIPanel
         _Node_InputField_Stage = null;
         _Node_Button_LoadStage = null;
         _Node_Button_SaveStage = null;
+        _Node_Button_ControlTest = null;
+        Node_Test = null;
     }
 
-    public override void OnClose()
+    protected override void OnClose()
     {
 
     }

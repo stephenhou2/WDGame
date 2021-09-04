@@ -8,12 +8,12 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// 所有要打开的面板，都先加到队列中
     /// </summary>
-    private GameQueue<UILoadAction> mToOpenPanels;
+    private SimpleQueue<UILoadAction> mToOpenPanels;
 
     /// <summary>
     /// 所有要关闭的面板，都先加到队列中
     /// </summary>
-    private GameQueue<UIPanel> mToClosePanels;
+    private SimpleQueue<UIPanel> mToClosePanels;
 
     /// <summary>
     /// 所有UI挂载的layer root
@@ -32,7 +32,9 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// 所有要加载的control
     /// </summary>
-    private GameQueue<UILoadAction> mToAddControls;
+    private SimpleQueue<UILoadAction> mToAddControls;
+
+    private Dictionary<int,UIControl> mAllControls;
 
     /// <summary>
     /// 注册UI面板的挂载层
@@ -43,7 +45,7 @@ public class UIManager: Singleton<UIManager>
         if (string.IsNullOrEmpty(layerPath))
             return;
 
-        var layer = GameObject.Find(layerPath);
+        GameObject layer = GameObject.Find(layerPath);
         if (layer != null)
             mLayers.Add(layerPath, layer);
     }
@@ -73,11 +75,12 @@ public class UIManager: Singleton<UIManager>
     public UIManager()
     {
         mLayers = new Dictionary<string, GameObject>();
-        mToOpenPanels = new GameQueue<UILoadAction>();
-        mToClosePanels = new GameQueue<UIPanel>();
+        mToOpenPanels = new SimpleQueue<UILoadAction>();
+        mToClosePanels = new SimpleQueue<UIPanel>();
         mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
 
-        mToAddControls = new GameQueue<UILoadAction>();
+        mToAddControls = new SimpleQueue<UILoadAction>();
+        mAllControls = new Dictionary<int, UIControl>();
 
         InitUILayers();
     }
@@ -100,14 +103,18 @@ public class UIManager: Singleton<UIManager>
 
     private void OnUIPanelLoadFinish(UIPanel panel,GameObject template,GameObject layerGo,UILoadFinishCall call)
     {
+        // Instantiate
         InstantiateUI(panel, template, layerGo);
-        panel.OnOpen();
 
+        // On Load Finish
         if (call != null)
         {
             call(panel);
         }
+        // OnOpen
+        panel.UIObjectOnOpen(null);
 
+        // Record Panel
         if (!mAllOpenPanels.ContainsKey(panel.GetType()))
         {
             mAllOpenPanels.Add(panel.GetType(), panel);
@@ -140,7 +147,7 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
-    private void UpdateOpenPanels()
+    private void _OpenPanels()
     {
         int cnt = Mathf.Min(UIDefine.Panel_Load_Per_Frame, mToOpenPanels.Count);
         for (int i = 0; i < cnt; i++)
@@ -157,16 +164,14 @@ public class UIManager: Singleton<UIManager>
     {
         if(panel != null)
         {
-            panel.OnClose();
-            panel.ClearAll();
-            panel.DestroyUIObject();
+            panel.UIObjectOnClose();
 
             if (mAllOpenPanels.ContainsKey(panel.GetType()))
                 mAllOpenPanels.Remove(panel.GetType());
         }
     }
 
-    private void UpdateClosePanels()
+    private void _ClosePanels()
     {
         while (mToClosePanels.HasItem())
         {
@@ -179,14 +184,21 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
-    private void OnUIControlLoadFinish(UIControl ctl, GameObject template, GameObject parent, UILoadFinishCall call)
+    private void OnUIControlLoadFinish(UIObject holder,UIControl ctl, GameObject template, GameObject parent, UILoadFinishCall call)
     {
         InstantiateUI(ctl, template, parent);
-        ctl.OnAdd();
+
+        ctl.UIObjectOnOpen(holder);
 
         if (call != null)
         {
             call(ctl);
+        }
+
+        int key = ctl.GetHashCode();
+        if (!mAllControls.ContainsKey(key))
+        {
+            mAllControls.Add(key,ctl);
         }
     }
 
@@ -205,18 +217,18 @@ public class UIManager: Singleton<UIManager>
                 if (obj != null)
                 {
                     GameObject template = obj as GameObject;
-                    OnUIControlLoadFinish(ctl, template, action.parent, action.call);
+                    OnUIControlLoadFinish(action.holder,ctl, template, action.parent, action.call);
                 }
             });
         }
         else
         {
             GameObject template = ResourceMgr.Load<GameObject>(action.uiPath, "Load UI Panel");
-            OnUIControlLoadFinish(ctl, template, action.parent, action.call);
+            OnUIControlLoadFinish(action.holder, ctl, template, action.parent, action.call);
         }
     }
 
-    private void UpdateAddControls()
+    private void _AddControls()
     {
         int cnt = Mathf.Min(UIDefine.Control_Load_Per_Frame, mToAddControls.Count);
         for (int i = 0; i < cnt; i++)
@@ -224,10 +236,11 @@ public class UIManager: Singleton<UIManager>
             UILoadAction action = mToAddControls.Dequeue();
             if (action != null)
             {
-                ExcutePanelLoadAction(action);
+                ExcuteControlLoadAction(action);
             }
         }
     }
+
 
     /// <summary>
     /// open panel
@@ -254,7 +267,7 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        UILoadAction action = new UILoadAction(panel, panelPath, layer, call, isAsync);
+        UILoadAction action = new UILoadAction(null,panel, panelPath, layer, call, isAsync);
         mToOpenPanels.Enqueue(action);
     }
 
@@ -266,7 +279,7 @@ public class UIManager: Singleton<UIManager>
     public void ClosePanel<T>()
     {
         UIPanel panel;
-        if (mAllOpenPanels.TryGetValue(typeof(T),out panel))
+        if (!mAllOpenPanels.TryGetValue(typeof(T), out panel))
         {
             Log.Error(ErrorLevel.Normal, "ClosePanel Error,close not opened panel,panel Type:{0}", typeof(T));
             return;
@@ -275,11 +288,16 @@ public class UIManager: Singleton<UIManager>
         mToClosePanels.Enqueue(panel);
     }
 
-    public void AddControl<T>(string uiPath, GameObject parent, UILoadFinishCall call = null, bool isAsync = true)
+    public void AddControl<T>(UIObject holder,string uiPath, GameObject parent, UILoadFinishCall call = null, bool isAsync = true)
         where T:UIControl,new()
     {
-        T control = new T();
+        if(holder == null)
+        {
+            Log.Error(ErrorLevel.Critical, "AddControl Failed,UI Control must has a holder!");
+            return;
+        }
 
+        T control = new T();
         if (string.IsNullOrEmpty(uiPath))
         {
             Log.Error(ErrorLevel.Critical, "AddControl Failed, load {0} with empty path! ", typeof(T));
@@ -292,8 +310,32 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        UILoadAction action = new UILoadAction(control, uiPath, parent, call, isAsync);
+        UILoadAction action = new UILoadAction(holder,control, uiPath, parent, call, isAsync);
         mToAddControls.Enqueue(action);
+    }
+
+    public void RemoveControl(UIObject holder, UIControl ctl)
+    {
+        if (holder == null)
+        {
+            Log.Error(ErrorLevel.Critical, "RemoveControl Failed,holder is null!");
+            return;
+        }
+
+        if (ctl == null)
+        {
+            Log.Error(ErrorLevel.Critical, "RemoveControl Failed,ctl is null!");
+            return;
+        }
+
+        ctl.UIObjectOnClose();
+        holder.RemoveChildUIObj(ctl);
+
+        int key = ctl.GetHashCode();
+        if (mAllControls.ContainsKey(key))
+        {
+            mAllControls.Remove(key);
+        }
     }
 
     private void UpdateAllOpenPanels(float deltaTime)
@@ -304,12 +346,23 @@ public class UIManager: Singleton<UIManager>
             if (panel != null)
                 panel.Update(deltaTime);
         }
+    }   
+    
+    private void UpdateAllControls(float deltaTime)
+    {
+        foreach (var kv in mAllControls)
+        {
+            UIControl ctl = kv.Value;
+            if (ctl != null)
+            {
+                ctl.Update(deltaTime);
+            }
+        }
     }
 
-    // TBD: control 附属于panel
+    // TBD: control 附属于
     // panel删除时要将子节点的control也删除（onRemove())
     // control 通过uimanager来删除
-    // uimanager 记录当前存在的control，驱动update
 
     // 考虑是否又复用的需求
 
@@ -319,12 +372,14 @@ public class UIManager: Singleton<UIManager>
     /// <param name="deltaTime"></param>
     public void Update(float deltaTime)
     {
-        UpdateClosePanels();        // close panels
+        _ClosePanels();        // close panels
 
-        UpdateOpenPanels();       // open panels
+        _OpenPanels();       // open panels
 
-        UpdateAddControls();      // add controls 
+        _AddControls();      // add controls 
 
         UpdateAllOpenPanels(deltaTime);  // common panel update
+
+        UpdateAllControls(deltaTime); // common control update
     }
 }

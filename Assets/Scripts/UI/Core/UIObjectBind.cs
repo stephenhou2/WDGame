@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-public partial class UIObject
+public abstract partial class UIObject
 {
     protected int BindNode(ref GameObject go, string node)
     {

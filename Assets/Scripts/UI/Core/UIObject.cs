@@ -8,11 +8,17 @@ public abstract partial class UIObject
     private List<IEnumerator> mEnumerators; // 后面自己实现协程
     protected GameObject mRoot;
     private List<UnityEvent> mUIEvents;
+    public List<UIObject> mChildUIObjs;
+    /// <summary>
+    /// control 持有者,可以是一个panel，也可以是另一个control
+    /// </summary>
+    protected UIObject mHolder;
 
-    protected UIObject() 
+    protected UIObject()
     {
         mEnumerators = new List<IEnumerator>();
         mUIEvents = new List<UnityEvent>();
+        mChildUIObjs = new List<UIObject>();
     } // 构造函数
 
     /// <summary>
@@ -20,10 +26,73 @@ public abstract partial class UIObject
     /// </summary>
     protected abstract void BindUINodes();
 
+    /// <summary>
+    /// panel 打开时调用
+    /// </summary>
+    protected abstract void OnOpen();
+
+    /// <summary>
+    /// panel关闭前调用
+    /// </summary>
+    protected abstract void OnClose();
+
+    public void SetHolder(UIObject holder)
+    {
+        mHolder = holder;
+    }
+
+    public void UIObjectOnClose()
+    {
+        DestroyAllChildUIObj();
+        //if(mHolder !=  null)
+        //{
+        //    mHolder.RemoveChildUIObj(this);
+        //}
+        OnClose();
+        DestroyUIObject();
+        ClearAll();
+    }
+
+    public void UIObjectOnOpen(UIObject holder)
+    {
+        if(holder != null)
+        {
+            SetHolder(holder);
+            holder.AddChildUIObj(this);
+        }
+        OnOpen();
+    }
+
+    public void AddChildUIObj(UIObject uiobj)
+    {
+        if(!mChildUIObjs.Contains(uiobj))
+        {
+            mChildUIObjs.Add(uiobj);
+        }
+    }
+
+    public void DestroyAllChildUIObj()
+    {
+        foreach(UIObject uiObj in mChildUIObjs)
+        {
+            uiObj.UIObjectOnClose();
+        }
+    }
+
+    public void RemoveChildUIObj(UIObject uiobj)
+    {
+        if (mChildUIObjs.Contains(uiobj))
+        {
+            mChildUIObjs.Remove(uiobj);
+        }
+    }
+
     public void ClearAll()
     {
         ClearUIEvents();
         CustomClear();
+        mChildUIObjs.Clear();
+        mHolder = null;
     }
 
     protected void ClearUIEvents()
