@@ -4,26 +4,28 @@ using UnityEngine;
 
 public class UIManager: Singleton<UIManager>
 {
+    //private void OnUIControlLoadFinish(UIEntity holder, UIControl ctl, GameObject template, GameObject parent, UILoadFinishCall call)
+    private delegate void UILoadFinishDelegate(UIEntity holder,UIEntity entity,GameObject template,GameObject parent, UILoadFinishCall call);
 
     /// <summary>
     /// 所有要打开的面板，都先加到队列中
     /// </summary>
-    private SimpleQueue<UILoadAction> mToOpenPanels;
+    private SimpleQueue<UILoadAction> mToOpenPanels = new SimpleQueue<UILoadAction>();
 
     /// <summary>
     /// 所有要关闭的面板，都先加到队列中
     /// </summary>
-    private SimpleQueue<UIPanel> mToClosePanels;
+    private SimpleQueue<UIPanel> mToClosePanels = new SimpleQueue<UIPanel>();
 
     /// <summary>
     /// 所有UI挂载的layer root
     /// </summary>
-    Dictionary<string, GameObject> mLayers;
+    Dictionary<string, GameObject> mLayers = new Dictionary<string, GameObject>();
 
     /// <summary>
     /// 所有已经打开的面板 
     /// </summary>
-    private Dictionary<System.Type, UIPanel> mAllOpenPanels;
+    private Dictionary<System.Type, UIPanel> mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
 
     // TODO:UI gameobject 复用
     //  难点：怎么在复用的时候将所有节点还原回原始状态
@@ -32,22 +34,32 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// 所有要加载的control
     /// </summary>
-    private SimpleQueue<UILoadAction> mToAddControls;
+    private SimpleQueue<UILoadAction> mToAddControls = new SimpleQueue<UILoadAction>();
 
-    private Dictionary<int,UIControl> mAllControls;
+    /// <summary>
+    /// UI实体缓存池
+    /// </summary>
+    private Dictionary<System.Type, GamePool> mUIEntityPools = new Dictionary<System.Type, GamePool>();
+
+    /// <summary>
+    /// UI GameObject 缓存池
+    /// </summary>
+    private Dictionary<string,GamePool> mUIObjectPool = new Dictionary<string, GamePool>();
+
+    private GameObject mUIPoolNode;
 
     /// <summary>
     /// 注册UI面板的挂载层
     /// </summary>
     /// <param name="layerPath"></param>
-    private void RegisterLayer(string layerPath)
+    private void RegisterLayer(GameObject uiRoot,string layerPath)
     {
         if (string.IsNullOrEmpty(layerPath))
             return;
 
-        GameObject layer = GameObject.Find(layerPath);
+        Transform layer = uiRoot.transform.Find(layerPath);
         if (layer != null)
-            mLayers.Add(layerPath, layer);
+            mLayers.Add(layerPath, layer.gameObject);
     }
 
     /// <summary>
@@ -65,54 +77,104 @@ public class UIManager: Singleton<UIManager>
         return null;
     }
 
-    private void InitUILayers()
+    private void InitUINodes()
     {
-        foreach(string layer in UIPathDef.ALL_UI_LAYER)
+        GameObject UIRoot = GameObject.Find(UIPathDef.UI_ROOT);
+        if(UIRoot == null)
         {
-             RegisterLayer(layer);
-        }
-    }
-    public UIManager()
-    {
-        mLayers = new Dictionary<string, GameObject>();
-        mToOpenPanels = new SimpleQueue<UILoadAction>();
-        mToClosePanels = new SimpleQueue<UIPanel>();
-        mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
-
-        mToAddControls = new SimpleQueue<UILoadAction>();
-        mAllControls = new Dictionary<int, UIControl>();
-
-        InitUILayers();
-    }
-
-    private void InstantiateUI(UIObject uiObj, GameObject template, GameObject layerGo)
-    {
-        if(template == null)
-        {
-            Log.Error(ErrorLevel.Critical, "InstantiateUI Failed, type:{0}",uiObj.GetType());
+            Log.Error(ErrorLevel.Fatal, "UI Root Not Find");
             return;
         }
 
-        GameObject uiGo = GameObject.Instantiate(template);
-        uiObj.BindUIObjectNodes(uiGo);
-        if (layerGo != null)
+        mUIPoolNode = UIRoot.transform.Find(UIPathDef.UI_POOL_NODE).gameObject;
+
+        // 绑定所有UI层级
+        foreach(string layer in UIPathDef.ALL_UI_LAYER)
         {
-            uiGo.transform.SetParent(layerGo.transform, false);
+             RegisterLayer(UIRoot,layer);
         }
     }
 
-    private void OnUIPanelLoadFinish(UIPanel panel,GameObject template,GameObject layerGo,UILoadFinishCall call)
+    public UIManager()
     {
-        // Instantiate
-        InstantiateUI(panel, template, layerGo);
+        InitUINodes();
+    }
+
+    private void EntityBindUIObj(UIEntity uiEntity, GameObject uiObj, GameObject layerGo)
+    {
+        if(uiObj == null)
+        {
+            Log.Error(ErrorLevel.Critical, "EntityBindUIObj Failed, type:{0}", uiEntity.GetType());
+            return;
+        }
+
+        uiEntity.BindUINodes(uiObj);
+        if (layerGo != null)
+        {
+            uiObj.transform.SetParent(layerGo.transform, false);
+        }
+    }
+
+    private T GetUIEntity<T>() where T:UIEntity,new()
+    {
+        T entity = null;
+
+        GamePool pool;
+        if(mUIEntityPools.TryGetValue(typeof(T),out pool))
+        {
+            if(pool != null)
+            {
+                entity = pool.PopObj<T>();
+            }
+        }
+
+        if(entity == null)
+        {
+            entity = new T();
+        }
+
+        return entity;
+    }
+
+    public void PushUIEntity<T>(T entity) where T:UIEntity
+    {
+        GamePool pool;
+
+        System.Type type = entity.GetType();
+        if (mUIEntityPools.TryGetValue(type, out pool))
+        {
+            if(pool == null)
+            {
+                pool = new GamePool(type);
+            }
+        }
+        else
+        {
+            pool = new GamePool(type);
+            mUIEntityPools.Add(type, pool);
+        }
+
+        pool.PushObj(entity);
+    }
+
+
+    private void WillOpenUI(UIEntity holder, UIEntity entity, GameObject uiObj, string uiPath, GameObject layerGo, UILoadFinishCall call)
+    {
+        EntityBindUIObj(entity, uiObj, layerGo);
 
         // On Load Finish
         if (call != null)
         {
-            call(panel);
+            call(entity);
         }
+
         // OnOpen
-        panel.UIObjectOnOpen(null);
+        entity.UIEntityOnOpen(uiPath, holder);
+    }
+
+    private void OnUIPanelLoadFinish(UIEntity holder,UIPanel panel,GameObject uiObj, string uiPath, GameObject layerGo,UILoadFinishCall call)
+    {
+        WillOpenUI(holder, panel, uiObj, uiPath, layerGo, call);
 
         // Record Panel
         if (!mAllOpenPanels.ContainsKey(panel.GetType()))
@@ -121,29 +183,86 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
+    private void OnUIControlLoadFinish(UIEntity holder, UIEntity entity, GameObject uiObj, string uiPath, GameObject layerGo, UILoadFinishCall call)
+    {
+        WillOpenUI(holder, entity, uiObj, uiPath, layerGo, call);
+    }
+
+    private GameObject GetUIObject(string uiPath)
+    {
+        GamePool pool;
+        if(!mUIObjectPool.TryGetValue(uiPath, out pool))
+        {
+            return null;
+        }
+
+        return pool.PopObj<GameObject>();
+    }
+
+    private void PushUIObject(string uiPath,GameObject uiObj)
+    {
+        if (string.IsNullOrEmpty(uiPath))
+        {
+            Log.Error(ErrorLevel.Normal, "PushUIObject Failed,empty uiPath");
+            return;
+        }
+
+        if (uiObj == null)
+        {
+            Log.Error(ErrorLevel.Normal, "PushUIObject Failed,push null game object");
+            return;
+        }
+
+        GamePool pool;
+        if (!mUIObjectPool.TryGetValue(uiPath, out pool))
+        {
+            pool = new GamePool(typeof(GameObject));
+            mUIObjectPool.Add(uiPath, pool);
+        }
+
+        pool.PushObj(uiObj);
+        uiObj.transform.SetParent(mUIPoolNode.transform,false);
+    }
+
     private void ExcutePanelLoadAction(UILoadAction action)
     {
-        UIPanel panel = action.uiObj as UIPanel;
+        UIPanel panel = action.uiEntity as UIPanel;
         if(panel == null)
         {
             Log.Error(ErrorLevel.Normal, "ExcutePanelLoadAction Error,Load null UIPanel!");
+        }
+
+        GameObject uiObj = GetUIObject(action.uiPath);
+
+        if (uiObj != null)
+        {
+            OnUIPanelLoadFinish(action.holder, panel, uiObj, action.uiPath, action.parent, action.call);
+            return;
         }
 
         if (action.isAsync)
         {
             ResourceMgr.AsyncLoadRes<GameObject> (action.uiPath, "Load UI Panel", (Object obj) =>
             {
-                if(obj != null)
-                {
-                    GameObject template = obj as GameObject;
-                    OnUIPanelLoadFinish(panel, template, action.parent, action.call);
-                }
+                if (obj == null)
+                    return;
+
+                GameObject template = obj as GameObject;
+                if (template == null)
+                    return;
+                   
+                uiObj = GameObject.Instantiate(template);
+                OnUIPanelLoadFinish(action.holder, panel, uiObj, action.uiPath, action.parent, action.call);
             });
         }
         else
         {
             GameObject template = ResourceMgr.Load<GameObject>(action.uiPath, "Load UI Panel");
-            OnUIPanelLoadFinish(panel, template,action.parent, action.call);
+            if (template == null)
+                return;
+
+            uiObj = GameObject.Instantiate(template);
+            OnUIPanelLoadFinish(action.holder, panel, uiObj, action.uiPath, action.parent, action.call);
         }
     }
 
@@ -164,7 +283,7 @@ public class UIManager: Singleton<UIManager>
     {
         if(panel != null)
         {
-            panel.UIObjectOnClose();
+            panel.UIEntityOnClose();
 
             if (mAllOpenPanels.ContainsKey(panel.GetType()))
                 mAllOpenPanels.Remove(panel.GetType());
@@ -184,47 +303,45 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
-    private void OnUIControlLoadFinish(UIObject holder,UIControl ctl, GameObject template, GameObject parent, UILoadFinishCall call)
-    {
-        InstantiateUI(ctl, template, parent);
-
-        ctl.UIObjectOnOpen(holder);
-
-        if (call != null)
-        {
-            call(ctl);
-        }
-
-        int key = ctl.GetHashCode();
-        if (!mAllControls.ContainsKey(key))
-        {
-            mAllControls.Add(key,ctl);
-        }
-    }
-
     private void ExcuteControlLoadAction(UILoadAction action)
     {
-        UIControl ctl = action.uiObj as UIControl;
+        UIControl ctl = action.uiEntity as UIControl;
         if (ctl == null)
         {
             Log.Error(ErrorLevel.Normal, "ExcuteControlLoadAction Error,Load null UIControl!");
+        }
+
+        GameObject uiObj = GetUIObject(action.uiPath);
+        
+        if(uiObj != null)
+        {
+            OnUIControlLoadFinish(action.holder, ctl, uiObj, action.uiPath, action.parent, action.call);
+            return;
         }
 
         if (action.isAsync)
         {
             ResourceMgr.AsyncLoadRes<GameObject>(action.uiPath, "Load UI Control", (Object obj) =>
             {
-                if (obj != null)
-                {
-                    GameObject template = obj as GameObject;
-                    OnUIControlLoadFinish(action.holder,ctl, template, action.parent, action.call);
-                }
+                if (obj == null)
+                    return;
+                
+                GameObject template = obj as GameObject;
+                if (template == null)
+                    return;
+
+                uiObj = GameObject.Instantiate(template);
+                OnUIControlLoadFinish(action.holder,ctl, uiObj, action.uiPath, action.parent, action.call);
             });
         }
         else
         {
-            GameObject template = ResourceMgr.Load<GameObject>(action.uiPath, "Load UI Panel");
-            OnUIControlLoadFinish(action.holder, ctl, template, action.parent, action.call);
+            GameObject template = ResourceMgr.Load<GameObject>(action.uiPath, "Load UI Control");
+            if (template == null)
+                return;
+
+            uiObj = GameObject.Instantiate(template);
+            OnUIControlLoadFinish(action.holder, ctl, uiObj, action.uiPath, action.parent, action.call);
         }
     }
 
@@ -247,16 +364,14 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="openArgs"></param>
-    public void OpenPanel<T>(UILoadFinishCall call = null,bool isAsync = true) where T:UIPanel,new()
+    public void OpenPanel<T>(string panelPath,UILoadFinishCall call = null,bool isAsync = true) where T:UIPanel,new()
     {
-        T panel = new T();
-
+        T panel = GetUIEntity<T>();
         string UILayerPath = panel.GetPanelLayerPath();
-        string panelPath = panel.GetPanelResPath();
 
         if (string.IsNullOrEmpty(panelPath))
         {
-            Log.Error(ErrorLevel.Critical, "OpenPanel Failed, panel {0} does not registered!", typeof(T));
+            Log.Error(ErrorLevel.Critical, "OpenPanel {0} Failed, empty panel path!",typeof(T));
             return;
         }
 
@@ -288,7 +403,7 @@ public class UIManager: Singleton<UIManager>
         mToClosePanels.Enqueue(panel);
     }
 
-    public void AddControl<T>(UIObject holder,string uiPath, GameObject parent, UILoadFinishCall call = null, bool isAsync = true)
+    public void AddControl<T>(UIEntity holder,string uiPath, GameObject parent, UILoadFinishCall call = null, bool isAsync = true)
         where T:UIControl,new()
     {
         if(holder == null)
@@ -297,7 +412,6 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        T control = new T();
         if (string.IsNullOrEmpty(uiPath))
         {
             Log.Error(ErrorLevel.Critical, "AddControl Failed, load {0} with empty path! ", typeof(T));
@@ -310,11 +424,12 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        UILoadAction action = new UILoadAction(holder,control, uiPath, parent, call, isAsync);
+        T control = GetUIEntity<T>();
+        UILoadAction action = new UILoadAction(holder, control, uiPath, parent, call, isAsync);
         mToAddControls.Enqueue(action);
     }
 
-    public void RemoveControl(UIObject holder, UIControl ctl)
+    public void RemoveControl(UIEntity holder, UIControl ctl)
     {
         if (holder == null)
         {
@@ -328,14 +443,8 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        ctl.UIObjectOnClose();
-        holder.RemoveChildUIObj(ctl);
-
-        int key = ctl.GetHashCode();
-        if (mAllControls.ContainsKey(key))
-        {
-            mAllControls.Remove(key);
-        }
+        ctl.UIEntityOnClose();
+        holder.RemoveChildUIEntity(ctl);
     }
 
     private void UpdateAllOpenPanels(float deltaTime)
@@ -347,24 +456,6 @@ public class UIManager: Singleton<UIManager>
                 panel.Update(deltaTime);
         }
     }   
-    
-    private void UpdateAllControls(float deltaTime)
-    {
-        foreach (var kv in mAllControls)
-        {
-            UIControl ctl = kv.Value;
-            if (ctl != null)
-            {
-                ctl.Update(deltaTime);
-            }
-        }
-    }
-
-    // TBD: control 附属于
-    // panel删除时要将子节点的control也删除（onRemove())
-    // control 通过uimanager来删除
-
-    // 考虑是否又复用的需求
 
     /// <summary>
     ///  UI Root Update...
@@ -379,7 +470,25 @@ public class UIManager: Singleton<UIManager>
         _AddControls();      // add controls 
 
         UpdateAllOpenPanels(deltaTime);  // common panel update
+    }
 
-        UpdateAllControls(deltaTime); // common control update
+    public void DestroyUIEntity(UIEntity entity)
+    {
+        if (entity == null)
+            return;
+
+        if (entity.CheckRecycleUIEntity()) // recycle ui entity
+        {
+            PushUIEntity(entity);
+        }
+
+        if (entity.CheckRecycleUIGameObject()) // recycle ui gameobject
+        {
+            PushUIObject(entity.GetUIResPath(),entity.GetRootObj());
+        }
+        else if (entity.GetRootObj() != null) // destroy ui gameobject,
+        {
+            GameObject.Destroy(entity.GetRootObj());
+        }
     }
 }

@@ -122,7 +122,7 @@ public class GameMapEditor : Singleton<GameMapEditor>,ISceneMgr
         mInputControl.RegisterInputHandle(mMapBorad);
 
         IntializeDrawers();
-        UIManager.Ins.OpenPanel<Panel_MapEditor>(null); ;
+        UIManager.Ins.OpenPanel<Panel_MapEditor>("UI/MapEditor/Panel_MapEditor", null); 
     }
 
     public void OnSceneExit()

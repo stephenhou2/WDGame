@@ -4,17 +4,17 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-public abstract partial class UIObject
+public abstract partial class UIEntity
 {
     protected int BindNode(ref GameObject go, string node)
     {
-        if (mRoot == null) // 没有根节点
+        if (mUIRoot == null) // 没有根节点
         {
             Log.Error(ErrorLevel.Critical, "BindNode failed,ui root node is null!");
             return -1;
         }
 
-        Transform targetNode = UIInterface.FindChildNode(mRoot.transform, node);
+        Transform targetNode = UIInterface.FindChildNode(mUIRoot.transform, node);
         if (targetNode == null)// 找不到要绑定的节点
         {
             Log.Error(ErrorLevel.Critical, "BindNode failed,does not has target node,node={0}", node);

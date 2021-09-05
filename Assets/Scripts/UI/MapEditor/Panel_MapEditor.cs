@@ -22,11 +22,6 @@ public class Panel_MapEditor : UIPanel
         return UIPathDef.UI_LAYER_BOTTOM_STATIC;
     }
 
-    public override string GetPanelResPath()
-    {
-        return "UI/MapEditor/Panel_MapEditor";
-    }
-
     protected override void OnOpen()
     {
 
@@ -124,7 +119,7 @@ public class Panel_MapEditor : UIPanel
         bool ret = GameMapEditor.Ins.DataMgr.HasMapData(mapId);
         if(!ret) // 没有地图数据，弹出创建地图面板
         {
-            UIManager.Ins.OpenPanel<Panel_CreateNewMap>((UIObject obj) =>
+            UIManager.Ins.OpenPanel<Panel_CreateNewMap>("UI/MapEditor/Panel_CreateNewMap",(UIEntity obj) =>
             {
                 Panel_CreateNewMap panel = obj as Panel_CreateNewMap;
                 panel.Initialize(mapId);
@@ -153,7 +148,7 @@ public class Panel_MapEditor : UIPanel
 
     private void OnControlTestButtonClick()
     {
-        UIManager.Ins.AddControl<Control_Test>(this, "UI/MapEditor/Control_Test", Node_Test, (UIObject obj) =>
+        UIManager.Ins.AddControl<Control_Test>(this, "UI/MapEditor/Control_Test", Node_Test, (UIEntity obj) =>
         {
             Log.Logic(LogLevel.Hint,"On load control finish:{0}", obj.GetType());
         });

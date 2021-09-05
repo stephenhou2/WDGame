@@ -20,11 +20,6 @@ public class Panel_CreateNewMap : UIPanel
         return UIPathDef.UI_LAYER_NORMAL_STATIC;
     }
 
-    public override string GetPanelResPath()
-    {
-        return "UI/MapEditor/Panel_CreateNewMap";
-    }
-
     protected override void OnOpen()
     {
         

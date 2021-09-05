@@ -10,9 +10,15 @@ public class Control_Test2 : UIControl
     {
         Log.Logic("OnTestButtonClick 2222222222222");
 
-        UIManager.Ins.ClosePanel<Panel_MapEditor>();
+        UIEntity holder = GetHolder();
+        UIManager.Ins.RemoveControl(holder,this);
     }
-    
+
+    public override int GetRecycleStrategy()
+    {
+        return UIDefine.UI_Recycle_UIEntity | UIDefine.UI_Recycle_UIGameObject;
+    }
+
     protected override void BindUINodes()
     {
         BindButtonNode(ref Button_Test, "Button_Test", OnTestButtonClick);
@@ -26,5 +32,10 @@ public class Control_Test2 : UIControl
     protected override void OnOpen()
     {
         Log.Logic("Control_Test OnOpen 22222222222");
+    }
+
+    public override void CustomClear()
+    {
+        Button_Test = null;
     }
 }

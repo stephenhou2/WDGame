@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class UIControl : UIObject
+public abstract class UIControl : UIEntity
 {
+    //private string m
 
 }
