@@ -64,10 +64,6 @@ public abstract partial class UIEntity
     public void UIEntityOnClose()
     {
         DestroyAllChildUIEntity();
-        //if(mHolder !=  null)
-        //{
-            //mHolder.RemoveChildUIObj(this);
-        //}
         OnClose();
         DestroyUIEntity();
         ClearAll();

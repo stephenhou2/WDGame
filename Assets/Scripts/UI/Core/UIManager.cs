@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class UIManager: Singleton<UIManager>
 {
-    //private void OnUIControlLoadFinish(UIEntity holder, UIControl ctl, GameObject template, GameObject parent, UILoadFinishCall call)
-    private delegate void UILoadFinishDelegate(UIEntity holder,UIEntity entity,GameObject template,GameObject parent, UILoadFinishCall call);
-
     /// <summary>
     /// 所有要打开的面板，都先加到队列中
     /// </summary>
@@ -27,10 +24,6 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     private Dictionary<System.Type, UIPanel> mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
 
-    // TODO:UI gameobject 复用
-    //  难点：怎么在复用的时候将所有节点还原回原始状态
-
-
     /// <summary>
     /// 所有要加载的control
     /// </summary>
@@ -46,6 +39,9 @@ public class UIManager: Singleton<UIManager>
     /// </summary>
     private Dictionary<string,GamePool> mUIObjectPool = new Dictionary<string, GamePool>();
 
+    /// <summary>
+    ///  UI GameObject 缓存池在场景中的挂点
+    /// </summary>
     private GameObject mUIPoolNode;
 
     /// <summary>
