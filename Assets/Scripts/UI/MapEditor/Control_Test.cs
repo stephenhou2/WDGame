@@ -12,7 +12,8 @@ public class Control_Test : UIControl
 
         //UIManager.Ins.RemoveControl(mHolder,this);
 
-        UIManager.Ins.AddControl<Control_Test2>(this, "UI/MapEditor/Control_Test2", mUIRoot);
+        //UIManager.Ins.AddControl<Control_Test2>(this, "UI/MapEditor/Control_Test2", mUIRoot);
+        UIManager.Ins.OpenPanel<Panel_MapEditor>("UI/MapEditor/Panel_MapEditor", null);
     }
     
     protected override void BindUINodes()
@@ -33,5 +34,10 @@ public class Control_Test : UIControl
     public override void CustomClear()
     {
         Button_Test = null;
+    }
+
+    public override int GetRecycleStrategy()
+    {
+        return UIDefine.UI_Recycle_UIEntity | UIDefine.UI_Recycle_UIGameObject;
     }
 }

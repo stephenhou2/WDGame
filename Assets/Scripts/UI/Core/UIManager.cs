@@ -17,10 +17,12 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// 所有UI挂载的layer root
     /// </summary>
-    Dictionary<string, GameObject> mLayers = new Dictionary<string, GameObject>();
+    private Dictionary<string, GameObject> mLayers = new Dictionary<string, GameObject>();
 
     /// <summary>
     /// 所有已经打开的面板 
+    /// 理论上一个面板同一时间应该只有一份
+    /// 多个的可以考虑设计为UIControl
     /// </summary>
     private Dictionary<System.Type, UIPanel> mAllOpenPanels = new Dictionary<System.Type, UIPanel>();
 
@@ -132,7 +134,7 @@ public class UIManager: Singleton<UIManager>
         return entity;
     }
 
-    public void PushUIEntity<T>(T entity) where T:UIEntity
+    private void PushUIEntity<T>(T entity) where T:UIEntity
     {
         GamePool pool;
 
@@ -173,9 +175,10 @@ public class UIManager: Singleton<UIManager>
         WillOpenUI(holder, panel, uiObj, uiPath, layerGo, call);
 
         // Record Panel
-        if (!mAllOpenPanels.ContainsKey(panel.GetType()))
+        System.Type type = panel.GetType();
+        if(!mAllOpenPanels.ContainsKey(type))
         {
-            mAllOpenPanels.Add(panel.GetType(), panel);
+            mAllOpenPanels.Add(type, panel);
         }
     }
 
@@ -247,7 +250,7 @@ public class UIManager: Singleton<UIManager>
                 if (template == null)
                     return;
                    
-                uiObj = GameObject.Instantiate(template);
+                uiObj = InstantiateAndSetName(template);
                 OnUIPanelLoadFinish(action.holder, panel, uiObj, action.uiPath, action.parent, action.call);
             });
         }
@@ -257,7 +260,7 @@ public class UIManager: Singleton<UIManager>
             if (template == null)
                 return;
 
-            uiObj = GameObject.Instantiate(template);
+            uiObj = InstantiateAndSetName(template);
             OnUIPanelLoadFinish(action.holder, panel, uiObj, action.uiPath, action.parent, action.call);
         }
     }
@@ -326,7 +329,7 @@ public class UIManager: Singleton<UIManager>
                 if (template == null)
                     return;
 
-                uiObj = GameObject.Instantiate(template);
+                uiObj = InstantiateAndSetName(template);
                 OnUIControlLoadFinish(action.holder,ctl, uiObj, action.uiPath, action.parent, action.call);
             });
         }
@@ -336,7 +339,7 @@ public class UIManager: Singleton<UIManager>
             if (template == null)
                 return;
 
-            uiObj = GameObject.Instantiate(template);
+            uiObj = InstantiateAndSetName(template);
             OnUIControlLoadFinish(action.holder, ctl, uiObj, action.uiPath, action.parent, action.call);
         }
     }
@@ -354,14 +357,36 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
+    private GameObject InstantiateAndSetName(GameObject template)
+    {
+        GameObject uiObj = GameObject.Instantiate(template);
+        uiObj.name = template.name;
+        return uiObj;
+    }
 
     /// <summary>
-    /// open panel
+    /// 检查面板是否打开
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public bool CheckPanelOpen<T>() where T:UIPanel
+    {
+        return mAllOpenPanels.ContainsKey(typeof(T));
+    }
+
+    /// <summary>
+    /// 打开面板
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="openArgs"></param>
     public void OpenPanel<T>(string panelPath,UILoadFinishCall call = null,bool isAsync = true) where T:UIPanel,new()
     {
+        if(CheckPanelOpen<T>())
+        {
+            Log.Error(ErrorLevel.Hint, "Reopen panel {0}", typeof(T));
+            return;
+        }
+
         T panel = GetUIEntity<T>();
         string UILayerPath = panel.GetPanelLayerPath();
 
@@ -383,22 +408,31 @@ public class UIManager: Singleton<UIManager>
     }
 
     /// <summary>
-    /// close panel
+    /// 关闭面板
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="panel"></param>
     public void ClosePanel<T>()
     {
         UIPanel panel;
-        if (!mAllOpenPanels.TryGetValue(typeof(T), out panel))
+        if(!mAllOpenPanels.TryGetValue(typeof(T),out panel))
         {
-            Log.Error(ErrorLevel.Normal, "ClosePanel Error,close not opened panel,panel Type:{0}", typeof(T));
+            Log.Error(ErrorLevel.Critical, "ClosePanel Error, there is no open panel of {0}", typeof(T));
             return;
         }
 
         mToClosePanels.Enqueue(panel);
     }
 
+    /// <summary>
+    /// 添加control
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="holder">control 的持有者，可以是Panel，也可以是另一个Control，但不能是自己</param>
+    /// <param name="uiPath">control 的资源路径</param>
+    /// <param name="parent">挂载在哪个父物体下</param>
+    /// <param name="call">加载结束后的回调</param>
+    /// <param name="isAsync">是否开启异步加载</param>
     public void AddControl<T>(UIEntity holder,string uiPath, GameObject parent, UILoadFinishCall call = null, bool isAsync = true)
         where T:UIControl,new()
     {
@@ -425,6 +459,11 @@ public class UIManager: Singleton<UIManager>
         mToAddControls.Enqueue(action);
     }
 
+    /// <summary>
+    /// 移除Controls
+    /// </summary>
+    /// <param name="holder">control的持有者</param>
+    /// <param name="ctl">被移除的control</param>
     public void RemoveControl(UIEntity holder, UIControl ctl)
     {
         if (holder == null)
@@ -439,17 +478,29 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
+        if(holder.GetHashCode() == ctl.GetHashCode())
+        {
+            Log.Error(ErrorLevel.Fatal, "RemoveControl Fatal Error, {0} holder is self! ",ctl.GetType());
+            return;
+        }
+
         ctl.UIEntityOnClose();
         holder.RemoveChildUIEntity(ctl);
     }
 
+    /// <summary>
+    /// 所有打开的面板Update
+    /// </summary>
+    /// <param name="deltaTime"></param>
     private void UpdateAllOpenPanels(float deltaTime)
     {
         foreach (var kv in mAllOpenPanels)
         {
             UIPanel panel = kv.Value;
-            if (panel != null)
+            if(panel != null)
+            {
                 panel.Update(deltaTime);
+            }
         }
     }   
 
@@ -468,6 +519,12 @@ public class UIManager: Singleton<UIManager>
         UpdateAllOpenPanels(deltaTime);  // common panel update
     }
 
+    /// <summary>
+    /// 删除UIEntity 和 UI GameObject
+    /// 移除Entity    （根据复用策略，可以进缓存池）
+    /// 移除UI GameObject （根据复用策略，可以选择进缓存池）
+    /// </summary>
+    /// <param name="entity"></param>
     public void DestroyUIEntity(UIEntity entity)
     {
         if (entity == null)

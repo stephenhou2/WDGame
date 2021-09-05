@@ -10,8 +10,9 @@ public class Control_Test2 : UIControl
     {
         Log.Logic("OnTestButtonClick 2222222222222");
 
-        UIEntity holder = GetHolder();
-        UIManager.Ins.RemoveControl(holder,this);
+        //UIEntity holder = GetHolder();
+        //UIManager.Ins.RemoveControl(holder,this);
+        UIManager.Ins.ClosePanel<Panel_MapEditor>();
     }
 
     public override int GetRecycleStrategy()

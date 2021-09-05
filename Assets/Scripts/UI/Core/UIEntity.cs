@@ -6,11 +6,23 @@ using UnityEngine.Events;
 public abstract partial class UIEntity
 {
     private List<IEnumerator> mEnumerators = new List<IEnumerator>(); // 后面自己实现协程
-    private List<UnityEvent> mUIEvents = new List<UnityEvent>();
-    public List<UIEntity> mChildUIEntitys = new List<UIEntity>();
-    protected GameObject mUIRoot;
     /// <summary>
-    /// control 持有者,可以是一个panel，也可以是另一个control
+    /// 所有的UI事件
+    /// </summary>
+    private List<UnityEvent> mUIEvents = new List<UnityEvent>();
+
+    /// <summary>
+    /// 所有的子Entity
+    /// </summary>
+    public List<UIEntity> mChildUIEntitys = new List<UIEntity>();
+
+    /// <summary>
+    /// UI（panel、control）的根节点
+    /// </summary>
+    protected GameObject mUIRoot;
+
+    /// <summary>
+    /// control 持有者,可以是一个panel，也可以是另一个control，但不能是自己
     /// </summary>
     protected UIEntity mHolder;
     private string mUIPath;
@@ -75,8 +87,15 @@ public abstract partial class UIEntity
 
         if (holder != null)
         {
-            SetHolder(holder);
-            holder.AddChildUIEntity(this);
+            if(holder.GetHashCode() == this.GetHashCode())
+            {
+                Log.Error(ErrorLevel.Fatal, "UIEntityOnOpen Fatal Error, {0} holer is self, will not bind holder!!!", this.GetType());
+            }
+            else
+            {
+                SetHolder(holder);
+                holder.AddChildUIEntity(this);
+            }
         }
         OnOpen();
     }
@@ -126,11 +145,19 @@ public abstract partial class UIEntity
     /// </summary>
     public abstract void CustomClear();
 
+    /// <summary>
+    /// 是否复用Entity
+    /// </summary>
+    /// <returns></returns>
     public bool CheckRecycleUIEntity()
     {
         return (GetRecycleStrategy() & UIDefine.UI_Recycle_UIEntity) > 0;
     }
 
+    /// <summary>
+    /// 是否复用GameObject
+    /// </summary>
+    /// <returns></returns>
     public bool CheckRecycleUIGameObject()
     {
         return (GetRecycleStrategy() & UIDefine.UI_Recycle_UIGameObject) > 0;
@@ -168,6 +195,9 @@ public abstract partial class UIEntity
 
     public void Update(float deltaTime)
     {
+        OnUpdate(deltaTime);
+
+        // 子Entity的update由父Entity驱动
         foreach(UIEntity childEntity in mChildUIEntitys)
         {
             if(childEntity != null)
@@ -175,7 +205,5 @@ public abstract partial class UIEntity
                 childEntity.Update(deltaTime);
             }
         }
-
-        OnUpdate(deltaTime);
     }
 }

@@ -9,6 +9,6 @@ public static class UIDefine
 
 
     public static readonly int UI_Recycle_DontRecycle = 0;
-    public static readonly int UI_Recycle_UIEntity = 1;
-    public static readonly int UI_Recycle_UIGameObject = 2;
+    public static readonly int UI_Recycle_UIEntity = 1;  // 复用组件
+    public static readonly int UI_Recycle_UIGameObject = 2; // 复用gameobject
 }
