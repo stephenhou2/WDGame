@@ -106,7 +106,7 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        uiEntity.BindUINodes(uiObj);
+        uiEntity.BindAllUINodes(uiObj);
         if (layerGo != null)
         {
             uiObj.transform.SetParent(layerGo.transform, false);
@@ -265,6 +265,9 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
+    /// <summary>
+    /// 目前仅做每帧加载上限限制，后面根据需求来处理（如还有面板在关闭动画过程中，需要等待等情况）
+    /// </summary>
     private void _OpenPanels()
     {
         int cnt = Mathf.Min(UIDefine.Panel_Load_Per_Frame, mToOpenPanels.Count);
@@ -278,6 +281,10 @@ public class UIManager: Singleton<UIManager>
         }
     }
 
+    /// <summary>
+    /// 目前先一次性全关，后面根据需求来处理
+    /// </summary>
+    /// <param name="panel"></param>
     private void ExcutePanelCloseAction(UIPanel panel)
     {
         if(panel != null)

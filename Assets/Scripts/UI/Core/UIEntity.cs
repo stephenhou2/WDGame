@@ -99,7 +99,7 @@ public abstract partial class UIEntity
         }
         OnOpen();
     }
-
+    
     public void AddChildUIEntity(UIEntity uiEntity)
     {
         if(!mChildUIEntitys.Contains(uiEntity))
@@ -168,7 +168,7 @@ public abstract partial class UIEntity
         UIManager.Ins.DestroyUIEntity(this);
     }
 
-    public void BindUINodes(GameObject root)
+    public void BindAllUINodes(GameObject root)
     {
         mUIRoot = root;
         if(mUIRoot != null)
