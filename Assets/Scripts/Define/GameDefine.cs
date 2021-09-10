@@ -6,9 +6,13 @@ public static class GameDefine
 {
     public static string _UI_ROOT = "_UI_ROOT";
     public static string _MAP_EDITOR = "_MAP_EDITOR";
-
 }
 
+public static class CoreDefine
+{
+    public const int BitTypeMaxSize = 128; //最多支持的类型数量
+    public const int BitTypeBufferSize = BitTypeMaxSize / sizeof(int);
+}
 
 public class PlatformDef
 {

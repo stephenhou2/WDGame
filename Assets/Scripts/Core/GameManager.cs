@@ -15,6 +15,13 @@ public class GameManager:MonoBehaviour
         mMapEditor = GameMapEditor.Ins;
 
         DontDestroyOnLoad(this);
+
+        BitType type = new BitType(1, "TestType 1");
+        BitType type2 = new BitType(2, "TestType 2");
+
+        BitType newType = BitType.BindEventTypeBuffer( new List<BitType> { type, type2 });
+
+        Log.Error(ErrorLevel.Hint, "newType = {0}", newType.GetEventName());
     }
 
     private void Start()
