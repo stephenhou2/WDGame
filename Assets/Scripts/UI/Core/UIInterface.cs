@@ -196,4 +196,16 @@ public static class UIInterface
         text.text = str;
     }
 
+    public static void SetGraphicColor(GameObject go,Color color)
+    {
+        var graphic = go.GetComponent<Graphic>();
+        if (graphic == null)
+        {
+            Log.Error(ErrorLevel.Normal, "SetGraphicColor Error,Graphic component is required!");
+            return;
+        }
+
+        graphic.color = color;
+    }
+
 }

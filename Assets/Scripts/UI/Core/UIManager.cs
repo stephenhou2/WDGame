@@ -34,12 +34,12 @@ public class UIManager: Singleton<UIManager>
     /// <summary>
     /// UI实体缓存池
     /// </summary>
-    private Dictionary<System.Type, GamePool> mUIEntityPools = new Dictionary<System.Type, GamePool>();
+    private Dictionary<System.Type, GamePool<UIEntity>> mUIEntityPools = new Dictionary<System.Type, GamePool<UIEntity>>();
 
     /// <summary>
     /// UI GameObject 缓存池
     /// </summary>
-    private Dictionary<string,GamePool> mUIObjectPool = new Dictionary<string, GamePool>();
+    private Dictionary<string, GameObjectPool> mUIObjectPool = new Dictionary<string, GameObjectPool>();
 
     /// <summary>
     ///  UI GameObject 缓存池在场景中的挂点
@@ -117,12 +117,12 @@ public class UIManager: Singleton<UIManager>
     {
         T entity = null;
 
-        GamePool pool;
+        GamePool<UIEntity> pool;
         if(mUIEntityPools.TryGetValue(typeof(T),out pool))
         {
             if(pool != null)
             {
-                entity = pool.PopObj<T>();
+                entity = pool.PopObj() as T;
             }
         }
 
@@ -136,19 +136,19 @@ public class UIManager: Singleton<UIManager>
 
     private void PushUIEntity<T>(T entity) where T:UIEntity
     {
-        GamePool pool;
+        GamePool<UIEntity> pool;
 
         System.Type type = entity.GetType();
         if (mUIEntityPools.TryGetValue(type, out pool))
         {
             if(pool == null)
             {
-                pool = new GamePool(type);
+                pool = new GamePool<UIEntity>();
             }
         }
         else
         {
-            pool = new GamePool(type);
+            pool = new GamePool<UIEntity>();
             mUIEntityPools.Add(type, pool);
         }
 
@@ -189,13 +189,13 @@ public class UIManager: Singleton<UIManager>
 
     private GameObject GetUIObject(string uiPath)
     {
-        GamePool pool;
+        GameObjectPool pool;
         if(!mUIObjectPool.TryGetValue(uiPath, out pool))
         {
             return null;
         }
 
-        return pool.PopObj<GameObject>();
+        return pool.PopObj();
     }
 
     private void PushUIObject(string uiPath,GameObject uiObj)
@@ -212,10 +212,11 @@ public class UIManager: Singleton<UIManager>
             return;
         }
 
-        GamePool pool;
+        GameObjectPool pool;
+
         if (!mUIObjectPool.TryGetValue(uiPath, out pool))
         {
-            pool = new GamePool(typeof(GameObject));
+            pool = new GameObjectPool(mUIPoolNode);
             mUIObjectPool.Add(uiPath, pool);
         }
 
@@ -431,8 +432,40 @@ public class UIManager: Singleton<UIManager>
         mToClosePanels.Enqueue(panel);
     }
 
+
+    /// <summary>
+    /// 直接绑定control
+    /// 非加载式，直接绑定
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="holder"></param>
+    /// <param name="rootNode"></param>
+    /// <param name="uiPath"></param>
+    /// <returns></returns>
+    public T BindControl<T>(UIEntity holder,GameObject rootNode,string uiPath) where T:UIControl,new()
+    {
+        if (holder == null)
+        {
+            Log.Error(ErrorLevel.Critical, "BindControl Failed,holder is null!");
+            return null;
+        }
+
+        if(rootNode == null)
+        {
+            Log.Error(ErrorLevel.Critical, "BindControl Failed,rootNode is null!");
+            return null;
+        }
+
+        var ctl = GetUIEntity<T>();
+        ctl.BindAllUINodes(rootNode);
+        // OnOpen
+        ctl.UIEntityOnOpen(uiPath, holder);
+        return ctl;
+    }
+
     /// <summary>
     /// 添加control
+    /// 资源加载+绑定control
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="holder">control 的持有者，可以是Panel，也可以是另一个Control，但不能是自己</param>
@@ -467,7 +500,7 @@ public class UIManager: Singleton<UIManager>
     }
 
     /// <summary>
-    /// 移除Controls
+    /// 移除Control
     /// </summary>
     /// <param name="holder">control的持有者</param>
     /// <param name="ctl">被移除的control</param>

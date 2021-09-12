@@ -6,6 +6,25 @@ using System.Collections.Generic;
 
 public abstract partial class UIEntity
 {
+    protected int BindControl<T>(ref T ctl, string node, string uiPath) where T : UIControl,new()
+    {
+        if (mUIRoot == null) // 没有根节点
+        {
+            Log.Error(ErrorLevel.Critical, "BindControl failed,ui root node is null!");
+            return -1;
+        }
+
+        Transform targetNode = UIInterface.FindChildNode(mUIRoot.transform, node);
+        if (targetNode == null)// 找不到要绑定的节点
+        {
+            Log.Error(ErrorLevel.Critical, "BindControl failed,does not has target node,node={0}", node);
+            return -2;
+        }
+
+        ctl = UIManager.Ins.BindControl<T>(this, targetNode.gameObject, uiPath);
+        return 0;
+    }
+
     protected int BindNode(ref GameObject go, string node)
     {
         if (mUIRoot == null) // 没有根节点
@@ -17,7 +36,7 @@ public abstract partial class UIEntity
         Transform targetNode = UIInterface.FindChildNode(mUIRoot.transform, node);
         if (targetNode == null)// 找不到要绑定的节点
         {
-            Log.Error(ErrorLevel.Critical, "BindNode failed,does not has target node,node={0}", node);
+            Log.Error(ErrorLevel.Critical, "BindNode failed,does not has target node,node={0},UIEntity is:{1}", node,this.GetType());
             return -2;
         }
         go = targetNode.gameObject; // 绑定成功

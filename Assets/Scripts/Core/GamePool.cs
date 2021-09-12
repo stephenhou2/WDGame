@@ -1,48 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class GamePool
+public class GamePool<T>
 {
-    private Type type;
-    private Stack<object> pool;
+    private Stack<T> pool;
 
-    public GamePool(Type type)
+    public GamePool()
     {
-        this.type = type;
-        this.pool = new Stack<object>();
+        this.pool = new Stack<T>();
     }
 
-    public void PushObj(object obj)
+    public void PushObj(T obj)
     {
-        if(!obj.GetType().Equals(type))
-        {
-            Log.Error(ErrorLevel.Normal, "PushObj Failed,type check failed!");
-            return;
-        }
-
         pool.Push(obj);
     }
 
-    public T PopObj<T>() where T:class
+    public T PopObj()
     {
-        if(!typeof(T).Equals(type))
-        {
-            Log.Error(ErrorLevel.Normal, "PopObj Failed,type check failed!");
-            return null;
-        }
-
         if(pool.Count  == 0)
         {
-            return null;
+            return default(T);
         }
 
-        return pool.Pop() as T;
+        return pool.Pop();
     }
 
     public void Clear()
     {
         pool.Clear();
     }
-
-
 }
