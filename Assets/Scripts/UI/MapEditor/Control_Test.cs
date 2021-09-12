@@ -12,8 +12,7 @@ public class Control_Test : UIControl
 
         //UIManager.Ins.RemoveControl(mHolder,this);
 
-        //UIManager.Ins.AddControl<Control_Test2>(this, "UI/MapEditor/Control_Test2", mUIRoot);
-        UIManager.Ins.OpenPanel<Panel_MapEditor>("UI/MapEditor/Panel_MapEditor", null);
+        UIManager.Ins.AddControl<Control_Test2>(this, "UI/MapEditor/Control_Test2", mUIRoot);
     }
     
     protected override void BindUINodes()
@@ -29,6 +28,15 @@ public class Control_Test : UIControl
     protected override void OnOpen()
     {
         Log.Logic("Control_Test OnOpen");
+
+        EmitterBus.AddListener(ModuleDef.MapEditor, "TestEvt", (GameEventArgs args) =>
+        {
+            TestEventArgs mArgs = args as TestEventArgs;
+            if(mArgs != null)
+            {
+                Log.Logic(LogLevel.Hint,"this is a test event,testNum:{0},testStr:{1},testFloat:{2}",mArgs.testNum,mArgs.testStr,mArgs.testFloat);
+            }
+        });
     }
 
     public override void CustomClear()

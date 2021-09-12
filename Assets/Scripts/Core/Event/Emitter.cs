@@ -1,58 +1,53 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public interface IEmitterOption
-{
-        void OnFirstListenerAdd();              // 第一次注册监听回调
-        void OnFirstListenerDidAdd();        // 第一次注册监听完成回调
-        void OnListenerDidAdd();                // 当有事件被监听成功
-        void OnLastListenerRemove();        // 当最后一个事件被移除
-}
-
-
-public class EmitterBus
-{
-    public Dictionary<BitType, Emitter> mAllEmitters = new Dictionary<BitType, Emitter>();
-}
-
-public class EmitterOption : IEmitterOption
-{
-    public void OnFirstListenerAdd()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnFirstListenerDidAdd()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnLastListenerRemove()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void OnListenerDidAdd()
-    {
-        throw new System.NotImplementedException();
-    }
-}
+﻿using System.Collections.Generic;
 
 public class Emitter
 {
-    private EmitterOption mOption;
+    private BitType mModuleType;
 
-    private BitType mType;
+    private Dictionary<string, GameEvent> mEvents = new Dictionary<string, GameEvent>();
 
-    private Dictionary<string, GameEvent> mListeners;
-
-}
-
-public class GameEvent
-{
-    public void AddListener()
+    public Emitter(BitType moduleType)
     {
+        mModuleType = moduleType;
+        mEvents = new Dictionary<string, GameEvent>();
+    }
 
+    public void OnFire(string evtName,GameEventArgs args)
+    {
+        GameEvent evt;
+        if(mEvents.TryGetValue(evtName,out evt))
+        {
+            if(evt != null)
+            {
+                evt.OnTrigger(args);
+            }
+        }
+    }
+
+    public void AddListener(string eventName,GameEventCallback callback)
+    {
+        GameEvent evt;
+        if(!mEvents.TryGetValue(eventName,out evt))
+        {
+            evt = new GameEvent();
+            mEvents.Add(eventName, evt);
+        }
+
+        if(evt == null)
+        {
+            evt = new GameEvent();
+        }
+
+        evt.AddListener(callback);
+    }
+
+    public BitType GetModuleType()
+    {
+        return mModuleType;
+    }
+
+    public void Dispose()
+    {
+        mEvents.Clear();
     }
 }

@@ -14,6 +14,11 @@ public static class CoreDefine
     public const int BitTypeBufferSize = BitTypeMaxSize / sizeof(int);
 }
 
+public static class ModuleDef
+{
+    public static BitType MapEditor = BitType.CreateBitType(0, "MapEditor");
+}
+
 public class PlatformDef
 {
     public const string Android = "android";
