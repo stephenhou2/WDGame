@@ -1,0 +1,19 @@
+﻿syntax =  "proto3";
+package TabelProto;
+
+
+message TestSheet
+{
+  uint32 ID = 1;
+  string Name = 2;
+  uint32 Age = 3;
+  repeated int32 GRADES = 4;
+}
+
+message Test2
+{
+  uint32 ID = 1;
+  string Name = 2;
+  uint32 Age = 3;
+  repeated int32 GRADES = 4;
+}
