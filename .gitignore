@@ -8,4 +8,5 @@ ProjectSettings/
 Temp/
 .vs/MapEditor/
 *.suo
-*.csproj
+MapEditor.csproj
+Assembly-CSharp.csproj
