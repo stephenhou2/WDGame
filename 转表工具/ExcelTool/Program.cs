@@ -11,26 +11,23 @@ namespace ExcelTool
         {
             ProtoGenerator protoGen = new ProtoGenerator();
 
-            string path = "E:/Learning/Unity/MapEditor/转表工具/Test.xlsx";
+            ExcelReader reader = new ExcelReader();
+            int readRet = reader.ReadAllTableExcel();
+            if(readRet < 0)
+            {
+                Console.WriteLine("<color=red>Read Excel Table Failed!</color>");
+                return;
+            }
 
-            List<ISheet> sheets = ExcelReader.ReadExcel(path);
-            foreach(var sheet in sheets)
+            var sheets = reader.GetSheetList();
+            foreach (var sheet in sheets)
             {
                 ExcelSheet es = new ExcelSheet();
                 es.ReadExcelData(sheet);
-                protoGen.AppedProto(es);
+                protoGen.AppendProto(es);
             }
 
-            protoGen.ExportProto("E:/Learning/Unity/MapEditor/转表工具/TableData.proto");
-
-            Process proc = new Process();
-            string targetDir = string.Format("E:/Learning/Unity/MapEditor/转表工具");
-
-            proc.StartInfo.WorkingDirectory = targetDir;
-            proc.StartInfo.FileName = "ExcelData.bat";
-
-            proc.Start();
-            proc.WaitForExit();
+            protoGen.ExportProto();
 
             Console.ReadLine();
         }

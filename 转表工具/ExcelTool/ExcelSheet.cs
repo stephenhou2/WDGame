@@ -10,6 +10,7 @@ using NPOI.SS.UserModel;
 
 public enum DataType
 {
+    Comment = 0, // 注释数据，不导出
     UInt = 1,
     Int = 2,
     String = 3,
@@ -49,6 +50,10 @@ public class ExcelSheet
         {
             return DataType.Array;
         }
+        else if(type == "$")
+        {
+            return DataType.Comment;
+        }
         else
         {
             return DataType.Undefine;
@@ -83,6 +88,31 @@ public class ExcelSheet
         return true;
     }
 
+    private bool ReadCellDatas(string sheetName,int row,List<ICell> cells)
+    {
+        List<string> data = new List<string>();
+        DataValues.Add(data);
+        for (int col = 0;col<cells.Count;col++)
+        {
+            DataType type = DataTypes[col];
+
+            if (type == DataType.Comment)
+                continue;
+
+            ICell cell = cells[col];
+            if(type == DataType.Undefine)
+            {
+                string log = string.Format("<color=red>ReadCellDatas failed,sheet name:{0},row:{1},col:{2}</color>", sheetName, row, col);
+                Console.WriteLine(log);
+                return false;
+            }
+
+            data.Add(cell.StringCellValue);
+        }
+
+        return true;
+    }
+
     public int ReadExcelData(ISheet sheet)
     {
         if(sheet == null)
@@ -96,12 +126,6 @@ public class ExcelSheet
         int lastRow = sheet.LastRowNum;
         for(int row = firstRow; row < lastRow;row ++)
         {
-
-        //}
-        //IEnumerator handle = sheet.GetRowEnumerator();
-        //var current = handle.Current;
-        //while(current != null)
-        //{
             var rowData = sheet.GetRow(row);
             var cells = rowData.Cells;
             if(row == 0)
@@ -113,10 +137,7 @@ public class ExcelSheet
             }
             else
             {
-                for(int i =0;i<cells.Count;i++)
-                {
-
-                }
+                ReadCellDatas(SheetName,row,cells);
             }
             row++; 
         }
