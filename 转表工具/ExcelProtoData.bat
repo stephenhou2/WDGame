@@ -6,7 +6,7 @@ echo %%i生成成功
 )
 
 for %%i in (./csharp_output/*.cs) do (
-copy .\csharp_output\%%i ..\ExcelProtoDataTool
+copy .\csharp_output\%%i .\ExcelProtoDataTool
 )
 
 pause
