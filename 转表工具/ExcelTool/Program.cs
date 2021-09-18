@@ -24,10 +24,12 @@ namespace ExcelTool
             {
                 ExcelSheet es = new ExcelSheet();
                 es.ReadExcelData(sheet);
-                protoGen.AppendProto(es);
+                string protoStr = protoGen.GetProtoString(es);
+                if (!string.IsNullOrEmpty(protoStr))
+                {
+                    protoGen.ExportProto(protoStr,es.SheetName);
+                }
             }
-
-            protoGen.ExportProto();
 
             Console.ReadLine();
         }

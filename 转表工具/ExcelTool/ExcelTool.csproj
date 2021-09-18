@@ -112,6 +112,7 @@
     <Compile Include="ExcelHandler\ExcelReader.cs" />
     <Compile Include="ProtoGenerator.cs" />
     <Compile Include="ProtoHandler.cs" />
+    <Compile Include="TableData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
