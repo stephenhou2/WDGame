@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<project name="ExcelProtoDataTool" default="show" basedir=".">
+ <target name="show">
+    <echo message="Hello NAnt"/>
+ </target>
+</project>

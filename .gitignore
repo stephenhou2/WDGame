@@ -4,7 +4,6 @@ Logs/
 MapEditor.sln
 obj/
 Packages/
-ProjectSettings/
 Temp/
 .vs/MapEditor/
 *.suo
