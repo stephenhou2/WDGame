@@ -54,14 +54,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExcelTool.exe" size="22496">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExcelTool.exe" size="24544">
       <assemblyIdentity name="ExcelTool" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>h5glCL3XwS48+KEZAL1gEhdIK2Cp4CwXOAxqDleJwdg=</dsig:DigestValue>
+        <dsig:DigestValue>gDqluW51mXj+SwgoDPZT8vyGlovYdhy3zxme2uYs3fs=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

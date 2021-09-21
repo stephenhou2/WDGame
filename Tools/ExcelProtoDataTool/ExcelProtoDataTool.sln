@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelProtoDataTool", "ExcelProtoDataTool.csproj", "{5D0BA384-6730-45DB-942B-9C7F5A76D8F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelProtoDataTool", "ExcelProtoDataTool.csproj", "{CF8AB5D7-295F-4451-8217-5B425664B12E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5D0BA384-6730-45DB-942B-9C7F5A76D8F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D0BA384-6730-45DB-942B-9C7F5A76D8F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D0BA384-6730-45DB-942B-9C7F5A76D8F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D0BA384-6730-45DB-942B-9C7F5A76D8F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF8AB5D7-295F-4451-8217-5B425664B12E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF8AB5D7-295F-4451-8217-5B425664B12E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF8AB5D7-295F-4451-8217-5B425664B12E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF8AB5D7-295F-4451-8217-5B425664B12E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6146B49E-375F-4CAF-A715-819F5D94DB63}
+		SolutionGuid = {4FEB77D9-3CCE-4874-9AC0-DD02D8D56023}
 	EndGlobalSection
 EndGlobal

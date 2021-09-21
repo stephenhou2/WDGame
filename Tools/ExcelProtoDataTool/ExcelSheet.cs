@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-//using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 
 public enum DataType
@@ -24,6 +18,8 @@ public class ExcelSheet
     public List<DataType> DataTypes;
     public List<string> DataKeys;
     public List<List<string>> DataValues;
+    public int DataRowCount;
+    public int DataColCnt;
 
     public ExcelSheet()
     {
@@ -60,39 +56,68 @@ public class ExcelSheet
         }
     }
 
-    private bool ParseDataTypeAndKeys(List<ICell> cells)
+    private int ParseDataTypeAndKeys(List<ICell> cells,string sheetName)
     {
         for(int i =0;i<cells.Count;i++)
         {
             string data = cells[i].StringCellValue;
             string[] v = data.Split(':');
+
+            DataType type = DataType.Undefine;
+            string key = string.Empty;
+            if (v.Length == 2)
+            {
+                type = GetDataType(v[0]);
+                key = v[1];
+            }
+            
+            DataTypes.Add(type);
+            DataKeys.Add(key);
+            DataColCnt++;
+
             if(v.Length != 2)
             {
-                return false;
+                return -1;
             }
 
-            DataType type = GetDataType(v[0]);
             if(type == DataType.Undefine)
             {
-                return false;
+                string log = string.Format("ParseDataTypeAndKeys Undefined field type,sheet name={0},col={1}",sheetName,i);
+                ConsoleLog.Error(log);
+                return -1;
             }
 
             if(string.IsNullOrEmpty(v[1]))
             {
-                return false;
+                string log = string.Format("ParseDataTypeAndKeys undefined field key,sheet name={0},col={1}", sheetName, i);
+                ConsoleLog.Error(log);
+                return -1;
             }
 
-            DataTypes.Add(type);
-            DataKeys.Add(v[1]);
         }
-        return true;
+        return 0;
     }
 
-    private bool ReadCellDatas(string sheetName,int row,List<ICell> cells)
+    public int ReadExcelFields(ISheet sheet)
+    {
+        if (sheet == null)
+        {
+            return -1;
+        }
+
+        SheetName = sheet.SheetName;
+
+        var rowData = sheet.GetRow(0);
+        var cells = rowData.Cells;
+
+        return ParseDataTypeAndKeys(cells,SheetName);
+    }
+
+    private int ReadCellDatas(string sheetName,int row,List<ICell> cells)
     {
         List<string> data = new List<string>();
         DataValues.Add(data);
-        for (int col = 0;col<cells.Count;col++)
+        for (int col = 0;col<DataColCnt;col++)
         {
             DataType type = DataTypes[col];
 
@@ -102,15 +127,26 @@ public class ExcelSheet
             ICell cell = cells[col];
             if(type == DataType.Undefine)
             {
-                string log = string.Format("<color=red>ReadCellDatas failed,sheet name:{0},row:{1},col:{2}</color>", sheetName, row, col);
-                Console.WriteLine(log);
-                return false;
+                string log = string.Format("ReadCellDatas failed, undefined dataType ,sheet name:{0},row:{1},col:{2}", sheetName, row, col);
+                ConsoleLog.Error(log);
+                return -1;
             }
 
-            data.Add(cell.StringCellValue);
+            switch (cell.CellType)
+            {
+                case CellType.String:
+                    data.Add(cell.StringCellValue);
+                    break;
+                case CellType.Numeric:
+                    data.Add(cell.NumericCellValue.ToString());
+                    break;
+                default:
+                    data.Add(string.Empty);
+                    break;
+            }
         }
 
-        return true;
+        return 0;
     }
 
     public int ReadExcelData(ISheet sheet)
@@ -120,29 +156,29 @@ public class ExcelSheet
             return -1;
         }
 
+        int ret = -2;
+
         SheetName = sheet.SheetName;
 
-        int firstRow = sheet.FirstRowNum;
-        int lastRow = sheet.LastRowNum;
-        for(int row = firstRow; row < lastRow;row ++)
+        DataRowCount = sheet.LastRowNum - 1;
+
+        for(int row = 0; row <= sheet.LastRowNum; row ++)
         {
             var rowData = sheet.GetRow(row);
             var cells = rowData.Cells;
             if(row == 0)
             {
-                if(ParseDataTypeAndKeys(cells))
-                {
-                    return -2;
-                }
+                ret++;
+                ret += ParseDataTypeAndKeys(cells, SheetName);
             }
-            else
+            else if(row != 1)
             {
-                ReadCellDatas(SheetName,row,cells);
+                ret++;
+                ret += ReadCellDatas(SheetName,row,cells);
             }
-            row++; 
         }
 
-        return 0;
+        return ret;
     }
 
 

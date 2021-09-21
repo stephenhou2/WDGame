@@ -1,10 +1,12 @@
-﻿using System;
+﻿using NPOI.SS.UserModel;
+using System;
+using System.Collections.Generic;
 
 namespace ExcelTool
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             ProtoGenerator protoGen = new ProtoGenerator();
 
@@ -16,19 +18,17 @@ namespace ExcelTool
                 return;
             }
 
-            var sheets = reader.GetSheetList();
-            foreach (var sheet in sheets)
+            var sheets = reader.GetAllSheets();
+            protoGen.ExportRegister(reader);
+            foreach (KeyValuePair<string,ISheet> kv in sheets)
             {
                 ExcelSheet es = new ExcelSheet();
-                es.ReadExcelData(sheet);
-                string protoStr = protoGen.GetProtoString(es);
-                if (!string.IsNullOrEmpty(protoStr))
-                {
-                    protoGen.ExportProto(protoStr,es.SheetName);
-                }
-            }
+                var sheet = kv.Value;
+                es.ReadExcelFields(sheet);
 
-            Console.ReadLine();
+                protoGen.ExportProto(es);
+                protoGen.ExportCSharp(es);
+            }
         }
     }
 }

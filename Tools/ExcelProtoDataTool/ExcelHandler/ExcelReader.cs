@@ -5,106 +5,102 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 
-namespace ExcelTool
+public class ExcelReader
 {
-    public class ExcelReader
+    private Dictionary<string, ISheet> mSheetList = new Dictionary<string, ISheet>();
+
+    public ISheet GetSheet(string sheetName)
     {
+        mSheetList.TryGetValue(sheetName, out ISheet sheet);
+        return sheet;
+    }
 
-        private List<ISheet> mSheetList;
+    public bool ReadExcel(string path)
+    {
+        IWorkbook workbook = null;
 
-        public List<ISheet> GetSheetList()
+        using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
         {
-            return mSheetList;
+            stream.Position = 0;
+            if (path.IndexOf(".xlsx") > 0) // 07或更高版本
+            {
+                workbook = new XSSFWorkbook(stream);
+            }
+            else if (path.IndexOf(".xls") > 0)  // 97-03版本
+            {
+                workbook = new HSSFWorkbook(stream);
+            }
+
+            if (workbook != null)
+            {
+                int sheetCnt = workbook.NumberOfSheets;
+                for (int i = 0; i < sheetCnt; i++)
+                {
+                    ISheet sheet = workbook.GetSheetAt(i);
+                    mSheetList.Add(sheet.SheetName,sheet);
+                }
+            }
+            else
+            {
+                string log = string.Format("Read Excel Failed,path:{0}",path);
+                ConsoleLog.Error(log);
+            }
         }
 
-        public bool ReadExcel(string path)
+        return true;
+    }
+
+    private bool ReadDir(DirectoryInfo dirInfo)
+    {
+        if (dirInfo == null)
         {
-            IWorkbook workbook = null;
-
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                stream.Position = 0;
-                if (path.IndexOf(".xlsx") > 0) // 07或更高版本
-                {
-                    workbook = new XSSFWorkbook(stream);
-                }
-                else if (path.IndexOf(".xls") > 0)  // 97-03版本
-                {
-                    workbook = new HSSFWorkbook(stream);
-                }
-
-                if (workbook != null)
-                {
-                    int sheetCnt = workbook.NumberOfSheets;
-                    for (int i = 0; i < sheetCnt; i++)
-                    {
-                        mSheetList.Add(workbook.GetSheetAt(i));
-                    }
-                }
-                else
-                {
-                    string log = string.Format("<color=red> Read Excel Failed,path:{0}</color>",path);
-                    Console.WriteLine(log);
-                }
-            }
-
-            return true;
+            string log = string.Format("<color=red> ReadAllTableExcel Failed,table root dir not find,root dir:{0}</color>", Define.TableRootPath);
+            Console.Write(log);
+            return false;
         }
 
-        public bool ReadDir(DirectoryInfo dirInfo)
+        DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
+        if(dirInfos.Length > 0)
         {
-            if (dirInfo == null)
+            for(int i = 0;i<dirInfos.Length;i++)
             {
-                string log = string.Format("<color=red> ReadAllTableExcel Failed,table root dir not find,root dir:{0}</color>", Define.TableRootPath);
-                Console.Write(log);
-                return false;
+                ReadDir(dirInfos[i]);
             }
-
-            DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
-            if(dirInfos.Length > 0)
-            {
-                for(int i = 0;i<dirInfos.Length;i++)
-                {
-                    ReadDir(dirInfos[i]);
-                }
-            }
-
-            FileInfo[] fileInfos = dirInfo.GetFiles();
-            if (null == fileInfos)
-            {
-                string log = string.Format("<color=red> ReadAllTableExcel Failed,GetFiles failed,root dir:{0}</color>", Define.TableRootPath);
-                Console.Write(log);
-                return false;
-            }
-
-            for (int i = 0; i < fileInfos.Length; i++)
-            {
-                FileInfo fi = fileInfos[i];
-                if (fi != null)
-                {
-                    ReadExcel(fi.FullName);
-                }
-                else
-                {
-                    string log = string.Format("<color=red> ReadAllTableExcel Failed,find null file info,root dir:{0}</color>", Define.TableRootPath);
-                    Console.Write(log);
-                    // continue 不中断
-                }
-            }
-
-            return true;
         }
 
-        public int ReadAllTableExcel()
+        FileInfo[] fileInfos = dirInfo.GetFiles();
+        if (null == fileInfos)
         {
-            mSheetList = new List<ISheet>();
+            string log = string.Format("ReadAllTableExcel Failed,GetFiles failed,root dir:{0}", Define.TableRootPath);
+            ConsoleLog.Error(log);
+            return false;
+        }
 
-            DirectoryInfo rootDirInfo = new DirectoryInfo(Define.TableRootPath);
+        for (int i = 0; i < fileInfos.Length; i++)
+        {
+            FileInfo fi = fileInfos[i];
+            if (fi != null)
+            {
+                ReadExcel(fi.FullName);
+            }
+            else
+            {
+                string log = string.Format("ReadAllTableExcel Failed,find null file info,root dir:{0}", Define.TableRootPath);
+                ConsoleLog.Error(log);
+                // continue 不中断
+            }
+        }
 
-            ReadDir(rootDirInfo);
+        return true;
+    }
+
+    public int ReadAllTableExcel()
+    {
+        DirectoryInfo rootDirInfo = new DirectoryInfo(Define.TableRootPath);
+
+        ReadDir(rootDirInfo);
     
-            return 0;
-        }
+        return 0;
     }
 }
 

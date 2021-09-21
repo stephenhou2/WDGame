@@ -7,12 +7,6 @@ public static class ProtoDataHandler
     public static int DATA_HANDLE_RET_INVALID_PATH = -1;
     public static int DATA_HANDLE_RET_NULL_DATA = -2;
 
-    //public static bool ExportProtoData(string protoPath)
-    //{
-
-    //    return true;
-    //}
-
     public static int SaveProtoData<T>(T src, string path) where T : IMessage
     {
         if (string.IsNullOrEmpty(path))

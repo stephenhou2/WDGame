@@ -54,14 +54,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExcelTool.exe" size="24544">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ExcelTool.exe" size="14816">
       <assemblyIdentity name="ExcelTool" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>2XlGUwfx6VLGAFs33QH85i3GbfnzxEe3wIQ6mUhTI1M=</dsig:DigestValue>
+        <dsig:DigestValue>ur/EX/rVf3a2dsHFOM7S6bMBJ40Gf9JxBMKnFg1UokU=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -73,7 +73,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>i8URa2s5YeP35I0FLLHmHeN/fWdoUypT60s4xdunpTU=</dsig:DigestValue>
+        <dsig:DigestValue>ztLu5xWQryrXU+KygrdMBY8FPUWPbGCa2NV5P3HNgug=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -185,13 +185,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="ExcelTool.exe.config" size="553">
+  <file name="ExcelTool.exe.config" size="565">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>hax6EmSa6TMaqEFSdthZ6HtrGolbJXeZlcBt7i1dzxs=</dsig:DigestValue>
+      <dsig:DigestValue>KgVDbvLTnrGqv/bJep8nqNqmI3Qhdr1KgezDEArnBaw=</dsig:DigestValue>
     </hash>
   </file>
 </asmv1:assembly>
