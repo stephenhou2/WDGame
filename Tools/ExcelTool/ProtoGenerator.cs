@@ -115,7 +115,7 @@ namespace ExcelTool
             str.Append(@"
             }
         v.Data.Add(cfg);
-         ProtoDataHandler.SaveProtoData(v,Define.ProtoDir+'/'+sheetName+"".bin"");
+         ProtoDataHandler.SaveProtoData(v,Define.ProtoBytesDir+'/'+sheetName+"".bin"");
         }
     }
 }");
