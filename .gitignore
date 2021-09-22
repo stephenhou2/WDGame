@@ -10,3 +10,5 @@ Temp/
 MapEditor.csproj
 Assembly-CSharp.csproj
 *.asset
+!*.exe
+!*.dll
