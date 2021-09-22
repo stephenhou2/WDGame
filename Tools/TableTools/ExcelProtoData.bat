@@ -17,7 +17,7 @@ copy .\output\exporter\%%i ..\ExcelProtoDataTool\ProtoExport
 
 ::nant -buildfile:../ExcelProtoDataTool\my.build
 
-msbuild E:\Learning\Unity\WDGame\Tools\ExcelProtoDataTool/ExcelProtoDataTool.csproj
+msbuild E:\Learning\Unity\WDGame\Tools\ExcelProtoDataTool/ExcelProtoDataTool.csproj  -t:Clean -p:Configuration=Debug;
 
 ExcelProtoDataTool.exe
 
