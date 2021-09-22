@@ -9,3 +9,4 @@ Temp/
 *.suo
 MapEditor.csproj
 Assembly-CSharp.csproj
+*.asset
