@@ -12,3 +12,4 @@ Assembly-CSharp.csproj
 *.asset
 !*.exe
 !*.dll
+!*.pdb
