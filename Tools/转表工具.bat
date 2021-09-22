@@ -1,8 +1,8 @@
 echo off
 
-pushd "%~dp0"
+cd ./TableTools
 
-call "TableTools\ExcelProtoData.bat"
+call "ExcelProtoData.bat"
 
 pause
 

@@ -1,16 +1,16 @@
 ﻿syntax =  "proto3";
 package TableProto;
 
-
 message MonsterCfg222
 {
-  int32 ID = 1;
-  string NAME = 2;
-  uint32 ATK = 3;
-  uint32 HP = 4;
+	int32 ID = 1;
+	string NAME = 2;
+	uint32 ATK = 3;
+	uint32 HP = 4;
+
 }
 
 message TB_MonsterCfg222
 {
-  repeated MonsterCfg222 data = 1;
+    repeated MonsterCfg222 data = 1;
 }

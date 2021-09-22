@@ -4,27 +4,46 @@ using NPOI.SS.UserModel;
 
 public enum DataType
 {
+    UInt = 0,
+    Int = 1,
+    String = 2,
+    Array = 3,
+    Undefine = 4
+}
+
+public enum FieldType
+{
     Comment = 0, // 注释数据，不导出
-    UInt = 1,
-    Int = 2,
-    String = 3,
-    Array = 4,
-    Undefine = 5
+    Unique = 1,
+    Key = 2,
+    Field = 3,
+    Undefine = 4
+}
+
+
+public struct FieldInfo
+{
+    public int Col;
+    public FieldType FieldType;
+    public DataType DataType;
+    public string Name;
 }
 
 public class ExcelSheet
 {
     public string SheetName;
-    public List<DataType> DataTypes;
-    public List<string> DataKeys;
+    List<FieldInfo> FieldInfos;
+    //public List<DataType> DataTypes;
+    //public List<string> DataKeys;
     public List<List<string>> DataValues;
     public int DataRowCount;
     public int DataColCnt;
 
     public ExcelSheet()
     {
-        DataTypes = new List<DataType>();
-        DataKeys = new List<string>();
+        //DataTypes = new List<DataType>();
+        //DataKeys = new List<string>();
+        FieldInfos = new List<FieldInfo>();
         DataValues = new List<List<string>>();
     }
 
@@ -56,10 +75,20 @@ public class ExcelSheet
         }
     }
 
+            //"UNI:INT:ID"
+            //"KEY:INT:ID"
+            //"FIELD:INT:ID"
+            //"COMMNET"
+
     private int ParseDataTypeAndKeys(List<ICell> cells, string sheetName)
     {
         for (int i = 0; i < cells.Count; i++)
         {
+
+
+
+
+
             string data = cells[i].StringCellValue;
             string[] v = data.Split(':');
 

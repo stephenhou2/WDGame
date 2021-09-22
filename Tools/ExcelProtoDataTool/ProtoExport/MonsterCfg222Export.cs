@@ -26,7 +26,7 @@ public class MonsterCfg222Export
 				cfg.HP = ProtoDataExpoter.GetUIntFieldValue(field);
 
             }
-        v.Data.Add(cfg);
+         v.Data.Add(cfg);
          ProtoDataHandler.SaveProtoData(v,Define.ProtoBytesDir+'/'+sheetName+".bin");
         }
     }

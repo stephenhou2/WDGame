@@ -17,9 +17,23 @@ namespace TableProto
             Ins.LoadAllPbCfgs();
         }
 
+        //private int LoadMonsterCfg()
+        //{
+        //    TB_MonsterCfg table = ProtoDataHandler.LoadProtoData<TB_MonsterCfg>(PathDefine.TABLE_PB_DATA_PATH + "/MonsterCfg.bin");
+        //    if(table == null)
+        //    {
+        //        return -1;
+        //    }
+
+        //    foreach(MonsterCfg cfg in(table.Data))
+        //    {
+
+        //    }
+        //}
+
         private void LoadAllPbCfgs()
         {
-
+            
         }
 
         public static void ClearPbCfg()
@@ -35,7 +49,7 @@ namespace TableProto
                 return cfg;
             }
 
-            Log.Error("Get MonsterCfg Failed, key = {0}", id);
+            Log.Error(ErrorLevel.Normal,"Get MonsterCfg Failed, key = {0}", id);
             return null;
         }
     }

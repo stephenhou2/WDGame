@@ -10,6 +10,7 @@ public static class PathDefine
     public static string DATA_DIR_PATH = Path.Combine(ROOT_PATH,"Data");
 
     public static string MAP_OBS_DIR_PATH = Path.Combine(DATA_DIR_PATH, "ObsData");
+    public static string TABLE_PB_DATA_PATH = Path.Combine(DATA_DIR_PATH, "TableData");
 
     public static string MAP_DATA_DIR_PATH = Path.Combine(DATA_DIR_PATH, "MapData");
 

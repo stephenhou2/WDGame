@@ -1,4 +1,5 @@
-﻿public class ExcelExportRegister
+﻿
+public class ExcelExportRegister
 {
     public void ExportAllProtoData()
     {
