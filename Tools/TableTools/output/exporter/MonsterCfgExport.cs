@@ -2,16 +2,24 @@
 
 public class MonsterCfgExport
 {
-    public void Export(ExcelReader reader)
+    public string SheetName = "MonsterCfg";
+
+    public int Export(ExcelReader reader)
     {
 		ISheet sheetData = reader.GetSheet("MonsterCfg");
         if (sheetData == null)
-            return;
+        {
+            string log = "Export MonsterCfg Error, sheetData null!";
+            ConsoleLog.Error(log); 
+            return -1;
+        }
 
         ExcelSheet sheet = new ExcelSheet();
         if(sheet.ReadExcelData(sheetData) < 0)
         {
-            return;
+            string log = "Export MonsterCfg Error, ReadExcelData Failed!";
+            ConsoleLog.Error(log); 
+            return -2;
         }
 
         string sheetName = sheet.SheetName;
@@ -29,7 +37,8 @@ public class MonsterCfgExport
 
             }
             v.Data.Add(cfg);
-            ProtoDataHandler.SaveProtoData(v, Define.ProtoBytesDir+'/'+sheetName+".bin");
         }
+        ProtoDataHandler.SaveProtoData(v, Define.ProtoBytesDir+'/'+sheetName+".bin");
+        return 0;
     }
 }

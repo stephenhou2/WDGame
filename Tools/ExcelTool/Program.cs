@@ -15,20 +15,31 @@ namespace ExcelTool
             if(readRet < 0)
             {
                 Console.WriteLine("<color=red>Read Excel Table Failed!</color>");
+                Console.ReadKey();
                 return;
             }
 
             var sheets = reader.GetAllSheets();
-            protoGen.ExportRegister(reader);
             foreach (KeyValuePair<string,ISheet> kv in sheets)
             {
                 ExcelSheet es = new ExcelSheet();
                 var sheet = kv.Value;
-                es.ReadExcelFields(sheet);
 
-                protoGen.ExportProto(es);
-                protoGen.ExportCSharp(es);
+                Dictionary<int,FieldInfo> fieldInfos = es.ReadTableFieldDefineRow(sheet);
+                if (fieldInfos == null)
+                {
+                    Console.ReadKey();
+                    return;
+                }
+
+                protoGen.ExportProto(sheet.SheetName,fieldInfos);
+
+                protoGen.ExportCSharp(sheet.SheetName,fieldInfos);
             }
+
+            protoGen.ExportRegister(reader);
+
+            Console.ReadKey();
         }
     }
 }

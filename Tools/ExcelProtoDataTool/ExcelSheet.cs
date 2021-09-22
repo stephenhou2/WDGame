@@ -4,134 +4,208 @@ using NPOI.SS.UserModel;
 
 public enum DataType
 {
+    UInt = 0,
+    Int = 1,
+    String = 2,
+    Array = 3,
+    Undefine = 4
+}
+
+public enum FieldType
+{
     Comment = 0, // 注释数据，不导出
-    UInt = 1,
-    Int = 2,
-    String = 3,
-    Array = 4,
-    Undefine = 5
+    Unique = 1,
+    Key = 2,
+    Field = 3,
+    Undefine = 4
+}
+
+
+public struct FieldInfo
+{
+    public int Col;
+    public FieldType FieldType;
+    public DataType DataType;
+    public string FiledName;
 }
 
 public class ExcelSheet
 {
     public string SheetName;
-    public List<DataType> DataTypes;
-    public List<string> DataKeys;
+    public Dictionary<int, FieldInfo> FieldInfos;
     public List<List<string>> DataValues;
     public int DataRowCount;
     public int DataColCnt;
 
     public ExcelSheet()
     {
-        DataTypes = new List<DataType>();
-        DataKeys = new List<string>();
+        FieldInfos = new Dictionary<int, FieldInfo>();
         DataValues = new List<List<string>>();
     }
 
-    private DataType GetDataType(string type)
+    //"UNI:INT:ID"
+    //"KEY:INT:ID"
+    //"FIELD:INT:ID"
+    //"COMMNET"
+
+    private FieldType GetFieldType(string s)
     {
-        if(type == "UINT")
+        if (s == "UNK") // unique key
+        {
+            return FieldType.Unique;
+        }
+        else if (s == "KEY") // key
+        {
+            return FieldType.Key;
+        }
+        else if (s == "FLD") // field
+        {
+            return FieldType.Field;
+        }
+        else if (s == "CMT") // comment
+        {
+            return FieldType.Comment;
+        }
+
+        return FieldType.Undefine;
+    }
+
+    private DataType GetDataType(string s)
+    {
+        if (s == "UINT")
         {
             return DataType.UInt;
         }
-        else if(type == "INT")
+        else if (s == "INT")
         {
             return DataType.Int;
         }
-        else if(type == "STR")
+        else if (s == "STR")
         {
             return DataType.String;
         }
-        else if(type == "ARR")
+        else if (s == "ARR")
         {
             return DataType.Array;
         }
-        else if(type == "$")
-        {
-            return DataType.Comment;
-        }
-        else
-        {
-            return DataType.Undefine;
-        }
+
+        return DataType.Undefine;
     }
 
-    private int ParseDataTypeAndKeys(List<ICell> cells,string sheetName)
-    {
-        for(int i =0;i<cells.Count;i++)
-        {
-            string data = cells[i].StringCellValue;
-            string[] v = data.Split(':');
 
-            DataType type = DataType.Undefine;
-            string key = string.Empty;
-            if (v.Length == 2)
-            {
-                type = GetDataType(v[0]);
-                key = v[1];
-            }
-            
-            DataTypes.Add(type);
-            DataKeys.Add(key);
-            DataColCnt++;
+    const string undefined = "##";
 
-            if(v.Length != 2)
-            {
-                return -1;
-            }
-
-            if(type == DataType.Undefine)
-            {
-                string log = string.Format("ParseDataTypeAndKeys Undefined field type,sheet name={0},col={1}",sheetName,i);
-                ConsoleLog.Error(log);
-                return -1;
-            }
-
-            if(string.IsNullOrEmpty(v[1]))
-            {
-                string log = string.Format("ParseDataTypeAndKeys undefined field key,sheet name={0},col={1}", sheetName, i);
-                ConsoleLog.Error(log);
-                return -1;
-            }
-
-        }
-        return 0;
-    }
-
-    public int ReadExcelFields(ISheet sheet)
+    public Dictionary<int, FieldInfo> ReadTableFieldDefineRow(ISheet sheet)
     {
         if (sheet == null)
         {
-            return -1;
+            string log = string.Format("ReadTableFieldDefineRow Error, Read null sheet!");
+            ConsoleLog.Error(log);
+            return null;
         }
 
-        SheetName = sheet.SheetName;
+        IRow row = sheet.GetRow(0);
+        if (row == null)
+        {
+            string log = string.Format("ReadTableFieldDefineRow Error, Field define not exist,sheet name:{0}", sheet.SheetName);
+            ConsoleLog.Error(log);
+            return null;
+        }
 
-        var rowData = sheet.GetRow(0);
-        var cells = rowData.Cells;
+        Dictionary<int, FieldInfo> sheetFieldInfos = new Dictionary<int, FieldInfo>();
+        Dictionary<string, FieldInfo> mFieldMap = new Dictionary<string, FieldInfo>();
+        for (int i = 0; i < row.Cells.Count; i++)
+        {
+            DataType dataType = DataType.Undefine;
+            FieldType fieldType = FieldType.Undefine;
+            string fieldName = undefined;
 
-        return ParseDataTypeAndKeys(cells,SheetName);
+            ICell cell = row.Cells[i];
+            if (cell != null && cell.CellType == CellType.String)
+            {
+                string s = cell.StringCellValue;
+                string[] list = s.Split(':');
+                if (list.Length > 0)
+                {
+                    fieldType = GetFieldType(list[0]);
+                }
+
+                if (list.Length > 1)
+                {
+                    dataType = GetDataType(list[1]);
+                }
+
+                if (list.Length > 2)
+                {
+                    fieldName = list[2];
+                }
+
+                if (fieldType == FieldType.Undefine)
+                {
+                    string log = string.Format("ReadTableFieldDefineRow Error, Undefined field type,sheet name={0},col={1}", sheet.SheetName, i);
+                    ConsoleLog.Error(log);
+                    return null;
+                }
+
+                if (fieldType != FieldType.Comment)
+                {
+                    if (dataType == DataType.Undefine)
+                    {
+                        string log = string.Format("ReadTableFieldDefineRow Error, Undefined data type,sheet name={0},col={1}", sheet.SheetName, i);
+                        ConsoleLog.Error(log);
+                        return null;
+                    }
+                }
+
+                FieldInfo fi = new FieldInfo();
+                fi.FieldType = fieldType;
+                fi.DataType = dataType;
+                fi.FiledName = fieldName;
+                fi.Col = i;
+
+                FieldInfo _fi;
+                if (mFieldMap.TryGetValue(fieldName, out _fi))
+                {
+                    string log = string.Format("ReadTableFieldDefineRow Error, same field name is not allowed,sheet name={0},col_1={1},col_2={2}", sheet.SheetName, i, _fi.Col);
+                    ConsoleLog.Error(log);
+                    return null;
+                }
+                mFieldMap.Add(fieldName, fi);
+
+                if (sheetFieldInfos.TryGetValue(i, out _fi))
+                {
+                    string log = string.Format("ReadTableFieldDefineRow Error, Add Field to same col,sheet name={0},col_1={1},col_2={2}", sheet.SheetName, fieldName, _fi.FiledName);
+                    ConsoleLog.Error(log);
+                    return null;
+                }
+                sheetFieldInfos.Add(i, fi);
+            }
+        }
+        return sheetFieldInfos;
     }
 
-    private int ReadCellDatas(string sheetName,int row,List<ICell> cells)
+    private int ReadCellDatas(ISheet sheet, int row)
     {
         List<string> data = new List<string>();
         DataValues.Add(data);
-        for (int col = 0;col<DataColCnt;col++)
+
+        IRow rowData = sheet.GetRow(row);
+        if (rowData == null)
         {
-            DataType type = DataTypes[col];
+            string log = string.Format("ReadCellDatas Error, row data is null,sheet name={0},row={1}", sheet.SheetName, row);
+            ConsoleLog.Error(log);
+            return -1;
+        }
 
-            if (type == DataType.Comment)
-                continue;
-
-            ICell cell = cells[col];
-            if(type == DataType.Undefine)
+        for (int col = 0; col < rowData.Cells.Count; col++)
+        {
+            ICell cell = rowData.Cells[col];
+            if (cell == null)
             {
-                string log = string.Format("ReadCellDatas failed, undefined dataType ,sheet name:{0},row:{1},col:{2}", sheetName, row, col);
+                string log = string.Format("ReadCellDatas Error, row cell is null,sheet name={0},row={1},col={2}", sheet.SheetName, row, col);
                 ConsoleLog.Error(log);
-                return -1;
+                return -2;
             }
-
             switch (cell.CellType)
             {
                 case CellType.String:
@@ -141,45 +215,42 @@ public class ExcelSheet
                     data.Add(cell.NumericCellValue.ToString());
                     break;
                 default:
-                    data.Add(string.Empty);
+                    data.Add(undefined);
                     break;
             }
         }
-
         return 0;
     }
 
     public int ReadExcelData(ISheet sheet)
     {
-        if(sheet == null)
+        if (sheet == null)
         {
+            string log = string.Format("ReadExcelData Error,read null sheet");
+            ConsoleLog.Error(log);
             return -1;
         }
 
-        int ret = -2;
+        FieldInfos = ReadTableFieldDefineRow(sheet);
 
-        SheetName = sheet.SheetName;
-
-        DataRowCount = sheet.LastRowNum - 1;
-
-        for(int row = 0; row <= sheet.LastRowNum; row ++)
+        if (FieldInfos == null)
         {
-            var rowData = sheet.GetRow(row);
-            var cells = rowData.Cells;
-            if(row == 0)
+            string log = string.Format("ReadExcelData Error, read table field define row failed,sheet name={0}", sheet.SheetName);
+            ConsoleLog.Error(log);
+            return -2;
+        }
+
+        for (int row = 2; row <= sheet.LastRowNum; row++)
+        {
+            int ret = ReadCellDatas(sheet, row);
+            if (ret < 0)
             {
-                ret++;
-                ret += ParseDataTypeAndKeys(cells, SheetName);
-            }
-            else if(row != 1)
-            {
-                ret++;
-                ret += ReadCellDatas(SheetName,row,cells);
+                string log = string.Format("ReadExcelData Error, row data read failed,sheet name={0},row={1}", sheet.SheetName, row);
+                ConsoleLog.Error(log);
+                return -3;
             }
         }
 
-        return ret;
+        return 0;
     }
-
-
 }

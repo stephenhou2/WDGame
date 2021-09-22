@@ -45,18 +45,23 @@ message TB_{0}
             }
         }
 
-        public void ExportProto(ExcelSheet sheet)
+        public void ExportProto(string sheetName,Dictionary<int,FieldInfo> fieldInfos)
         {
             StringBuilder str = new StringBuilder();
-            for (int i = 0; i < sheet.DataTypes.Count; i++)
+
+            int index = 0;
+            foreach(KeyValuePair<int,FieldInfo> kv in fieldInfos)
             {
-                DataType type = sheet.DataTypes[i];
-                string key = sheet.DataKeys[i];
-                int index = i + 1;
-                AppendPbDef(str, type, key, index);
+                FieldInfo fi = kv.Value;
+                if (fi.FieldType == FieldType.Comment || fi.FieldType == FieldType.Undefine)
+                    continue;
+
+                index++;
+                AppendPbDef(str, fi.DataType, fi.FiledName, index);
             }
-            string file = string.Format(PBStr, sheet.SheetName, str.ToString());
-            string protoPath = Path.Combine(Define.ProtoDir,string.Format("{0}.proto", sheet.SheetName));
+
+            string file = string.Format(PBStr, sheetName, str.ToString());
+            string protoPath = Path.Combine(Define.ProtoDir,string.Format("{0}.proto", sheetName));
             File.WriteAllText(protoPath, file, Encoding.UTF8);
         }
 
@@ -65,16 +70,24 @@ message TB_{0}
 
 public class {0}Export
 {{
-    public void Export(ExcelReader reader)
+    public string SheetName = ""{0}"";
+
+    public int Export(ExcelReader reader)
     {{
 		ISheet sheetData = reader.GetSheet(""{0}"");
         if (sheetData == null)
-            return;
+        {{
+            string log = ""Export {0} Error, sheetData null!"";
+            ConsoleLog.Error(log); 
+            return -1;
+        }}
 
         ExcelSheet sheet = new ExcelSheet();
         if(sheet.ReadExcelData(sheetData) < 0)
         {{
-            return;
+            string log = ""Export {0} Error, ReadExcelData Failed!"";
+            ConsoleLog.Error(log); 
+            return -2;
         }}
 
         string sheetName = sheet.SheetName;
@@ -88,8 +101,9 @@ public class {0}Export
 {1}
             }}
             v.Data.Add(cfg);
-            ProtoDataHandler.SaveProtoData(v, Define.ProtoBytesDir+'/'+sheetName+"".bin"");
         }}
+        ProtoDataHandler.SaveProtoData(v, Define.ProtoBytesDir+'/'+sheetName+"".bin"");
+        return 0;
     }}
 }}
 ";
@@ -111,7 +125,7 @@ public class {0}Export
             else if (type == DataType.Array)
             {
 
-                str.AppendFormat(@"\t\t\t\tvar t = ProtoDataExpoter.GetArrayFieldValue(field); 
+                str.AppendFormat(@"         var t = ProtoDataExpoter.GetArrayFieldValue(field); 
                 for(int m = 0;m<t.Length;m++)
                 {{
                     cfg.{0}.Add(t[m]);
@@ -119,40 +133,53 @@ public class {0}Export
             }
         }
 
-        public void ExportCSharp(ExcelSheet sheet)
+        public void ExportCSharp(string sheetName, Dictionary<int, FieldInfo> fieldInfos)
         {
             StringBuilder str = new StringBuilder();
-            for (int i = 0; i < sheet.DataTypes.Count; i++)
+            foreach (KeyValuePair<int, FieldInfo> kv in fieldInfos)
             {
-                DataType type = sheet.DataTypes[i];
-                string key = sheet.DataKeys[i];
-                AppendCSharpLine(str, type, key);
+                FieldInfo fi = kv.Value;
+                if (fi.FieldType == FieldType.Comment || fi.FieldType == FieldType.Undefine)
+                    continue;
+                AppendCSharpLine(str, fi.DataType, fi.FiledName);
             }
 
-            string file = string.Format(PbExportStr, sheet.SheetName, str.ToString());
-            string protoPath = Path.Combine(Define.ExporterDir, string.Format("{0}Export.cs", sheet.SheetName));
+            string file = string.Format(PbExportStr, sheetName, str.ToString());
+            string protoPath = Path.Combine(Define.ExporterDir, string.Format("{0}Export.cs", sheetName));
             File.WriteAllText(protoPath, file, Encoding.UTF8);
         }
 
         const string RegisterStr = @"
 public class ExcelExportRegister
 {{
-    public void ExportAllProtoData()
+    public int ExportAllProtoData()
     {{
+        string log = string.Empty;
         ExcelReader reader = new ExcelReader();
         int readRet = reader.ReadAllTableExcel();
-        if(readRet == 0)
+        if(readRet < 0)
         {{
-{0}
+            log = string.Format(""ExportAllProtoData, ReadAllTableExcel failed"");
+            ConsoleLog.Error(log); 
+            return -1;
         }}
+{0}
+        return 0;
     }}
-}}
+}}";
+
+        const string exportStr = @"	    {0}Export v{1} = new {0}Export();
+		if(v{1}.Export(reader) < 0)
+        {{
+            log = ""Export Proto Data failed, sheet : {0}"";
+            ConsoleLog.Error(log);
+            return -2;
+        }}
 ";
 
         private void AppendReigster(StringBuilder str, string sheetName,int index)
         {
-            str.AppendFormat("\t\t\t{0}Export v{1} = new {0}Export();\r\n", sheetName, index);
-            str.AppendFormat("\t\t\tv{0}.Export(reader);\r\n", index);
+            str.AppendFormat(exportStr, sheetName, index);
         }
 
         public void ExportRegister(ExcelReader reader)

@@ -2,16 +2,24 @@
 
 public class TestSheetExport
 {
-    public void Export(ExcelReader reader)
+    public string SheetName = "TestSheet";
+
+    public int Export(ExcelReader reader)
     {
 		ISheet sheetData = reader.GetSheet("TestSheet");
         if (sheetData == null)
-            return;
+        {
+            string log = "Export TestSheet Error, sheetData null!";
+            ConsoleLog.Error(log); 
+            return -1;
+        }
 
         ExcelSheet sheet = new ExcelSheet();
         if(sheet.ReadExcelData(sheetData) < 0)
         {
-            return;
+            string log = "Export TestSheet Error, ReadExcelData Failed!";
+            ConsoleLog.Error(log); 
+            return -2;
         }
 
         string sheetName = sheet.SheetName;
@@ -25,14 +33,15 @@ public class TestSheetExport
 				cfg.ID = ProtoDataExpoter.GetUIntFieldValue(field);
 				cfg.Name = ProtoDataExpoter.GetStringFieldValue(field);
 				cfg.Age = ProtoDataExpoter.GetUIntFieldValue(field);
-\t\t\t\tvar t = ProtoDataExpoter.GetArrayFieldValue(field); 
+         var t = ProtoDataExpoter.GetArrayFieldValue(field); 
                 for(int m = 0;m<t.Length;m++)
                 {
                     cfg.GRADES.Add(t[m]);
                 }
             }
             v.Data.Add(cfg);
-            ProtoDataHandler.SaveProtoData(v, Define.ProtoBytesDir+'/'+sheetName+".bin");
         }
+        ProtoDataHandler.SaveProtoData(v, Define.ProtoBytesDir+'/'+sheetName+".bin");
+        return 0;
     }
 }
