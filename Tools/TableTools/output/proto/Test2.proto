@@ -3,9 +3,9 @@ package TableProto;
 
 message Test2
 {
-	uint32 ID = 1;
+	int32 ID = 1;
 	string Name = 2;
-	uint32 Age = 3;
+	int32 Age = 3;
 	repeated int32 GRADES = 4;
 
 }

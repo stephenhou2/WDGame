@@ -79,9 +79,9 @@ public class TestSheetExport
                 {
                     cellStr = lineData[col];
                 }
-				cfg.ID = ProtoDataExpoter.GetUIntFieldValue(cellStr);
+				cfg.ID = ProtoDataExpoter.GetIntFieldValue(cellStr);
 				cfg.Name = ProtoDataExpoter.GetStringFieldValue(cellStr);
-				cfg.Age = ProtoDataExpoter.GetUIntFieldValue(cellStr);
+				cfg.Age = ProtoDataExpoter.GetIntFieldValue(cellStr);
                  var t = ProtoDataExpoter.GetArrayFieldValue(cellStr); 
                 for(int m = 0;m<t.Length;m++)
                 {

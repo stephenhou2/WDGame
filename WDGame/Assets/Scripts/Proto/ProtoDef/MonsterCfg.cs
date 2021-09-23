@@ -26,7 +26,7 @@ namespace TableProto {
           string.Concat(
             "Ch1vdXRwdXQvcHJvdG8vTW9uc3RlckNmZy5wcm90bxIKVGFibGVQcm90byI/",
             "CgpNb25zdGVyQ2ZnEgoKAklEGAEgASgFEgwKBE5BTUUYAiABKAkSCwoDQVRL",
-            "GAMgASgNEgoKAkhQGAQgASgNIjUKDVRCX01vbnN0ZXJDZmcSJAoEZGF0YRgB",
+            "GAMgASgFEgoKAkhQGAQgASgFIjUKDVRCX01vbnN0ZXJDZmcSJAoEZGF0YRgB",
             "IAMoCzIWLlRhYmxlUHJvdG8uTW9uc3RlckNmZ2IGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
@@ -112,10 +112,10 @@ namespace TableProto {
 
     /// <summary>Field number for the "ATK" field.</summary>
     public const int ATKFieldNumber = 3;
-    private uint aTK_;
+    private int aTK_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public uint ATK {
+    public int ATK {
       get { return aTK_; }
       set {
         aTK_ = value;
@@ -124,10 +124,10 @@ namespace TableProto {
 
     /// <summary>Field number for the "HP" field.</summary>
     public const int HPFieldNumber = 4;
-    private uint hP_;
+    private int hP_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public uint HP {
+    public int HP {
       get { return hP_; }
       set {
         hP_ = value;
@@ -192,11 +192,11 @@ namespace TableProto {
       }
       if (ATK != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt32(ATK);
+        output.WriteInt32(ATK);
       }
       if (HP != 0) {
         output.WriteRawTag(32);
-        output.WriteUInt32(HP);
+        output.WriteInt32(HP);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -218,11 +218,11 @@ namespace TableProto {
       }
       if (ATK != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt32(ATK);
+        output.WriteInt32(ATK);
       }
       if (HP != 0) {
         output.WriteRawTag(32);
-        output.WriteUInt32(HP);
+        output.WriteInt32(HP);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -241,10 +241,10 @@ namespace TableProto {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(NAME);
       }
       if (ATK != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ATK);
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ATK);
       }
       if (HP != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(HP);
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(HP);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -294,11 +294,11 @@ namespace TableProto {
             break;
           }
           case 24: {
-            ATK = input.ReadUInt32();
+            ATK = input.ReadInt32();
             break;
           }
           case 32: {
-            HP = input.ReadUInt32();
+            HP = input.ReadInt32();
             break;
           }
         }
@@ -325,11 +325,11 @@ namespace TableProto {
             break;
           }
           case 24: {
-            ATK = input.ReadUInt32();
+            ATK = input.ReadInt32();
             break;
           }
           case 32: {
-            HP = input.ReadUInt32();
+            HP = input.ReadInt32();
             break;
           }
         }

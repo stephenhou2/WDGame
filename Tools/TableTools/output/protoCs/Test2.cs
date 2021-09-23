@@ -25,7 +25,7 @@ namespace TableProto {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "ChhvdXRwdXQvcHJvdG8vVGVzdDIucHJvdG8SClRhYmxlUHJvdG8iPgoFVGVz",
-            "dDISCgoCSUQYASABKA0SDAoETmFtZRgCIAEoCRILCgNBZ2UYAyABKA0SDgoG",
+            "dDISCgoCSUQYASABKAUSDAoETmFtZRgCIAEoCRILCgNBZ2UYAyABKAUSDgoG",
             "R1JBREVTGAQgAygFIisKCFRCX1Rlc3QyEh8KBGRhdGEYASADKAsyES5UYWJs",
             "ZVByb3RvLlRlc3QyYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
@@ -88,10 +88,10 @@ namespace TableProto {
 
     /// <summary>Field number for the "ID" field.</summary>
     public const int IDFieldNumber = 1;
-    private uint iD_;
+    private int iD_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public uint ID {
+    public int ID {
       get { return iD_; }
       set {
         iD_ = value;
@@ -112,10 +112,10 @@ namespace TableProto {
 
     /// <summary>Field number for the "Age" field.</summary>
     public const int AgeFieldNumber = 3;
-    private uint age_;
+    private int age_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public uint Age {
+    public int Age {
       get { return age_; }
       set {
         age_ = value;
@@ -183,7 +183,7 @@ namespace TableProto {
     #else
       if (ID != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt32(ID);
+        output.WriteInt32(ID);
       }
       if (Name.Length != 0) {
         output.WriteRawTag(18);
@@ -191,7 +191,7 @@ namespace TableProto {
       }
       if (Age != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt32(Age);
+        output.WriteInt32(Age);
       }
       gRADES_.WriteTo(output, _repeated_gRADES_codec);
       if (_unknownFields != null) {
@@ -206,7 +206,7 @@ namespace TableProto {
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (ID != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt32(ID);
+        output.WriteInt32(ID);
       }
       if (Name.Length != 0) {
         output.WriteRawTag(18);
@@ -214,7 +214,7 @@ namespace TableProto {
       }
       if (Age != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt32(Age);
+        output.WriteInt32(Age);
       }
       gRADES_.WriteTo(ref output, _repeated_gRADES_codec);
       if (_unknownFields != null) {
@@ -228,13 +228,13 @@ namespace TableProto {
     public int CalculateSize() {
       int size = 0;
       if (ID != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ID);
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ID);
       }
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
       if (Age != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(Age);
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Age);
       }
       size += gRADES_.CalculateSize(_repeated_gRADES_codec);
       if (_unknownFields != null) {
@@ -275,7 +275,7 @@ namespace TableProto {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            ID = input.ReadUInt32();
+            ID = input.ReadInt32();
             break;
           }
           case 18: {
@@ -283,7 +283,7 @@ namespace TableProto {
             break;
           }
           case 24: {
-            Age = input.ReadUInt32();
+            Age = input.ReadInt32();
             break;
           }
           case 34:
@@ -307,7 +307,7 @@ namespace TableProto {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            ID = input.ReadUInt32();
+            ID = input.ReadInt32();
             break;
           }
           case 18: {
@@ -315,7 +315,7 @@ namespace TableProto {
             break;
           }
           case 24: {
-            Age = input.ReadUInt32();
+            Age = input.ReadInt32();
             break;
           }
           case 34:

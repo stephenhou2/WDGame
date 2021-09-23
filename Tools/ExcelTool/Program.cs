@@ -36,10 +36,11 @@ namespace ExcelTool
                 protoGen.ExportProto(sheet.SheetName,fieldInfos);
 
                 protoGen.ExportCSharp(sheet.SheetName,fieldInfos);
+
             }
 
             protoGen.ExportRegister(reader);
-
+            protoGen.ExportTableReader(reader);
             //Console.ReadKey();
             return 0;
         }

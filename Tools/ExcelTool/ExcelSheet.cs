@@ -4,7 +4,6 @@ using NPOI.SS.UserModel;
 
 public enum DataType
 {
-    UInt = 0,
     Int = 1,
     String = 2,
     Array = 3,
@@ -82,11 +81,7 @@ public class ExcelSheet
 
     private DataType GetDataType(string s)
     {
-        if (s == "UINT")
-        {
-            return DataType.UInt;
-        }
-        else if (s == "INT")
+        if (s == "INT")
         {
             return DataType.Int;
         }

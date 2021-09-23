@@ -27,10 +27,6 @@ message TB_{0}
 
         private void AppendPbDef(StringBuilder str, DataType type, string key, int index)
         {
-            if (type == DataType.UInt)
-            {
-                str.AppendFormat("\tuint32 {0} = {1};\r\n", key, index);
-            }
             if (type == DataType.Int)
             {
                 str.AppendFormat("\tint32 {0} = {1};\r\n", key, index);
@@ -172,13 +168,9 @@ public class {0}Export
 }}
 ";
 
-        private void AppendExporterLine(StringBuilder str, DataType type,string key)
+        private void AppendExporterLine(StringBuilder str, DataType type, string key)
         {
-            if (type == DataType.UInt)
-            {
-                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetUIntFieldValue(cellStr);\r\n", key);
-            }
-            else if (type == DataType.Int)
+             if (type == DataType.Int)
             {
                 str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetIntFieldValue(cellStr);\r\n", key);
             }
@@ -240,7 +232,7 @@ public class ExcelExportRegister
         }}
 ";
 
-        private void AppendReigster(StringBuilder str, string sheetName,int index)
+        private void AppendReigster(StringBuilder str, string sheetName, int index)
         {
             str.AppendFormat(exportStr, sheetName, index);
         }
@@ -250,7 +242,7 @@ public class ExcelExportRegister
             var allSheets = reader.GetAllSheets();
             int cnt = 0;
             StringBuilder str = new StringBuilder();
-            foreach(KeyValuePair<string,ISheet> kv in allSheets)
+            foreach (KeyValuePair<string, ISheet> kv in allSheets)
             {
                 var sheet = kv.Value;
                 AppendReigster(str, sheet.SheetName, cnt);
@@ -262,9 +254,220 @@ public class ExcelExportRegister
             File.WriteAllText(protoPath, file, Encoding.UTF8);
         }
 
+        const string DataTableReader = @"using System.Collections.Generic;
+
+namespace TableProto
+{{
+    public partial class DataTables
+    {{
+        public static DataTables Ins;
+
+        public static void CreateDataTables()
+        {{
+            Ins = new DataTables();
+            Ins.LoadAllDataTables();
+        }}
+
+        private void LoadAllDataTables()
+        {{
+{0}
+        }}
+
+        public void ClearAllDataTables()
+        {{
+{1}
+        }}
+    }}
+}}
+";
+
+        private void AppendLoadStr(StringBuilder str, string sheetName)
+        {
+            str.AppendFormat("\t\t\tLoad{0}();\r\n", sheetName);
+        }
+
+        private void AppendClearStr(StringBuilder str, string sheetName)
+        {
+            str.AppendFormat("\t\t\tClear{0}();\r\n", sheetName);
+        }
+
+        const string singleTableReader = @"using System.Collections.Generic;
+
+namespace TableProto
+{{
+    public partial class DataTables
+    {{
+{1}
+        private int Load{0}()
+        {{
+            TB_{0} table = ProtoDataHandler.LoadProtoData<TB_{0}>(PathDefine.TABLE_PB_DATA_PATH + ""/{0}.bin"");
+            if (table == null)
+            {{
+                return -1;
+            }}
+
+            foreach ({0} cfg in table.Data)
+            {{
+                tb_{0}.Add(cfg.{2}, cfg);
+            }}
+
+            return 0;
+        }}
+
+        public {0} Get{0}(int id)
+        {{
+            {0} cfg;
+            if (tb_{0}.TryGetValue(id, out cfg))
+            {{
+                return cfg;
+            }}
+
+            Log.Error(ErrorLevel.Normal, ""Get {0} Failed, key = {{0}}"", id);
+            return null;
+        }}
+
+{3}
+
+        public void Clear{0}()
+        {{
+            tb_{0} = null;
+            {0}KeyMap = null;
+        }}
+    }}
+}}
+";
+
+        private void AppendTableDicDefs(StringBuilder str, string sheetName)
+        {
+            str.AppendFormat(@"
+        public Dictionary<int, {0}> tb_{0} = new Dictionary<int, {0}>();
+        private Dictionary<string, int> {0}KeyMap = new Dictionary<string, int>();", sheetName);
+        }
+
+        private string GetUniqueKey(ExcelSheet es)
+        {
+            List<FieldInfo> fieldInfos = es.FieldInfos;
+            for(int col=0;col<fieldInfos.Count;col++)
+            {
+                FieldInfo fi = fieldInfos[col];
+                if(fi.FieldType == FieldType.Unique)
+                {
+                    return fi.FiledName;
+                }
+            }
+
+            return string.Empty;
+        }
+
+
+
+        const string RedefineFunc = @"
+        public {0} Get{0}{1}({2})
+        {{
+            string key = ""{3}"";
+            int uniqueKey;
+            if({0}KeyMap.TryGetValue(key,out uniqueKey))
+            {{
+                {0} cfg;
+                if(tb_{0}.TryGetValue(uniqueKey,out cfg))
+                {{
+                    return cfg;
+                }}
+            }}
+            else
+            {{
+                Log.Error(ErrorLevel.Critical,""Get{0}{1} Failed, unique key not find!"");
+            }}
+
+            return null;
+        }}";
+
+        private List<FieldInfo> mKeyFields = new List<FieldInfo>();
+
+        private string GetTypeStr(DataType type)
+        {
+            if (type == DataType.Int)
+                return "int";
+
+            if (type == DataType.String)
+                return "string";
+
+            return string.Empty;
+        }
+
+        private string GetRedefineFunc(ExcelSheet es)
+        {
+            List<FieldInfo> fieldInfos = es.FieldInfos;
+
+            mKeyFields.Clear();
+            for (int col = 0; col < fieldInfos.Count; col++)
+            {
+                FieldInfo fi = fieldInfos[col];
+                if (fi.FieldType == FieldType.Key && fi.DataType != DataType.Array && fi.DataType != DataType.Undefine)
+                {
+                    mKeyFields.Add(fi);
+                }
+            }
+
+            if (mKeyFields.Count == 0)
+                return string.Empty;
+
+            StringBuilder s1 = new StringBuilder();
+            StringBuilder s2 = new StringBuilder();
+            StringBuilder s3 = new StringBuilder();
+            for (int i =0;i<mKeyFields.Count;i++)
+            {
+                s1.AppendFormat("_{0}", mKeyFields[i].FiledName);
+
+                string typeStr = GetTypeStr(mKeyFields[i].DataType);
+                if(!string.IsNullOrEmpty(typeStr))
+                {
+                    s2.AppendFormat("{0} {1},", typeStr, mKeyFields[i].FiledName);
+                    s3.AppendFormat("{0}_", mKeyFields[i].FiledName);
+                }
+            }
+
+            if (s2.Length > 0)
+                s2.Remove(s2.Length - 1, 1);
+
+            return string.Format(RedefineFunc,es.SheetName,s1.ToString(),s2.ToString(),s3.ToString());
+        }
+
+        private void ExportSingleTableReader(ISheet sheet)
+        {
+            StringBuilder tableDicDefs = new StringBuilder();
+            AppendTableDicDefs(tableDicDefs, sheet.SheetName);
+            ExcelSheet es = new ExcelSheet();
+            es.ReadTableFieldDefineRow(sheet);
+
+            string uniqueKey = GetUniqueKey(es);
+
+            string redefineFunc = GetRedefineFunc(es);
+
+            string file = string.Format(singleTableReader, sheet.SheetName, tableDicDefs.ToString(), uniqueKey, redefineFunc);
+            string filePath = Path.Combine(Define.DataTableCSDir, string.Format("DataTables_{0}.cs", sheet.SheetName));
+            File.WriteAllText(filePath, file, Encoding.UTF8);
+        }
+
         public void ExportTableReader(ExcelReader reader)
         {
+            var allSheets = reader.GetAllSheets();
 
+            StringBuilder loadStr = new StringBuilder();
+            StringBuilder clearStr = new StringBuilder();
+            foreach (KeyValuePair<string, ISheet> kv in allSheets)
+            {
+                var sheet = kv.Value;
+
+                AppendLoadStr(loadStr, sheet.SheetName);
+                AppendClearStr(clearStr, sheet.SheetName);
+
+                ExportSingleTableReader(sheet);
+            }
+
+            string file = string.Format(DataTableReader, loadStr.ToString(),clearStr.ToString());
+            string filePath = Path.Combine(Define.DataTableCSDir, "DataTables.cs");
+            File.WriteAllText(filePath, file, Encoding.UTF8);
         }
     }
 }

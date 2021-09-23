@@ -81,8 +81,8 @@ public class MonsterCfgExport
                 }
 				cfg.ID = ProtoDataExpoter.GetIntFieldValue(cellStr);
 				cfg.NAME = ProtoDataExpoter.GetStringFieldValue(cellStr);
-				cfg.ATK = ProtoDataExpoter.GetUIntFieldValue(cellStr);
-				cfg.HP = ProtoDataExpoter.GetUIntFieldValue(cellStr);
+				cfg.ATK = ProtoDataExpoter.GetIntFieldValue(cellStr);
+				cfg.HP = ProtoDataExpoter.GetIntFieldValue(cellStr);
 
             }
 

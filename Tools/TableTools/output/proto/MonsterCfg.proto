@@ -5,8 +5,8 @@ message MonsterCfg
 {
 	int32 ID = 1;
 	string NAME = 2;
-	uint32 ATK = 3;
-	uint32 HP = 4;
+	int32 ATK = 3;
+	int32 HP = 4;
 
 }
 
