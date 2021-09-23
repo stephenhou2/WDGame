@@ -20,6 +20,11 @@ public class ExcelReader
         return sheet;
     }
 
+    public static bool IsTempFile(string filename)
+    {
+        return filename.StartsWith("~");
+    }
+
     public bool ReadExcel(string path)
     {
         IWorkbook workbook = null;
@@ -84,15 +89,16 @@ public class ExcelReader
         for (int i = 0; i < fileInfos.Length; i++)
         {
             FileInfo fi = fileInfos[i];
-            if (fi != null)
-            {
-                ReadExcel(fi.FullName);
-            }
-            else
+            if(fi == null)
             {
                 string log = string.Format("ReadAllTableExcel Failed,find null file info,root dir:{0}", Define.TableRootPath);
                 ConsoleLog.Error(log);
-                // continue 不中断
+                continue;
+            }
+
+            if (!IsTempFile(fi.Name))
+            {
+                ReadExcel(fi.FullName);
             }
         }
 

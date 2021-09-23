@@ -6,7 +6,7 @@ namespace ExcelTool
 {
     class Program
     {
-        static void Main()
+        static int Main()
         {
             ProtoGenerator protoGen = new ProtoGenerator();
 
@@ -15,8 +15,8 @@ namespace ExcelTool
             if(readRet < 0)
             {
                 Console.WriteLine("<color=red>Read Excel Table Failed!</color>");
-                Console.ReadKey();
-                return;
+                //Console.ReadKey();
+                return -1;
             }
 
             var sheets = reader.GetAllSheets();
@@ -25,13 +25,14 @@ namespace ExcelTool
                 ExcelSheet es = new ExcelSheet();
                 var sheet = kv.Value;
 
-                Dictionary<int,FieldInfo> fieldInfos = es.ReadTableFieldDefineRow(sheet);
-                if (fieldInfos == null)
+                int ret  = es.ReadTableFieldDefineRow(sheet);
+                if (ret < 0)
                 {
-                    Console.ReadKey();
-                    return;
+                    //Console.ReadKey();
+                    return -2;
                 }
 
+                List<FieldInfo> fieldInfos = es.FieldInfos;
                 protoGen.ExportProto(sheet.SheetName,fieldInfos);
 
                 protoGen.ExportCSharp(sheet.SheetName,fieldInfos);
@@ -39,7 +40,8 @@ namespace ExcelTool
 
             protoGen.ExportRegister(reader);
 
-            Console.ReadKey();
+            //Console.ReadKey();
+            return 0;
         }
     }
 }

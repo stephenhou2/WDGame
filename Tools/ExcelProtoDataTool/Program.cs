@@ -6,7 +6,6 @@ class Program
     {
         ExcelExportRegister reg = new ExcelExportRegister();
         reg.ExportAllProtoData();
-        Console.ReadKey();
     }
 }
 

@@ -29,18 +29,28 @@ public struct FieldInfo
     public string FiledName;
 }
 
+public struct ExcelLine
+{
+    public int Row;
+    public List<string> lineData;
+
+    public void InitExcelLine(int row, List<string> line)
+    {
+        Row = row;
+        lineData = line;
+    }
+}
+
 public class ExcelSheet
 {
     public string SheetName;
-    public Dictionary<int,FieldInfo> FieldInfos;
-    public List<List<string>> DataValues;
-    public int DataRowCount;
-    public int DataColCnt;
+    public List<FieldInfo> FieldInfos;
+    public List<ExcelLine> ExcelLines;
 
     public ExcelSheet()
     {
-        FieldInfos = new Dictionary<int, FieldInfo>();
-        DataValues = new List<List<string>>();
+        FieldInfos = new List<FieldInfo>();
+        ExcelLines = new List<ExcelLine>();
     }
 
     //"UNI:INT:ID"
@@ -95,24 +105,26 @@ public class ExcelSheet
 
     const string undefined = "##";
 
-    public Dictionary<int,FieldInfo> ReadTableFieldDefineRow(ISheet sheet)
+    public int ReadTableFieldDefineRow(ISheet sheet)
     {
-        if(sheet == null)
+        if (sheet == null)
         {
             string log = string.Format("ReadTableFieldDefineRow Error, Read null sheet!");
             ConsoleLog.Error(log);
-            return null;
+            return -1;
         }
 
+        SheetName = sheet.SheetName;
+
         IRow row = sheet.GetRow(0);
-        if(row == null)
+        if (row == null)
         {
             string log = string.Format("ReadTableFieldDefineRow Error, Field define not exist,sheet name:{0}", sheet.SheetName);
             ConsoleLog.Error(log);
-            return null;
+            return -2;
         }
 
-        Dictionary<int, FieldInfo> sheetFieldInfos = new Dictionary<int, FieldInfo>();
+        List<FieldInfo> sheetFieldInfos = new List<FieldInfo>();
         Dictionary<string, FieldInfo> mFieldMap = new Dictionary<string, FieldInfo>();
         for (int i = 0; i < row.Cells.Count; i++)
         {
@@ -121,30 +133,30 @@ public class ExcelSheet
             string fieldName = undefined;
 
             ICell cell = row.Cells[i];
-            if(cell != null && cell.CellType == CellType.String)
+            if (cell != null && cell.CellType == CellType.String)
             {
                 string s = cell.StringCellValue;
                 string[] list = s.Split(':');
-                if(list.Length > 0)
+                if (list.Length > 0)
                 {
-                    fieldType = GetFieldType(list[0]); 
+                    fieldType = GetFieldType(list[0]);
                 }
 
-                if(list.Length > 1)
+                if (list.Length > 1)
                 {
                     dataType = GetDataType(list[1]);
                 }
-                
+
                 if (list.Length > 2)
                 {
                     fieldName = list[2];
                 }
 
-                if(fieldType == FieldType.Undefine)
+                if (fieldType == FieldType.Undefine)
                 {
                     string log = string.Format("ReadTableFieldDefineRow Error, Undefined field type,sheet name={0},col={1}", sheet.SheetName, i);
                     ConsoleLog.Error(log);
-                    return null;
+                    return -3;
                 }
 
                 if (fieldType != FieldType.Comment)
@@ -153,8 +165,15 @@ public class ExcelSheet
                     {
                         string log = string.Format("ReadTableFieldDefineRow Error, Undefined data type,sheet name={0},col={1}", sheet.SheetName, i);
                         ConsoleLog.Error(log);
-                        return null;
+                        return -4;
                     }
+                }
+
+                if (fieldType == FieldType.Unique && dataType != DataType.Int)
+                {
+                    string log = string.Format("ReadTableFieldDefineRow Error, unique key must be int type ,sheet name={0}", sheet.SheetName);
+                    ConsoleLog.Error(log);
+                    return -5;
                 }
 
                 FieldInfo fi = new FieldInfo();
@@ -164,43 +183,36 @@ public class ExcelSheet
                 fi.Col = i;
 
                 FieldInfo _fi;
-                if (mFieldMap.TryGetValue(fieldName,out _fi))
+                if (mFieldMap.TryGetValue(fieldName, out _fi))
                 {
                     string log = string.Format("ReadTableFieldDefineRow Error, same field name is not allowed,sheet name={0},col_1={1},col_2={2}", sheet.SheetName, i, _fi.Col);
                     ConsoleLog.Error(log);
-                    return null;
+                    return -5;
                 }
                 mFieldMap.Add(fieldName, fi);
-
-                if (sheetFieldInfos.TryGetValue(i, out _fi))
-                {
-                    string log = string.Format("ReadTableFieldDefineRow Error, Add Field to same col,sheet name={0},col_1={1},col_2={2}", sheet.SheetName, fieldName, _fi.FiledName);
-                    ConsoleLog.Error(log);
-                    return null;
-                }
-                sheetFieldInfos.Add(i, fi);
+                sheetFieldInfos.Add(fi);
             }
         }
-        return sheetFieldInfos;
+
+        FieldInfos = sheetFieldInfos;
+        return 0;
     }
 
     private int ReadCellDatas(ISheet sheet, int row)
     {
-        List<string> data = new List<string>();
-        DataValues.Add(data);
-
         IRow rowData = sheet.GetRow(row);
-        if(rowData == null)
+        if (rowData == null)
         {
             string log = string.Format("ReadCellDatas Error, row data is null,sheet name={0},row={1}", sheet.SheetName, row);
             ConsoleLog.Error(log);
             return -1;
         }
 
-        for(int col =0;col<rowData.Cells.Count;col++)
+        List<string> cellDatas = new List<string>();
+        for (int col = 0; col < rowData.Cells.Count; col++)
         {
             ICell cell = rowData.Cells[col];
-            if(cell == null)
+            if (cell == null)
             {
                 string log = string.Format("ReadCellDatas Error, row cell is null,sheet name={0},row={1},col={2}", sheet.SheetName, row, col);
                 ConsoleLog.Error(log);
@@ -209,16 +221,20 @@ public class ExcelSheet
             switch (cell.CellType)
             {
                 case CellType.String:
-                    data.Add(cell.StringCellValue);
+                    cellDatas.Add(cell.StringCellValue);
                     break;
                 case CellType.Numeric:
-                    data.Add(cell.NumericCellValue.ToString());
+                    cellDatas.Add(cell.NumericCellValue.ToString());
                     break;
                 default:
-                    data.Add(undefined);
+                    cellDatas.Add(undefined);
                     break;
             }
         }
+
+        ExcelLine line = new ExcelLine();
+        line.InitExcelLine(row, cellDatas);
+        ExcelLines.Add(line);
         return 0;
     }
 
@@ -226,21 +242,28 @@ public class ExcelSheet
     {
         if (sheet == null)
         {
+            string log = string.Format("ReadExcelData Error,read null sheet");
+            ConsoleLog.Error(log);
             return -1;
         }
 
-        FieldInfos = ReadTableFieldDefineRow(sheet);
+        SheetName = sheet.SheetName;
+        int ret = ReadTableFieldDefineRow(sheet);
 
-        if(FieldInfos == null)
+        if (ret < 0)
         {
+            string log = string.Format("ReadExcelData Error, read table field define row failed,sheet name={0}", sheet.SheetName);
+            ConsoleLog.Error(log);
             return -2;
         }
 
-        for(int row = 2;row <= sheet.LastRowNum;row++)
+        for (int row = 2; row <= sheet.LastRowNum; row++)
         {
-            int ret = ReadCellDatas(sheet, row);
-            if(ret < 0)
+            ret = ReadCellDatas(sheet, row);
+            if (ret < 0)
             {
+                string log = string.Format("ReadExcelData Error, row data read failed,sheet name={0},row={1}", sheet.SheetName, row);
+                ConsoleLog.Error(log);
                 return -3;
             }
         }

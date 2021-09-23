@@ -1,4 +1,6 @@
 ﻿using NPOI.SS.UserModel;
+using System.Collections.Generic;
+using System.Text;
 
 public class MonsterCfgExport
 {
@@ -23,22 +25,85 @@ public class MonsterCfgExport
         }
 
         string sheetName = sheet.SheetName;
-        TableProto.TB_MonsterCfg v = new TableProto.TB_MonsterCfg();
-        for (int i = 0; i<sheet.DataRowCount; i++)
+        TableProto.TB_MonsterCfg tb = new TableProto.TB_MonsterCfg();
+        var lines = sheet.ExcelLines;
+        var fieldInfos = sheet.FieldInfos;
+
+        Dictionary<string, int> keyMap = new Dictionary<string, int>();
+        Dictionary<int, int> uniqueKeyMap = new Dictionary<int, int>();
+        StringBuilder unitKey = new StringBuilder();
+
+        for(int row = 0;row<lines.Count;row++)
         {
-		    TableProto.MonsterCfg cfg = new TableProto.MonsterCfg();
-            for (int j = 0; j<sheet.DataColCnt; j++)
+            List<string> lineData =  lines[row].lineData;
+            if(lineData == null)
             {
-                var field = sheet.DataValues[i][j];
-				cfg.ID = ProtoDataExpoter.GetIntFieldValue(field);
-				cfg.NAME = ProtoDataExpoter.GetStringFieldValue(field);
-				cfg.ATK = ProtoDataExpoter.GetUIntFieldValue(field);
-				cfg.HP = ProtoDataExpoter.GetUIntFieldValue(field);
+                string log = string.Format(" Export MonsterCfg Error, lineData null at row:{0}",row);
+                ConsoleLog.Error(log);
+                return -3;
+            }
+            
+            unitKey.Clear();
+            TableProto.MonsterCfg cfg = new TableProto.MonsterCfg();
+            for (int col = 0;col < fieldInfos.Count;col++)
+            {
+                FieldInfo fi = fieldInfos[col];
+    
+                if(fi.FieldType == FieldType.Comment && fi.FieldType == FieldType.Undefine)
+                {
+                    continue;
+                }
+                
+                if(fi.FieldType == FieldType.Key)
+                {
+                    unitKey.AppendFormat("|{0}", fi.FiledName);
+                }
+
+                string cellStr = string.Empty;
+                if (fi.FieldType == FieldType.Unique)
+                {
+                    int uniqueKey = ProtoDataExpoter.GetIntFieldValue(lineData[col]);
+                    if (uniqueKeyMap.ContainsKey(uniqueKey))
+                    {
+                        string log = string.Format("Export MonsterCfg Error, Unique key repeated at row:{0} and row:{1}", uniqueKeyMap[uniqueKey]+2,row+2);
+                        ConsoleLog.Error(log);
+                        return -3;
+                    }
+                    else
+                    {
+                        uniqueKeyMap.Add(uniqueKey, row);
+                    }
+                }
+
+                if (col >= 0 && col < lineData.Count)
+                {
+                    cellStr = lineData[col];
+                }
+				cfg.ID = ProtoDataExpoter.GetIntFieldValue(cellStr);
+				cfg.NAME = ProtoDataExpoter.GetStringFieldValue(cellStr);
+				cfg.ATK = ProtoDataExpoter.GetUIntFieldValue(cellStr);
+				cfg.HP = ProtoDataExpoter.GetUIntFieldValue(cellStr);
 
             }
-            v.Data.Add(cfg);
+
+            string uk = unitKey.ToString();
+            if(!string.IsNullOrEmpty(uk))
+            {
+                if (keyMap.ContainsKey(uk))
+                {
+                    string log = string.Format("Export MonsterCfg Error, United key repeated at row:{0} and row:{1}", keyMap[uk]+2, row+2);
+                    ConsoleLog.Error(log);
+                    return -3;
+                }
+                else
+                {
+                    keyMap.Add(uk, row);
+                }
+            }
+
+            tb.Data.Add(cfg);
         }
-        ProtoDataHandler.SaveProtoData(v, Define.ProtoBytesDir+'/'+sheetName+".bin");
+        ProtoDataHandler.SaveProtoData(tb, Define.ProtoBytesDir+'/'+sheetName+".bin");
         return 0;
     }
 }

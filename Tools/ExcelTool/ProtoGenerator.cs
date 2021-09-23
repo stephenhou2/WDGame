@@ -25,7 +25,7 @@ message TB_{0}
 }}
 ";
 
-        private void AppendPbDef(StringBuilder str,DataType type,string key, int index)
+        private void AppendPbDef(StringBuilder str, DataType type, string key, int index)
         {
             if (type == DataType.UInt)
             {
@@ -45,14 +45,13 @@ message TB_{0}
             }
         }
 
-        public void ExportProto(string sheetName,Dictionary<int,FieldInfo> fieldInfos)
+        public void ExportProto(string sheetName, List<FieldInfo> fieldInfos)
         {
             StringBuilder str = new StringBuilder();
 
             int index = 0;
-            foreach(KeyValuePair<int,FieldInfo> kv in fieldInfos)
+            foreach (FieldInfo fi in fieldInfos)
             {
-                FieldInfo fi = kv.Value;
                 if (fi.FieldType == FieldType.Comment || fi.FieldType == FieldType.Undefine)
                     continue;
 
@@ -61,12 +60,14 @@ message TB_{0}
             }
 
             string file = string.Format(PBStr, sheetName, str.ToString());
-            string protoPath = Path.Combine(Define.ProtoDir,string.Format("{0}.proto", sheetName));
+            string protoPath = Path.Combine(Define.ProtoDir, string.Format("{0}.proto", sheetName));
             File.WriteAllText(protoPath, file, Encoding.UTF8);
         }
 
 
         const string PbExportStr = @"using NPOI.SS.UserModel;
+using System.Collections.Generic;
+using System.Text;
 
 public class {0}Export
 {{
@@ -91,57 +92,119 @@ public class {0}Export
         }}
 
         string sheetName = sheet.SheetName;
-        TableProto.TB_{0} v = new TableProto.TB_{0}();
-        for (int i = 0; i<sheet.DataRowCount; i++)
+        TableProto.TB_{0} tb = new TableProto.TB_{0}();
+        var lines = sheet.ExcelLines;
+        var fieldInfos = sheet.FieldInfos;
+
+        Dictionary<string, int> keyMap = new Dictionary<string, int>();
+        Dictionary<int, int> uniqueKeyMap = new Dictionary<int, int>();
+        StringBuilder unitKey = new StringBuilder();
+
+        for(int row = 0;row<lines.Count;row++)
         {{
-		    TableProto.{0} cfg = new TableProto.{0}();
-            for (int j = 0; j<sheet.DataColCnt; j++)
+            List<string> lineData =  lines[row].lineData;
+            if(lineData == null)
             {{
-                var field = sheet.DataValues[i][j];
+                string log = string.Format("" Export {0} Error, lineData null at row:{{0}}"",row);
+                ConsoleLog.Error(log);
+                return -3;
+            }}
+            
+            unitKey.Clear();
+            TableProto.{0} cfg = new TableProto.{0}();
+            for (int col = 0;col < fieldInfos.Count;col++)
+            {{
+                FieldInfo fi = fieldInfos[col];
+    
+                if(fi.FieldType == FieldType.Comment && fi.FieldType == FieldType.Undefine)
+                {{
+                    continue;
+                }}
+                
+                if(fi.FieldType == FieldType.Key)
+                {{
+                    unitKey.AppendFormat(""|{{0}}"", fi.FiledName);
+                }}
+
+                string cellStr = string.Empty;
+                if (fi.FieldType == FieldType.Unique)
+                {{
+                    int uniqueKey = ProtoDataExpoter.GetIntFieldValue(lineData[col]);
+                    if (uniqueKeyMap.ContainsKey(uniqueKey))
+                    {{
+                        string log = string.Format(""Export {0} Error, Unique key repeated at row:{{0}} and row:{{1}}"", uniqueKeyMap[uniqueKey]+2,row+2);
+                        ConsoleLog.Error(log);
+                        return -3;
+                    }}
+                    else
+                    {{
+                        uniqueKeyMap.Add(uniqueKey, row);
+                    }}
+                }}
+
+                if (col >= 0 && col < lineData.Count)
+                {{
+                    cellStr = lineData[col];
+                }}
 {1}
             }}
-            v.Data.Add(cfg);
+
+            string uk = unitKey.ToString();
+            if(!string.IsNullOrEmpty(uk))
+            {{
+                if (keyMap.ContainsKey(uk))
+                {{
+                    string log = string.Format(""Export {0} Error, United key repeated at row:{{0}} and row:{{1}}"", keyMap[uk]+2, row+2);
+                    ConsoleLog.Error(log);
+                    return -3;
+                }}
+                else
+                {{
+                    keyMap.Add(uk, row);
+                }}
+            }}
+
+            tb.Data.Add(cfg);
         }}
-        ProtoDataHandler.SaveProtoData(v, Define.ProtoBytesDir+'/'+sheetName+"".bin"");
+        ProtoDataHandler.SaveProtoData(tb, Define.ProtoBytesDir+'/'+sheetName+"".bin"");
         return 0;
     }}
 }}
 ";
 
-        private void AppendCSharpLine(StringBuilder str, DataType type,string key)
+        private void AppendExporterLine(StringBuilder str, DataType type,string key)
         {
             if (type == DataType.UInt)
             {
-                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetUIntFieldValue(field);\r\n", key);
+                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetUIntFieldValue(cellStr);\r\n", key);
             }
             else if (type == DataType.Int)
             {
-                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetIntFieldValue(field);\r\n", key);
+                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetIntFieldValue(cellStr);\r\n", key);
             }
             else if (type == DataType.String)
             {
-                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetStringFieldValue(field);\r\n", key);
+                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetStringFieldValue(cellStr);\r\n", key);
             }
             else if (type == DataType.Array)
             {
 
-                str.AppendFormat(@"         var t = ProtoDataExpoter.GetArrayFieldValue(field); 
+                str.AppendFormat(@"                 var t = ProtoDataExpoter.GetArrayFieldValue(cellStr); 
                 for(int m = 0;m<t.Length;m++)
                 {{
                     cfg.{0}.Add(t[m]);
-                }}",key);
+                }}", key);
             }
         }
 
-        public void ExportCSharp(string sheetName, Dictionary<int, FieldInfo> fieldInfos)
+        public void ExportCSharp(string sheetName, List<FieldInfo> fieldInfos)
         {
             StringBuilder str = new StringBuilder();
-            foreach (KeyValuePair<int, FieldInfo> kv in fieldInfos)
+            foreach (FieldInfo fi in fieldInfos)
             {
-                FieldInfo fi = kv.Value;
                 if (fi.FieldType == FieldType.Comment || fi.FieldType == FieldType.Undefine)
                     continue;
-                AppendCSharpLine(str, fi.DataType, fi.FiledName);
+                AppendExporterLine(str, fi.DataType, fi.FiledName);
             }
 
             string file = string.Format(PbExportStr, sheetName, str.ToString());

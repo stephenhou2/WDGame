@@ -9,7 +9,7 @@ namespace TableProto
         public static PbCfg Ins;
 
         public Dictionary<int, MonsterCfg> mMonsterCfgs = new Dictionary<int, MonsterCfg>();
-
+        //private Dictionary<string,int> monsterCfgKeyMap = 
 
         public static void CreatePbCfg()
         {
@@ -17,19 +17,21 @@ namespace TableProto
             Ins.LoadAllPbCfgs();
         }
 
-        //private int LoadMonsterCfg()
-        //{
-        //    TB_MonsterCfg table = ProtoDataHandler.LoadProtoData<TB_MonsterCfg>(PathDefine.TABLE_PB_DATA_PATH + "/MonsterCfg.bin");
-        //    if(table == null)
-        //    {
-        //        return -1;
-        //    }
+        private int LoadMonsterCfg()
+        {
+            TB_MonsterCfg table = ProtoDataHandler.LoadProtoData<TB_MonsterCfg>(PathDefine.TABLE_PB_DATA_PATH + "/MonsterCfg.bin");
+            if (table == null)
+            {
+                return -1;
+            }
 
-        //    foreach(MonsterCfg cfg in(table.Data))
-        //    {
+            foreach (MonsterCfg cfg in (table.Data))
+            {
 
-        //    }
-        //}
+            }
+
+            return 0;
+        }
 
         private void LoadAllPbCfgs()
         {
