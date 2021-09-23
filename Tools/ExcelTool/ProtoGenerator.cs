@@ -364,7 +364,7 @@ namespace TableProto
         const string RedefineFunc = @"
         public {0} Get{0}{1}({2})
         {{
-            string key = ""{3}"";
+            string key = string.Format(""{3}"",{4});
             int uniqueKey;
             if({0}KeyMap.TryGetValue(key,out uniqueKey))
             {{
@@ -415,6 +415,7 @@ namespace TableProto
             StringBuilder s1 = new StringBuilder();
             StringBuilder s2 = new StringBuilder();
             StringBuilder s3 = new StringBuilder();
+            StringBuilder s4 = new StringBuilder();
             for (int i =0;i<mKeyFields.Count;i++)
             {
                 s1.AppendFormat("_{0}", mKeyFields[i].FiledName);
@@ -423,14 +424,18 @@ namespace TableProto
                 if(!string.IsNullOrEmpty(typeStr))
                 {
                     s2.AppendFormat("{0} {1},", typeStr, mKeyFields[i].FiledName);
-                    s3.AppendFormat("{0}_", mKeyFields[i].FiledName);
+                    s3.AppendFormat("{{{0}}}_", i);
+                    s4.AppendFormat("{0},", mKeyFields[i].FiledName);
                 }
             }
 
             if (s2.Length > 0)
                 s2.Remove(s2.Length - 1, 1);
 
-            return string.Format(RedefineFunc,es.SheetName,s1.ToString(),s2.ToString(),s3.ToString());
+            if (s4.Length > 0)
+                s4.Remove(s4.Length - 1, 1);
+
+            return string.Format(RedefineFunc,es.SheetName,s1.ToString(),s2.ToString(),s3.ToString(),s4.ToString());
         }
 
         private void ExportSingleTableReader(ISheet sheet)

@@ -38,7 +38,7 @@ namespace TableProto
 
         public Test2 GetTest2_Name_Age(string Name,int Age)
         {
-            string key = "Name_Age_";
+            string key = string.Format("{0}_{1}_",Name,Age);
             int uniqueKey;
             if(Test2KeyMap.TryGetValue(key,out uniqueKey))
             {
