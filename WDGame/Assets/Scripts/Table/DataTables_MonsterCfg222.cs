@@ -37,6 +37,8 @@ namespace TableProto
 
 
 
+         private void LoadMonsterCfg222Redefine(){} 
+
         public void ClearMonsterCfg222()
         {
             tb_MonsterCfg222 = null;

@@ -10,6 +10,7 @@ namespace TableProto
         {
             Ins = new DataTables();
             Ins.LoadAllDataTables();
+            Ins.LoadAllTableRedefines();
         }
 
         private void LoadAllDataTables()
@@ -27,6 +28,15 @@ namespace TableProto
 			ClearTest2();
 			ClearMonsterCfg();
 			ClearMonsterCfg222();
+
+        }
+
+        public void LoadAllTableRedefines()
+        {
+			LoadTestSheetRedefine();
+			LoadTest2Redefine();
+			LoadMonsterCfgRedefine();
+			LoadMonsterCfg222Redefine();
 
         }
     }

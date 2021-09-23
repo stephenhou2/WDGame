@@ -56,6 +56,25 @@ namespace TableProto
             return null;
         }
 
+        private void LoadTestSheetRedefine()
+        {
+            TestSheetKeyMap.Clear();
+            for (int i =0;i<tb_TestSheet.Count;i++)
+            {
+                var cfg = tb_TestSheet[i];
+                int uniqueKey = cfg.ID;
+                string unitKey = string.Format("{0}_{1}", cfg.Name,cfg.Age);
+                if (!TestSheetKeyMap.ContainsKey(unitKey))
+                {
+                    TestSheetKeyMap.Add(unitKey, uniqueKey);
+                }
+                else
+                {
+                    Log.Error(ErrorLevel.Critical, "LoadTestSheetRedefine Error, repeated unit key where unique key is {0}", uniqueKey);
+                }
+            }
+        } 
+
         public void ClearTestSheet()
         {
             tb_TestSheet = null;

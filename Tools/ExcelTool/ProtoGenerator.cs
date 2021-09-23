@@ -170,7 +170,7 @@ public class {0}Export
 
         private void AppendExporterLine(StringBuilder str, DataType type, string key)
         {
-             if (type == DataType.Int)
+            if (type == DataType.Int)
             {
                 str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetIntFieldValue(cellStr);\r\n", key);
             }
@@ -266,6 +266,7 @@ namespace TableProto
         {{
             Ins = new DataTables();
             Ins.LoadAllDataTables();
+            Ins.LoadAllTableRedefines();
         }}
 
         private void LoadAllDataTables()
@@ -276,6 +277,11 @@ namespace TableProto
         public void ClearAllDataTables()
         {{
 {1}
+        }}
+
+        public void LoadAllTableRedefines()
+        {{
+{2}
         }}
     }}
 }}
@@ -289,6 +295,11 @@ namespace TableProto
         private void AppendClearStr(StringBuilder str, string sheetName)
         {
             str.AppendFormat("\t\t\tClear{0}();\r\n", sheetName);
+        }
+
+        private void AppendRedefineLoadStr(StringBuilder str, string sheetName)
+        {
+            str.AppendFormat("\t\t\tLoad{0}Redefine();\r\n", sheetName);
         }
 
         const string singleTableReader = @"using System.Collections.Generic;
@@ -327,6 +338,7 @@ namespace TableProto
         }}
 
 {3}
+{4} 
 
         public void Clear{0}()
         {{
@@ -347,10 +359,10 @@ namespace TableProto
         private string GetUniqueKey(ExcelSheet es)
         {
             List<FieldInfo> fieldInfos = es.FieldInfos;
-            for(int col=0;col<fieldInfos.Count;col++)
+            for (int col = 0; col < fieldInfos.Count; col++)
             {
                 FieldInfo fi = fieldInfos[col];
-                if(fi.FieldType == FieldType.Unique)
+                if (fi.FieldType == FieldType.Unique)
                 {
                     return fi.FiledName;
                 }
@@ -416,12 +428,12 @@ namespace TableProto
             StringBuilder s2 = new StringBuilder();
             StringBuilder s3 = new StringBuilder();
             StringBuilder s4 = new StringBuilder();
-            for (int i =0;i<mKeyFields.Count;i++)
+            for (int i = 0; i < mKeyFields.Count; i++)
             {
                 s1.AppendFormat("_{0}", mKeyFields[i].FiledName);
 
                 string typeStr = GetTypeStr(mKeyFields[i].DataType);
-                if(!string.IsNullOrEmpty(typeStr))
+                if (!string.IsNullOrEmpty(typeStr))
                 {
                     s2.AppendFormat("{0} {1},", typeStr, mKeyFields[i].FiledName);
                     s3.AppendFormat("{{{0}}}_", i);
@@ -435,8 +447,74 @@ namespace TableProto
             if (s4.Length > 0)
                 s4.Remove(s4.Length - 1, 1);
 
-            return string.Format(RedefineFunc,es.SheetName,s1.ToString(),s2.ToString(),s3.ToString(),s4.ToString());
+            return string.Format(RedefineFunc, es.SheetName, s1.ToString(), s2.ToString(), s3.ToString(), s4.ToString());
         }
+
+        const string RedefineLoadFunc = @"
+        private void Load{0}Redefine()
+        {{
+            {0}KeyMap.Clear();
+            for (int i =0;i<tb_{0}.Count;i++)
+            {{
+                var cfg = tb_{0}[i];
+                int uniqueKey = cfg.{1};
+                string unitKey = string.Format(""{2}"", {3});
+                if (!{0}KeyMap.ContainsKey(unitKey))
+                {{
+                    {0}KeyMap.Add(unitKey, uniqueKey);
+                }}
+                else
+                {{
+                    Log.Error(ErrorLevel.Critical, ""Load{0}Redefine Error, repeated unit key where unique key is {{0}}"", uniqueKey);
+                }}
+            }}
+        }}";
+
+        private string GetRedefineLoadFunc(ExcelSheet es)
+        {
+            List<FieldInfo> fieldInfos = es.FieldInfos;
+
+            mKeyFields.Clear();
+            string uniqueKey = string.Empty;
+            for (int col = 0; col < fieldInfos.Count; col++)
+            {
+                FieldInfo fi = fieldInfos[col];
+                if (fi.FieldType == FieldType.Key && fi.DataType != DataType.Array && fi.DataType != DataType.Undefine)
+                {
+                    mKeyFields.Add(fi);
+                }
+
+                if(fi.FieldType == FieldType.Unique)
+                {
+                    uniqueKey = fi.FiledName;
+                }
+            }
+
+            if (mKeyFields.Count == 0)
+                return string.Format(@"
+         private void Load{0}Redefine(){{}}",es.SheetName);
+
+            StringBuilder s1 = new StringBuilder();
+            StringBuilder s2 = new StringBuilder();
+            for (int i = 0; i < mKeyFields.Count; i++)
+            {
+                string typeStr = GetTypeStr(mKeyFields[i].DataType);
+                if (!string.IsNullOrEmpty(typeStr))
+                {
+                    s1.AppendFormat("{{{0}}}_", i);
+                    s2.AppendFormat("cfg.{0},", mKeyFields[i].FiledName);
+                }
+            }
+
+            if (s1.Length > 0)
+                s1.Remove(s1.Length - 1, 1);
+
+            if (s2.Length > 0)
+                s2.Remove(s2.Length - 1, 1);
+
+            return string.Format(RedefineLoadFunc, es.SheetName, uniqueKey, s1.ToString(), s2.ToString());
+        }
+
 
         private void ExportSingleTableReader(ISheet sheet)
         {
@@ -448,8 +526,9 @@ namespace TableProto
             string uniqueKey = GetUniqueKey(es);
 
             string redefineFunc = GetRedefineFunc(es);
+            string redefineLoadFunc = GetRedefineLoadFunc(es);
 
-            string file = string.Format(singleTableReader, sheet.SheetName, tableDicDefs.ToString(), uniqueKey, redefineFunc);
+            string file = string.Format(singleTableReader, sheet.SheetName, tableDicDefs.ToString(), uniqueKey, redefineFunc, redefineLoadFunc);
             string filePath = Path.Combine(Define.DataTableCSDir, string.Format("DataTables_{0}.cs", sheet.SheetName));
             File.WriteAllText(filePath, file, Encoding.UTF8);
         }
@@ -460,17 +539,19 @@ namespace TableProto
 
             StringBuilder loadStr = new StringBuilder();
             StringBuilder clearStr = new StringBuilder();
+            StringBuilder redefineLoadStr = new StringBuilder();
             foreach (KeyValuePair<string, ISheet> kv in allSheets)
             {
                 var sheet = kv.Value;
 
                 AppendLoadStr(loadStr, sheet.SheetName);
                 AppendClearStr(clearStr, sheet.SheetName);
+                AppendRedefineLoadStr(redefineLoadStr, sheet.SheetName);
 
                 ExportSingleTableReader(sheet);
             }
 
-            string file = string.Format(DataTableReader, loadStr.ToString(),clearStr.ToString());
+            string file = string.Format(DataTableReader, loadStr.ToString(),clearStr.ToString(), redefineLoadStr.ToString());
             string filePath = Path.Combine(Define.DataTableCSDir, "DataTables.cs");
             File.WriteAllText(filePath, file, Encoding.UTF8);
         }
