@@ -21,7 +21,7 @@ public class LuaManager : Singleton<LuaManager>
     /// <returns></returns>
     private byte[] CustomLuaLoader(ref string filePath)
     {
-        if(filePath.Equals("boot"))
+        if (filePath.Equals("LuaEntry"))
         {
             return null;
         }
@@ -46,7 +46,7 @@ public class LuaManager : Singleton<LuaManager>
         mLuaEnv.AddLoader(CustomLuaLoader);
 
         // lua 文件入口
-        mLuaEnv.DoString("require('boot')");
+        mLuaEnv.DoString("require('LuaEntry')");
     }
 
     /// <summary>

@@ -1,5 +1,10 @@
-DefineLuaManifest(
+local fileTb = 
+{
+    ["TestFolder"] = 
     {
-        "LogDef",
-    }
-)
+        "Test",
+    },
+    "Manifest",
+}
+
+RegisterLuaFile("Define",fileTb)
