@@ -6,22 +6,31 @@ public class GameManager:MonoBehaviour
 {
     private UIManager mUIMgr;
     private ResourceMgr mResMgr;
-    private GameMapEditor mMapEditor;
+    private GameMapEditor mMapEditor; // sceneMgr完成后要整体移到scenemgr管理
+    private LuaManager mLuaMgr;
 
     private void Awake()
+    {
+        InitializeAllModules();
+
+        DontDestroyOnLoad(this);
+    }
+
+    private void InitializeAllModules()
     {
         mUIMgr = UIManager.Ins;
         mResMgr = ResourceMgr.Ins;
         mMapEditor = GameMapEditor.Ins;
+        
+        mLuaMgr = LuaManager.Ins;
+        mLuaMgr.CreateLuaEnv();
+    }
 
-        DontDestroyOnLoad(this);
+    private void DisposeAllModules()
+    {
 
-        BitType type = BitType.CreateBitType(1, "TestType 1");
-        BitType type2 = BitType.CreateBitType(2, "TestType 2");
 
-        BitType newType = BitType.BindEventTypeBuffer( new List<BitType> { type, type2 });
-
-        Log.Error(ErrorLevel.Hint, "newType = {0}", newType.GetFullTypeName());
+        mLuaMgr.DisposeLuaEnv();
     }
 
     private void Start()
@@ -37,7 +46,9 @@ public class GameManager:MonoBehaviour
     private void Update()
     {
         float deltaTime = GetDeltaTime();
+
         mUIMgr.Update(deltaTime);
+        mLuaMgr.Update(deltaTime);
         mMapEditor.OnUpdate(deltaTime);
     }
 }

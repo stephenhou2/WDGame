@@ -1,0 +1,5 @@
+DefineLuaManifest(
+    {
+        "LogDef",
+    }
+)

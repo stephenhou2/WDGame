@@ -8,13 +8,15 @@ public enum ErrorLevel
     Critical = 1, // 严重错误
     Normal = 2, // 一般错误
     Hint = 3, // 提示性错误
+    Undefine = 4,
 }
 
 public enum LogLevel
 {
     Critical = 0, 
     Normal = 1, 
-    Hint = 2, 
+    Hint = 2,
+    Undefine = 3,
 }
 
 public static class Log

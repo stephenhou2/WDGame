@@ -1,0 +1,6 @@
+DefineLuaManifest(
+    {
+        "Class",
+        "Log",
+    }
+)

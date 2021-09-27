@@ -9,6 +9,8 @@ public static class PathDefine
 
     public static string DATA_DIR_PATH = Path.Combine(ROOT_PATH,"Data");
 
+    public static string LUA_DIR_PATH = Path.Combine(DATA_DIR_PATH, "LuaScripts");
+
     public static string MAP_OBS_DIR_PATH = Path.Combine(DATA_DIR_PATH, "ObsData");
     public static string TABLE_PB_DATA_PATH = Path.Combine(DATA_DIR_PATH, "TableData");
 
@@ -19,5 +21,4 @@ public static class PathDefine
     public const string INTERNAL_ASSETBUNDLES_DIR = "AssetBundles";
 
     public static string ASSET_DIR = PathHelper.GetMacroPath(Path.Combine(Application.streamingAssetsPath, INTERNAL_ASSETBUNDLES_DIR));
-
 }
