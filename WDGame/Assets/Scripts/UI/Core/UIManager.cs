@@ -550,13 +550,16 @@ public class UIManager: Singleton<UIManager>
     /// <param name="deltaTime"></param>
     public void Update(float deltaTime)
     {
-        _ClosePanels();        // close panels
-
         _OpenPanels();       // open panels
 
         _AddControls();      // add controls 
 
         UpdateAllOpenPanels(deltaTime);  // common panel update
+    }
+
+    public void LateUpdate(float deltaTime)
+    {
+        _ClosePanels();        // close panels
     }
 
     /// <summary>
@@ -583,5 +586,10 @@ public class UIManager: Singleton<UIManager>
         {
             GameObject.Destroy(entity.GetRootObj());
         }
+    }
+
+    public void DisposeUIManager()
+    {
+
     }
 }

@@ -75,6 +75,11 @@ public class LuaManager : Singleton<LuaManager>
 
     }
 
+    public void LateUpdate(float deltaTime)
+    {
+
+    }
+
     public void DisposeLuaEnv()
     {
         if(mLuaEnv != null)

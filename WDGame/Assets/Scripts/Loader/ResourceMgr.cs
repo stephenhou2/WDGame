@@ -148,6 +148,21 @@ public partial class ResourceMgr : Singleton<ResourceMgr>
         Clear();
     }
 
+    public void DisposeResourceMgr()
+    {
+
+    }
+
+    public void Update(float deltaTime)
+    {
+
+    }
+
+    public void LateUpdate(float deltaTime)
+    {
+
+    }
+
     public static UnityEngine.Object Load(string url, string reason)
     {
         return LoadRes<UnityEngine.Object>(url, true, reason);

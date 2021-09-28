@@ -6,8 +6,8 @@ public class GameManager:MonoBehaviour
 {
     private UIManager mUIMgr;
     private ResourceMgr mResMgr;
-    private GameMapEditor mMapEditor; // sceneMgr完成后要整体移到scenemgr管理
     private LuaManager mLuaMgr;
+    private SceneManager mSceneMgr; // 场景管理器
 
     private void Awake()
     {
@@ -20,22 +20,24 @@ public class GameManager:MonoBehaviour
     {
         mUIMgr = UIManager.Ins;
         mResMgr = ResourceMgr.Ins;
-        mMapEditor = GameMapEditor.Ins;
-        
+
+        mSceneMgr = SceneManager.Ins;
+        mSceneMgr.InitializeSceneManager();
+
         mLuaMgr = LuaManager.Ins;
         mLuaMgr.CreateLuaEnv();
     }
 
     private void DisposeAllModules()
     {
-
-
+        mUIMgr.DisposeUIManager();
         mLuaMgr.DisposeLuaEnv();
+        mResMgr.DisposeResourceMgr();
     }
 
     private void Start()
     {
-        mMapEditor.OnSceneEnter();
+        mSceneMgr.SwitchToScene(SceneDef.LoginScene);
     }
 
     private float GetDeltaTime()
@@ -47,8 +49,19 @@ public class GameManager:MonoBehaviour
     {
         float deltaTime = GetDeltaTime();
 
-        mUIMgr.Update(deltaTime);
+        mResMgr.Update(deltaTime);
+        mSceneMgr.Update(deltaTime);
         mLuaMgr.Update(deltaTime);
-        mMapEditor.OnUpdate(deltaTime);
+        mUIMgr.Update(deltaTime);
+    }
+
+    private void LateUpdate()
+    {
+        float deltaTime = GetDeltaTime();
+
+        mResMgr.LateUpdate(deltaTime);
+        mSceneMgr.OnLateUpdate(deltaTime);
+        mLuaMgr.LateUpdate(deltaTime);
+        mUIMgr.LateUpdate(deltaTime);
     }
 }

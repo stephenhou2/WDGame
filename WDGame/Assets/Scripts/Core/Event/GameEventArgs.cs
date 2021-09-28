@@ -6,10 +6,3 @@ public abstract class GameEventArgs
 {
 
 }
-
-public class TestEventArgs:GameEventArgs
-{
-    public int testNum;
-    public string testStr;
-    public float testFloat;
-}

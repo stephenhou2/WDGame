@@ -28,15 +28,6 @@ public class Control_Test : UIControl
     protected override void OnOpen()
     {
         Log.Logic("Control_Test OnOpen");
-
-        EmitterBus.AddListener(ModuleDef.MapEditor, "TestEvt", (GameEventArgs args) =>
-        {
-            TestEventArgs mArgs = args as TestEventArgs;
-            if(mArgs != null)
-            {
-                Log.Logic(LogLevel.Hint,"this is a test event,testNum:{0},testStr:{1},testFloat:{2}",mArgs.testNum,mArgs.testStr,mArgs.testFloat);
-            }
-        });
     }
 
     public override void CustomClear()

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameMapEditor : Singleton<GameMapEditor>,ISceneMgr
+public class GameMapEditor : Singleton<GameMapEditor>
 {
     public GameObject mMapEditorRoot;
 
@@ -100,6 +100,11 @@ public class GameMapEditor : Singleton<GameMapEditor>,ISceneMgr
 
     }
 
+    public void OnLateUpdate(float deltaTime)
+    {
+
+    }
+
     public void OnSceneEnter()
     {
         mMapEditorRoot = GameObject.Find(GameDefine._MAP_EDITOR);
@@ -122,7 +127,6 @@ public class GameMapEditor : Singleton<GameMapEditor>,ISceneMgr
         mInputControl.RegisterInputHandle(mMapBorad);
 
         IntializeDrawers();
-        UIManager.Ins.OpenPanel<Panel_MapEditor>("UI/MapEditor/Panel_MapEditor", null); 
     }
 
     public void OnSceneExit()

@@ -13,11 +13,6 @@ public class Control_Test2 : UIControl
         //UIEntity holder = GetHolder();
         //UIManager.Ins.RemoveControl(holder,this);
         //UIManager.Ins.ClosePanel<Panel_MapEditor>();
-        TestEventArgs args = new TestEventArgs();
-        args.testNum = 1;
-        args.testStr = "test str";
-        args.testFloat = 1.001f;
-        EmitterBus.Fire(ModuleDef.MapEditor, "TestEvt", args);
     }
 
     public override int GetRecycleStrategy()

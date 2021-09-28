@@ -16,7 +16,15 @@ public static class CoreDefine
 
 public static class ModuleDef
 {
-    public static BitType MapEditor = BitType.CreateBitType(0, "MapEditor");
+    public static BitType SceneMgr = BitType.CreateBitType(0, "SceneMgr");
+    public static BitType MapEditor = BitType.CreateBitType(1, "MapEditor");
+}
+
+public static class SceneDef
+{
+    public const string MapEditorScene = "MapEditor";
+    public const string LoginScene = "Login";
+
 }
 
 public class PlatformDef
