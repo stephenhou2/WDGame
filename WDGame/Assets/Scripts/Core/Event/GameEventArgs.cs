@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public abstract class GameEventArgs
+﻿namespace GameEngine
 {
+    public abstract class GameEventArgs
+    {
 
+    }
 }

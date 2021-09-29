@@ -1,45 +1,46 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
-public class EmitterBus
+namespace GameEngine
 {
-    private static Dictionary<BitType, Emitter> mAllEmitters = new Dictionary<BitType, Emitter>();
-
-    private static Emitter GetEmitter(BitType moduleType)
+    public class EmitterBus
     {
-        Emitter emitter = null;
-        if (mAllEmitters.TryGetValue(moduleType, out emitter))
+        private static Dictionary<BitType, Emitter> mAllEmitters = new Dictionary<BitType, Emitter>();
+
+        private static Emitter GetEmitter(BitType moduleType)
         {
+            Emitter emitter = null;
+            if (mAllEmitters.TryGetValue(moduleType, out emitter))
+            {
+                return emitter;
+            }
+
+            emitter = new Emitter(moduleType);
+            mAllEmitters.Add(moduleType, emitter);
             return emitter;
         }
 
-        emitter = new Emitter(moduleType);
-        mAllEmitters.Add(moduleType, emitter);
-        return emitter;
-    }
-
-    public static void Fire(BitType moduleType, string evtName, GameEventArgs args)
-    {
-        if (moduleType == null)
-            return;
-
-        moduleType.ForEachSingleType((BitType type) =>
+        public static void Fire(BitType moduleType, string evtName, GameEventArgs args)
         {
-            Emitter emitter = GetEmitter(moduleType);
-            emitter.OnFire(evtName, args);
-        });
-    }
+            if (moduleType == null)
+                return;
 
-    public static void AddListener(BitType moduleType, string evtName, GameEventCallback callback)
-    {
-        if (moduleType == null)
-            return;
+            moduleType.ForEachSingleType((BitType type) =>
+            {
+                Emitter emitter = GetEmitter(moduleType);
+                emitter.OnFire(evtName, args);
+            });
+        }
 
-        moduleType.ForEachSingleType((BitType type) =>
+        public static void AddListener(BitType moduleType, string evtName, GameEventCallback callback)
         {
-            Emitter emitter = GetEmitter(moduleType);
-            emitter.AddListener(evtName, callback);
-        });
+            if (moduleType == null)
+                return;
+
+            moduleType.ForEachSingleType((BitType type) =>
+            {
+                Emitter emitter = GetEmitter(moduleType);
+                emitter.AddListener(evtName, callback);
+            });
+        }
     }
 }

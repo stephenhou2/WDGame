@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class GameEventArgs_String : GameEventArgs
+﻿namespace GameEngine
 {
-    public string Value;
-    public GameEventArgs_String(string value)
+    public class GameEventArgs_String : GameEventArgs
     {
-        this.Value = value;
+        public string Value;
+        public GameEventArgs_String(string value)
+        {
+            this.Value = value;
+        }
     }
 }

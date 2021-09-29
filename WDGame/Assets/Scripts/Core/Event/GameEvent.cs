@@ -1,29 +1,30 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
-public delegate void GameEventCallback(GameEventArgs args);
-public class GameEvent
+namespace GameEngine
 {
-    List<GameEventCallback> mHandles = new List<GameEventCallback>();
-    public void AddListener(GameEventCallback callback)
+    public delegate void GameEventCallback(GameEventArgs args);
+    public class GameEvent
     {
-        mHandles.Add(callback);
-    }
-
-    public void OnTrigger(GameEventArgs args)
-    {
-        foreach (var handle in mHandles)
+        List<GameEventCallback> mHandles = new List<GameEventCallback>();
+        public void AddListener(GameEventCallback callback)
         {
-            if (handle != null)
+            mHandles.Add(callback);
+        }
+
+        public void OnTrigger(GameEventArgs args)
+        {
+            foreach (var handle in mHandles)
             {
-                handle(args);
+                if (handle != null)
+                {
+                    handle(args);
+                }
             }
         }
-    }
 
-    public void Dispose()
-    {
-        mHandles.Clear();
+        public void Dispose()
+        {
+            mHandles.Clear();
+        }
     }
 }

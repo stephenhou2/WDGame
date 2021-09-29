@@ -1,17 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using GameEngine;
 
 public class LoginScene : IScene
 {
     public void OnSceneEnter()
     {
-        //UIManager.Ins.OpenPanel<>
+        UIManager.Ins.OpenPanel<LoginPanel>("UI/Login/Panel_Login",null);
+    }
+
+    public string GetSceneName()
+    {
+        return SceneDef.LoginScene;
     }
 
     public void OnSceneExit()
     {
-        
+        UIManager.Ins.ClosePanel<LoginPanel>();
     }
 
     public void OnSceneLateUpdate(float deltaTime)

@@ -1,18 +1,21 @@
 ﻿using System;
 
-public class Singleton<T> where T:new()
+namespace GameEngine
 {
-    private static T mIns;
-    public static T Ins
+    public class Singleton<T> where T : new()
     {
-        get
+        private static T mIns;
+        public static T Ins
         {
-            if(mIns == null)
+            get
             {
-                mIns = default(T) == null ? Activator.CreateInstance<T>() : default(T) ;
-            }
+                if (mIns == null)
+                {
+                    mIns = default(T) == null ? Activator.CreateInstance<T>() : default(T);
+                }
 
-            return mIns;
+                return mIns;
+            }
         }
     }
 }

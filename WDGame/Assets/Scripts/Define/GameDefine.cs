@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using GameEngine;
 
 public static class GameDefine
 {
@@ -22,8 +20,8 @@ public static class ModuleDef
 
 public static class SceneDef
 {
-    public const string MapEditorScene = "MapEditor";
     public const string LoginScene = "Login";
+    public const string MapEditorScene = "MapEditor";
 
 }
 

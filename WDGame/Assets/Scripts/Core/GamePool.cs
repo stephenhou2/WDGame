@@ -1,32 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class GamePool<T>
+namespace GameEngine
 {
-    private Stack<T> pool;
-
-    public GamePool()
+    public class GamePool<T>
     {
-        this.pool = new Stack<T>();
-    }
+        private Stack<T> pool;
 
-    public void PushObj(T obj)
-    {
-        pool.Push(obj);
-    }
-
-    public T PopObj()
-    {
-        if(pool.Count  == 0)
+        public GamePool()
         {
-            return default(T);
+            this.pool = new Stack<T>();
         }
 
-        return pool.Pop();
-    }
+        public void PushObj(T obj)
+        {
+            pool.Push(obj);
+        }
 
-    public void Clear()
-    {
-        pool.Clear();
+        public T PopObj()
+        {
+            if (pool.Count == 0)
+            {
+                return default(T);
+            }
+
+            return pool.Pop();
+        }
+
+        public void Clear()
+        {
+            pool.Clear();
+        }
     }
 }

@@ -1,90 +1,93 @@
 ﻿using XLua;
 
-public class LuaManager : Singleton<LuaManager>
+namespace GameEngine
 {
-    LuaEnv mLuaEnv;
-
-    /// <summary>
-    /// lua 文件相对路径 -> 绝对路径
-    /// </summary>
-    /// <param name="filePath"></param>
-    /// <returns></returns>
-    private string GetLuaFileFullPath(string filePath)
+    public class LuaManager : Singleton<LuaManager>
     {
-        return string.Format("{0}/{1}.lua", PathDefine.LUA_DIR_PATH,filePath);
-    }
+        LuaEnv mLuaEnv;
 
-    /// <summary>
-    /// custom lua loader
-    /// </summary>
-    /// <param name="filePath"></param>
-    /// <returns></returns>
-    private byte[] CustomLuaLoader(ref string filePath)
-    {
-        if (filePath.Equals("LuaEntry"))
+        /// <summary>
+        /// lua 文件相对路径 -> 绝对路径
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private string GetLuaFileFullPath(string filePath)
         {
-            return null;
+            return string.Format("{0}/{1}.lua", PathDefine.LUA_DIR_PATH, filePath);
         }
 
-        string fullPath = GetLuaFileFullPath(filePath);
-        if(!FileHelper.FileExist(fullPath))
+        /// <summary>
+        /// custom lua loader
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private byte[] CustomLuaLoader(ref string filePath)
         {
-            Log.Error(ErrorLevel.Critical, "Custom Load Lua File Failed,filePath:{0}",fullPath);
-            return null;
+            if (filePath.Equals("LuaEntry"))
+            {
+                return null;
+            }
+
+            string fullPath = GetLuaFileFullPath(filePath);
+            if (!FileHelper.FileExist(fullPath))
+            {
+                Log.Error(ErrorLevel.Critical, "Custom Load Lua File Failed,filePath:{0}", fullPath);
+                return null;
+            }
+
+            Log.Logic(LogLevel.Hint, "lua file full path:{0}", fullPath);
+
+            return FileHelper.ReadAllBytes(fullPath);
         }
 
-        Log.Logic(LogLevel.Hint, "lua file full path:{0}", fullPath);
-
-        return FileHelper.ReadAllBytes(fullPath);
-    }
-
-    public void CreateLuaEnv()
-    {
-        mLuaEnv = new LuaEnv();
-
-        // 添加自定义loader
-        mLuaEnv.AddLoader(CustomLuaLoader);
-
-        // lua 文件入口
-        mLuaEnv.DoString("require('LuaEntry')");
-    }
-
-    /// <summary>
-    /// 加载单个lua脚本
-    /// </summary>
-    /// <param name="luaFile">lua文件在luaScripts文件夹下的相对路径</param>
-    private void LoadLuaScript(string luaFile)
-    {
-        mLuaEnv.DoString(string.Format("require('{0}')",luaFile));
-    }
-
-    public void DoString(string s)
-    {
-        if(mLuaEnv != null)
+        public void CreateLuaEnv()
         {
-            mLuaEnv.DoString(s);
+            mLuaEnv = new LuaEnv();
+
+            // 添加自定义loader
+            mLuaEnv.AddLoader(CustomLuaLoader);
+
+            // lua 文件入口
+            mLuaEnv.DoString("require('LuaEntry')");
         }
-        else
+
+        /// <summary>
+        /// 加载单个lua脚本
+        /// </summary>
+        /// <param name="luaFile">lua文件在luaScripts文件夹下的相对路径</param>
+        private void LoadLuaScript(string luaFile)
         {
-            Log.Error(ErrorLevel.Fatal, "LuaManager mLuaEnv is null!");
+            mLuaEnv.DoString(string.Format("require('{0}')", luaFile));
         }
-    }
 
-    public void Update(float deltaTime)
-    {
-
-    }
-
-    public void LateUpdate(float deltaTime)
-    {
-
-    }
-
-    public void DisposeLuaEnv()
-    {
-        if(mLuaEnv != null)
+        public void DoString(string s)
         {
-            mLuaEnv.Dispose();
+            if (mLuaEnv != null)
+            {
+                mLuaEnv.DoString(s);
+            }
+            else
+            {
+                Log.Error(ErrorLevel.Fatal, "LuaManager mLuaEnv is null!");
+            }
+        }
+
+        public void Update(float deltaTime)
+        {
+
+        }
+
+        public void LateUpdate(float deltaTime)
+        {
+
+        }
+
+        public void DisposeLuaEnv()
+        {
+            if (mLuaEnv != null)
+            {
+                mLuaEnv.Dispose();
+            }
         }
     }
 }

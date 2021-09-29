@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 public static class SettingDefine
 {
     public const float MapEditorZoomSpeed = 2f;

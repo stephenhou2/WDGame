@@ -1,123 +1,125 @@
-﻿/// <summary>
-///  简单队列
-/// </summary>
-/// <typeparam name="T"></typeparam>
-public class SimpleQueue<T>
+﻿namespace GameEngine
 {
-    private SimpleQueueNode<T> Head;
-    private SimpleQueueNode<T> Tail;
 
-    public SimpleQueueNode<T> Current;
-
-    public bool MoveNext()
+    /// <summary>
+    ///  简单队列
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class SimpleQueue<T>
     {
-        if (Current == null)
-            return false;
+        private SimpleQueueNode<T> Head;
+        private SimpleQueueNode<T> Tail;
 
-        var next = Current.GetNext();
-        if (next == null)
-            return false;
+        public SimpleQueueNode<T> Current;
 
-        Current = next;
-        return true;
-    }
-
-    public void Reset()
-    {
-        Current = Head;
-    }
-    public int Count { get; private set; } = 0;
-
-    public void Enqueue(T obj)
-    {
-        SimpleQueueNode<T> node = new SimpleQueueNode<T>(obj);
-        // 队列内没有元素
-        if(Tail == null)
+        public bool MoveNext()
         {
-            Head = node;
-            Tail = Head;
-            Count = 1;
-            return;
+            if (Current == null)
+                return false;
+
+            var next = Current.GetNext();
+            if (next == null)
+                return false;
+
+            Current = next;
+            return true;
         }
 
-        // 队列内有元素，加到队尾
-        Tail.SetNext(node);
-        node.SetLast(Tail);
-        Tail = node;
-        Count++;
-    }
-
-    public bool HasItem()
-    {
-        return Head != null;
-    }
-
-    public T Dequeue()
-    {
-        // 队列内没有元素
-        if (Count == 0)
+        public void Reset()
         {
-            return default(T);
+            Current = Head;
+        }
+        public int Count { get; private set; } = 0;
+
+        public void Enqueue(T obj)
+        {
+            SimpleQueueNode<T> node = new SimpleQueueNode<T>(obj);
+            // 队列内没有元素
+            if (Tail == null)
+            {
+                Head = node;
+                Tail = Head;
+                Count = 1;
+                return;
+            }
+
+            // 队列内有元素，加到队尾
+            Tail.SetNext(node);
+            node.SetLast(Tail);
+            Tail = node;
+            Count++;
         }
 
-        // 队列内只有一个元素
-        T obj = Head.GetObj();
-        if(Count == 1)
+        public bool HasItem()
         {
-            Head = null;
-            Tail = null;
-            Count = 0;
+            return Head != null;
+        }
+
+        public T Dequeue()
+        {
+            // 队列内没有元素
+            if (Count == 0)
+            {
+                return default(T);
+            }
+
+            // 队列内只有一个元素
+            T obj = Head.GetObj();
+            if (Count == 1)
+            {
+                Head = null;
+                Tail = null;
+                Count = 0;
+                return obj;
+            }
+
+            // 队列内有多个元素
+            var next = Head.GetNext();
+            if (next != null)
+            {
+                next.SetLast(null);
+            }
+            Head = next;
+            Count--;
             return obj;
         }
+    }
 
-        // 队列内有多个元素
-        var next = Head.GetNext();
-        if (next != null)
+    public class SimpleQueueNode<T>
+    {
+        private SimpleQueueNode<T> mLast;
+        private SimpleQueueNode<T> mNext;
+
+        private T mObj;
+
+        public SimpleQueueNode(T obj)
         {
-            next.SetLast(null);
+            mObj = obj;
         }
-        Head = next;
-        Count--;
-        return obj;
+
+        public T GetObj()
+        {
+            return mObj;
+        }
+
+        public void SetLast(SimpleQueueNode<T> node)
+        {
+            mLast = node;
+        }
+
+        public SimpleQueueNode<T> GetLast()
+        {
+            return mLast;
+        }
+
+        public void SetNext(SimpleQueueNode<T> node)
+        {
+            mNext = node;
+        }
+
+        public SimpleQueueNode<T> GetNext()
+        {
+            return mNext;
+        }
     }
-}
-
-public class SimpleQueueNode<T>
-{
-    private SimpleQueueNode<T> mLast;
-    private SimpleQueueNode<T> mNext;
-
-    private T mObj;
-
-    public SimpleQueueNode(T obj)
-    {
-        mObj = obj;
-    }
-
-    public T GetObj()
-    {
-        return mObj;
-    }
-
-    public void SetLast(SimpleQueueNode<T> node)
-    {
-        mLast = node;
-    }
-
-    public SimpleQueueNode<T> GetLast()
-    {
-        return mLast;
-    }
-
-    public void SetNext(SimpleQueueNode<T> node)
-    {
-        mNext = node;
-    }
-
-    public SimpleQueueNode<T> GetNext()
-    {
-        return mNext;
-    }
-
-
 }

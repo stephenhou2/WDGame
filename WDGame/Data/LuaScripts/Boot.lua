@@ -25,13 +25,13 @@ end
 require("Core/Manifest")
 require("Define/Manifest")
 
-local cls_Animal = class("Animal")
+local _cls = class("Animal")
 
 function Animal.StaticFunc()
     print("Animal.StaticFunc")
 end
 
-function Func()
+function _cls.Func()
     print("cls_Animal.Func")
 end
 

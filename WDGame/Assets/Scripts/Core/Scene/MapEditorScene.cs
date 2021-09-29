@@ -1,10 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using GameEngine;
 
 public class MapEditorScene : IScene
 {
-    private GameMapEditor mMapEditor; 
+    private GameMapEditor mMapEditor;
+
+    public string GetSceneName()
+    {
+        return SceneDef.MapEditorScene;
+    }
 
     public void OnSceneEnter()
     {
@@ -24,11 +27,11 @@ public class MapEditorScene : IScene
 
     public void OnSceneLateUpdate(float deltaTime)
     {
-        mMapEditor.OnUpdate(deltaTime);
+        
     }
 
     public void OnSceneUpdate(float deltaTime)
     {
-        
+        mMapEditor.OnUpdate(deltaTime);
     }
 }

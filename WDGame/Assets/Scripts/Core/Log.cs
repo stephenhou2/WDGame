@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public enum ErrorLevel
 {    
@@ -54,5 +52,10 @@ public static class Log
     public static void Warning(string str, params object[] args)
     {
         Debug.LogWarningFormat(str,args);
+    }
+
+    public static void Assert(bool condition,string msg)
+    {
+        Debug.Assert(condition, msg);
     }
 }

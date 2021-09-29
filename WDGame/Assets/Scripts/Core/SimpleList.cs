@@ -1,61 +1,60 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
-
-/// <summary>
-/// 扩容速度
-/// </summary>
-public enum SimpleListEnlargeMode
+﻿namespace GameEngine
 {
-    Slow = 1,
-    Normal = 2,
-    Fast = 3,
-}
 
-public struct HashIndex
-{
-    public int hashCode;
-    public int index;
-}
-
-public class SimpleList<T>
-{
-    private HashIndex[] mIndexArray;
-    private SimpleQueue<int> validIndexQueue;
-    private T[] mObjArray;
-    private SimpleListEnlargeMode mEnlargeMode;
-
-    public SimpleList(uint initSize, SimpleListEnlargeMode mode)
+    /// <summary>
+    /// 扩容速度
+    /// </summary>
+    public enum SimpleListEnlargeMode
     {
-        mIndexArray = new HashIndex[initSize];
-        validIndexQueue = new SimpleQueue<int>();
-        mObjArray = new T[initSize];
-
-        mEnlargeMode = mode;
+        Slow = 1,
+        Normal = 2,
+        Fast = 3,
     }
 
-    private void Enlarge()
+    public struct HashIndex
     {
-
+        public int hashCode;
+        public int index;
     }
 
-    private int GetValidIndex()
+    public class SimpleList<T>
     {
+        private HashIndex[] mIndexArray;
+        private SimpleQueue<int> validIndexQueue;
+        private T[] mObjArray;
+        private SimpleListEnlargeMode mEnlargeMode;
 
-        return -1;
-    }
-
-    public void Add(T obj)
-    {
-        GetValidIndex();
-        while (GetValidIndex() == -1)
+        public SimpleList(uint initSize, SimpleListEnlargeMode mode)
         {
-            Enlarge();
+            mIndexArray = new HashIndex[initSize];
+            validIndexQueue = new SimpleQueue<int>();
+            mObjArray = new T[initSize];
+
+            mEnlargeMode = mode;
         }
 
-        //int validIndex = GetValidIndex();
-        //mIndexArray[validIndex] = obj.GetHashCode();
-        //mObjArray[validIndex] = obj;
+        private void Enlarge()
+        {
+
+        }
+
+        private int GetValidIndex()
+        {
+
+            return -1;
+        }
+
+        public void Add(T obj)
+        {
+            GetValidIndex();
+            while (GetValidIndex() == -1)
+            {
+                Enlarge();
+            }
+
+            //int validIndex = GetValidIndex();
+            //mIndexArray[validIndex] = obj.GetHashCode();
+            //mObjArray[validIndex] = obj;
+        }
     }
 }

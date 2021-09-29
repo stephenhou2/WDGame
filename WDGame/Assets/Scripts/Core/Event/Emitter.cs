@@ -1,53 +1,55 @@
 ﻿using System.Collections.Generic;
-
-public class Emitter
+namespace GameEngine
 {
-    private BitType mModuleType;
-
-    private Dictionary<string, GameEvent> mEvents = new Dictionary<string, GameEvent>();
-
-    public Emitter(BitType moduleType)
+    public class Emitter
     {
-        mModuleType = moduleType;
-        mEvents = new Dictionary<string, GameEvent>();
-    }
+        private BitType mModuleType;
 
-    public void OnFire(string evtName,GameEventArgs args)
-    {
-        GameEvent evt;
-        if(mEvents.TryGetValue(evtName,out evt))
+        private Dictionary<string, GameEvent> mEvents = new Dictionary<string, GameEvent>();
+
+        public Emitter(BitType moduleType)
         {
-            if(evt != null)
+            mModuleType = moduleType;
+            mEvents = new Dictionary<string, GameEvent>();
+        }
+
+        public void OnFire(string evtName, GameEventArgs args)
+        {
+            GameEvent evt;
+            if (mEvents.TryGetValue(evtName, out evt))
             {
-                evt.OnTrigger(args);
+                if (evt != null)
+                {
+                    evt.OnTrigger(args);
+                }
             }
         }
-    }
 
-    public void AddListener(string eventName,GameEventCallback callback)
-    {
-        GameEvent evt;
-        if(!mEvents.TryGetValue(eventName,out evt))
+        public void AddListener(string eventName, GameEventCallback callback)
         {
-            evt = new GameEvent();
-            mEvents.Add(eventName, evt);
+            GameEvent evt;
+            if (!mEvents.TryGetValue(eventName, out evt))
+            {
+                evt = new GameEvent();
+                mEvents.Add(eventName, evt);
+            }
+
+            if (evt == null)
+            {
+                evt = new GameEvent();
+            }
+
+            evt.AddListener(callback);
         }
 
-        if(evt == null)
+        public BitType GetModuleType()
         {
-            evt = new GameEvent();
+            return mModuleType;
         }
 
-        evt.AddListener(callback);
-    }
-
-    public BitType GetModuleType()
-    {
-        return mModuleType;
-    }
-
-    public void Dispose()
-    {
-        mEvents.Clear();
+        public void Dispose()
+        {
+            mEvents.Clear();
+        }
     }
 }
