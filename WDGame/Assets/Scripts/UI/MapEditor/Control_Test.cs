@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using GameEngine;
 using UnityEngine;
 
 public class Control_Test : UIControl

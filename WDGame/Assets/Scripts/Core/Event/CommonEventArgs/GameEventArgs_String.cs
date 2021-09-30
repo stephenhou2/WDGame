@@ -1,11 +1,10 @@
-﻿namespace GameEngine
+﻿using GameEngine;
+
+public class GameEventArgs_String : GameEventArgs
 {
-    public class GameEventArgs_String : GameEventArgs
+    public string Value;
+    public GameEventArgs_String(string value)
     {
-        public string Value;
-        public GameEventArgs_String(string value)
-        {
-            this.Value = value;
-        }
+        this.Value = value;
     }
 }

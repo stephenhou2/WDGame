@@ -4,7 +4,7 @@ TODO LIST
 1.转表工具  version 0.0.0
 2.事件系统  version 0.0.0
 3.xlua 接入  version 0.0.0
-4.场景管理器
+4.场景管理器  version 0.0.0
 5.资源加载管理 version 0.0.0
 6.战斗设计
 7.热更机制   使用xlua，原则上只做热修复

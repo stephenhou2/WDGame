@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace GameEngine
 {
-
     public class UIManager : Singleton<UIManager>
     {
         /// <summary>
@@ -245,17 +244,17 @@ namespace GameEngine
             if (action.isAsync)
             {
                 ResourceMgr.AsyncLoadRes<GameObject>(action.uiPath, "Load UI Panel", (Object obj) =>
-               {
-                   if (obj == null)
-                       return;
+                {
+                    if (obj == null)
+                        return;
 
-                   GameObject template = obj as GameObject;
-                   if (template == null)
-                       return;
+                    GameObject template = obj as GameObject;
+                    if (template == null)
+                        return;
 
-                   uiObj = InstantiateAndSetName(template);
-                   OnUIPanelLoadFinish(action.holder, panel, uiObj, action.uiPath, action.parent, action.call);
-               });
+                    uiObj = InstantiateAndSetName(template);
+                    OnUIPanelLoadFinish(action.holder, panel, uiObj, action.uiPath, action.parent, action.call);
+                });
             }
             else
             {

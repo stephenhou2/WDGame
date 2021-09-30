@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using GameEngine;
 using UnityEngine;
 
 public delegate void UILoadFinishCall(UIEntity ui);

@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using GameEngine;
 public class GameEventArgs_Int : GameEventArgs
 {
     public int Value;
