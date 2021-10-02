@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class MapEditorInputControl
+public class MapEditorInputControl:IInputControl
 {
     private bool mTouchDownOnUI;
     private int mTouchCount = 0;
@@ -94,12 +93,7 @@ public class MapEditorInputControl
         }
     }
 
-    public void UpdateTouchZoomEnd()
-    {
-
-    }
-
-    public void InputControlUpdate()
+    public void InputControlUpdate(float deltaTime)
     {
 #if UNITY_EDITOR
         if (Input.GetMouseButtonDown(0))
@@ -147,4 +141,25 @@ public class MapEditorInputControl
 #endif
     }
 
+    void Reset()
+    {
+        mTouchDownOnUI = false;
+        mTouchCount = 0;
+        mTouchPos = Vector2.one;
+        mDrag = false;
+    }
+
+    public void OnEnter()
+    {
+        Reset();
+        foreach(var kv in mInputHandleDic)
+        {
+            kv.Value.InitializeInputControl();
+        }
+    }
+
+    public void OnExit()
+    {
+        
+    }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IInputHandle 
 {
-    string GetHandleName();
+    void InitializeInputControl();
 
     void OnTouchDown(Vector3 touchPos);
 
@@ -13,4 +13,6 @@ public interface IInputHandle
     void OnDrag(Vector3 deltaPos,Vector3 touchPos);
 
     void OnZoom(float zoomChange);
+
+    string GetHandleName();
 }

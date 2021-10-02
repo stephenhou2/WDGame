@@ -1,25 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using GameEngine;
 using UnityEngine;
 
-public class MapEditorCameraControl: IInputHandle
+public class MapEditorCameraHandle: IInputHandle
 {
     private Camera mCam;
 
-    private float mMaxCamHeight;
-    private float mMinCamHeight;
-
-    private float mZoomSpeed;
-    private float mMoveSpeed;
-
-    public MapEditorCameraControl(Camera cam,float camMaxHeight,float camMinHeight,float zoomSpeed,float moveSpeed)
+    public void InitializeInputControl()
     {
-        mCam = cam;
-        mMaxCamHeight = camMaxHeight;
-        mMinCamHeight = camMinHeight;
-
-        mZoomSpeed = zoomSpeed;
-        mMoveSpeed = moveSpeed;
+        mCam = CameraManager.Ins.MainCam;
     }
 
     public void CamMove(Vector3 deltaPos)
@@ -29,7 +17,7 @@ public class MapEditorCameraControl: IInputHandle
 
         if (mCam != null)
         {
-            mCam.transform.position -= deltaPos * mMoveSpeed;
+            mCam.transform.position -= deltaPos * SettingDefine.MapEditorMoveSpeed;
         }
     }
 
@@ -38,8 +26,8 @@ public class MapEditorCameraControl: IInputHandle
         if (mCam != null)
         {
             Vector3 camPos = mCam.transform.position;
-            Vector3 newPos = new Vector3(camPos.x, camPos.y, camPos.z + zoomChange * mZoomSpeed);
-            if (newPos.z >= mMinCamHeight && newPos.z <= mMaxCamHeight)
+            Vector3 newPos = new Vector3(camPos.x, camPos.y, camPos.z + zoomChange * SettingDefine.MapEditorMoveSpeed);
+            if (newPos.z >= SettingDefine.MapEditorCamMinHeight && newPos.z <= SettingDefine.MapEditorCamMaxHeight)
             {
                 mCam.transform.position = newPos;
             }

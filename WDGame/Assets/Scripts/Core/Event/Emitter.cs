@@ -13,7 +13,7 @@ namespace GameEngine
             mEvents = new Dictionary<string, GameEvent>();
         }
 
-        public void OnFire(string evtName, GameEventArgs args)
+        public void OnFire(string evtName, GameEventArgs args = null)
         {
             GameEvent evt;
             if (mEvents.TryGetValue(evtName, out evt))

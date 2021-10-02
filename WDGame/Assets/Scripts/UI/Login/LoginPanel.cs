@@ -17,7 +17,7 @@ public class LoginPanel : UIPanel
 
     private void OnClickEnterMapEditor()
     {
-        EmitterBus.Fire(ModuleDef.SceneMgr, "SwitchToScene", new GameEventArgs_String(SceneDef.MapEditorScene));
+        EmitterBus.Fire(ModuleDef.SceneModule, "SwitchToScene", new GameEventArgs_String(SceneDef.MapEditorScene));
     }
 
     protected override void BindUINodes()

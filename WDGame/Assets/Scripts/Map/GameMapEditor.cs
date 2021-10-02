@@ -12,7 +12,7 @@ public class GameMapEditor : Singleton<GameMapEditor>
     private GameMapDrawer mObstacleDrawer; //阻挡格绘制
 
     private MapEditorInputControl mInputControl; // 输入控制
-    private MapEditorCameraControl mCamControl;// 相机控制
+    private MapEditorCameraHandle mCamControl;// 相机控制
     public MapEditorDataMgr DataMgr; //地图数据层
     private MapBoard mMapBorad;  //地图绘制
 
@@ -95,8 +95,6 @@ public class GameMapEditor : Singleton<GameMapEditor>
 
     public void OnUpdate(float deltaTime)
     {
-        if(mInputControl != null)
-            mInputControl.InputControlUpdate();
 
     }
 
@@ -105,26 +103,32 @@ public class GameMapEditor : Singleton<GameMapEditor>
 
     }
 
+    public void InitializeInputHandle()
+    {
+        if(!InputManager.Ins.HasInputControl(InputDef.MapEditorInputCtl))
+        {
+            mInputControl = new MapEditorInputControl();
+            mCamControl = new MapEditorCameraHandle();
+            mMapBorad = new MapBoard();
+
+            mInputControl.RegisterInputHandle(mCamControl);
+            mInputControl.RegisterInputHandle(mMapBorad);
+
+            InputManager.Ins.RegisterInputControl(InputDef.MapEditorInputCtl,mInputControl);
+        }
+
+        InputManager.Ins.ChangeToInputControl(InputDef.MapEditorInputCtl);
+    }
+
     public void OnSceneEnter()
     {
         mMapEditorRoot = GameObject.Find(GameDefine._MAP_EDITOR);
         mDrawerDic = new Dictionary<int, GameMapDrawer>();
         MapConfig = new MapEditorConfigs(); // 下面的组件初始化之前必须先初始化配置
-        mCamControl = new MapEditorCameraControl(
-            Camera.main,
-            SettingDefine.MapEditorCamMaxHeight,
-            SettingDefine.MapEditorCamMinHeight,
-            SettingDefine.MapEditorZoomSpeed,
-            SettingDefine.MapEditorMoveSpeed);
-
-
-        mInputControl = new MapEditorInputControl();
         mRecordMgr = new MapEditRecordManager(5);
         DataMgr = new MapEditorDataMgr();
-        mMapBorad = new MapBoard();
-        mMapBorad.SetMapBrush(new ObstacleBrush());
-        mInputControl.RegisterInputHandle(mCamControl);
-        mInputControl.RegisterInputHandle(mMapBorad);
+
+        InitializeInputHandle();
 
         IntializeDrawers();
     }

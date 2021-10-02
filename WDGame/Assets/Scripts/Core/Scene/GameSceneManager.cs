@@ -15,7 +15,7 @@ namespace GameEngine
             mSceneMap.Add(SceneDef.MapEditorScene, new MapEditorScene());
             mSceneMap.Add(SceneDef.LoginScene, new LoginScene());
 
-            EmitterBus.AddListener(ModuleDef.SceneMgr, "SwitchToScene", (evtArgs) =>
+            EmitterBus.AddListener(ModuleDef.SceneModule, "SwitchToScene", (evtArgs) =>
             {
                 var args = evtArgs as GameEventArgs_String;
                 if (null != args)

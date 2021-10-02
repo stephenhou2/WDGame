@@ -32,6 +32,8 @@ public class Control_MapEditorSelection : UIControl
         {
             UIInterface.SetGraphicColor(mAllSelections[i], mCurSelection == i ? SelectColor : DeselectColor);
         }
+
+        EmitterBus.Fire(ModuleDef.MapEditorModule, "OnMapEditorChangeMode",new GameEventArgs_Int(indexId));
     }
 
     /// <summary>

@@ -14,8 +14,9 @@ public static class CoreDefine
 
 public static class ModuleDef
 {
-    public static BitType SceneMgr = BitType.CreateBitType(0, "SceneMgr");
-    public static BitType MapEditor = BitType.CreateBitType(1, "MapEditor");
+    public static BitType SceneModule = BitType.CreateBitType(0, "SceneModule");
+    public static BitType InputModule = BitType.CreateBitType(1, "InputModule");
+    public static BitType MapEditorModule = BitType.CreateBitType(2, "MapEditorModule");
 }
 
 public static class SceneDef
@@ -23,6 +24,16 @@ public static class SceneDef
     public const string LoginScene = "Login";
     public const string MapEditorScene = "MapEditor";
 
+}
+
+public static class InputDef
+{
+    public const string MapEditorInputCtl = "MapEditorInput";
+}
+
+public static class CameraDef
+{
+    public const string MapEditorCamCtl = "MapEditorCamCtl";
 }
 
 public class PlatformDef

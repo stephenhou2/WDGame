@@ -1,17 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using GameEngine;
 using UnityEngine;
 
 public class MapBoard:IInputHandle
 {
     private IMapBrush mCurBrush;
     private int mBrushWidth; // 笔刷宽度
+    private IMapBrush _obstacleBrush;
 
     private bool mCanBrush = true;
 
-    public void SetMapBrush(IMapBrush brush)
+    public MapBoard()
     {
-        mCurBrush = brush;
+        _obstacleBrush = new ObstacleBrush();
+    }
+
+    public void SetMapBrush(int brushType)
+    {
+        if(brushType == (int)MapDefine.MapBrushType.Obstacle)
+        {
+            mCurBrush = _obstacleBrush;
+        }
+        else
+        {
+            mCurBrush = null;
+        }
     }
 
     public void SetBrushWidth(int width)
@@ -97,6 +109,29 @@ public class MapBoard:IInputHandle
 
     public void OnZoom(float zoomChange)
     {
-        
+       
+    }
+
+    private void OnChangeMode(GameEventArgs args)
+    {
+        GameEventArgs_Int intArg = args as GameEventArgs_Int;
+        if(intArg == null)
+        {
+            Log.Error(ErrorLevel.Normal, "OnChangeMode Erorr, event args invalid!");
+            return;
+        }
+
+        SetMapBrush(intArg.Value);
+    }
+
+    private void BindEvents()
+    {
+        EmitterBus.AddListener(ModuleDef.MapEditorModule, "OnMapEditorChangeMode", OnChangeMode);
+    }
+
+    public void InitializeInputControl()
+    {
+        mCanBrush = true;
+        BindEvents();
     }
 }

@@ -19,7 +19,7 @@ namespace GameEngine
             return emitter;
         }
 
-        public static void Fire(BitType moduleType, string evtName, GameEventArgs args)
+        public static void Fire(BitType moduleType, string evtName, GameEventArgs args = null)
         {
             if (moduleType == null)
                 return;

@@ -6,8 +6,9 @@ public class MapDefine
 {
     public enum MapBrushType
     {
-        Obstacle = 0,
-        Max = 1
+        None = 0,
+        Obstacle = 1,
+        Max = 2,
     }
 
     public static string[] BrushName =
