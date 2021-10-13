@@ -74,19 +74,6 @@ public class TestSheetExport
                         uniqueKeyMap.Add(uniqueKey, row);
                     }
                 }
-
-                if (col >= 0 && col < lineData.Count)
-                {
-                    cellStr = lineData[col];
-                }
-				cfg.ID = ProtoDataExpoter.GetIntFieldValue(cellStr);
-				cfg.Name = ProtoDataExpoter.GetStringFieldValue(cellStr);
-				cfg.Age = ProtoDataExpoter.GetIntFieldValue(cellStr);
-                 var t = ProtoDataExpoter.GetArrayFieldValue(cellStr); 
-                for(int m = 0;m<t.Length;m++)
-                {
-                    cfg.GRADES.Add(t[m]);
-                }
             }
 
             string uk = unitKey.ToString();
@@ -103,7 +90,14 @@ public class TestSheetExport
                     keyMap.Add(uk, row);
                 }
             }
-
+				cfg.ID = ProtoDataExpoter.GetIntFieldValue(lineData[0]);
+				cfg.Name = ProtoDataExpoter.GetStringFieldValue(lineData[1]);
+				cfg.Age = ProtoDataExpoter.GetIntFieldValue(lineData[2]);
+                 var t = ProtoDataExpoter.GetArrayFieldValue(lineData[3]); 
+                for(int m = 0;m<t.Length;m++)
+                {
+                    cfg.GRADES.Add(t[m]);
+                }
             tb.Data.Add(cfg);
         }
         ProtoDataHandler.SaveProtoData(tb, Define.ProtoBytesDir+'/'+sheetName+".bin");

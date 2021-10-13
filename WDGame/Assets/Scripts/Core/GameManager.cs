@@ -30,6 +30,10 @@ namespace GameEngine
 
             _luaMgr = LuaManager.Ins;
             _luaMgr.CreateLuaEnv();
+
+            TableProto.DataTables.CreateDataTables();
+            var cfg = TableProto.DataTables.Ins.GetTestSheet(1);
+            Log.Logic(LogLevel.Normal, "name:{0}", cfg.Name);
         }
 
         private void DisposeAllModules()

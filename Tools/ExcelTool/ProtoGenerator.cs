@@ -1,7 +1,7 @@
-﻿using System.Text;
-using System.IO;
+﻿using NPOI.SS.UserModel;
 using System.Collections.Generic;
-using NPOI.SS.UserModel;
+using System.IO;
+using System.Text;
 
 namespace ExcelTool
 {
@@ -137,12 +137,6 @@ public class {0}Export
                         uniqueKeyMap.Add(uniqueKey, row);
                     }}
                 }}
-
-                if (col >= 0 && col < lineData.Count)
-                {{
-                    cellStr = lineData[col];
-                }}
-{1}
             }}
 
             string uk = unitKey.ToString();
@@ -159,7 +153,7 @@ public class {0}Export
                     keyMap.Add(uk, row);
                 }}
             }}
-
+{1}
             tb.Data.Add(cfg);
         }}
         ProtoDataHandler.SaveProtoData(tb, Define.ProtoBytesDir+'/'+sheetName+"".bin"");
@@ -168,24 +162,24 @@ public class {0}Export
 }}
 ";
 
-        private void AppendExporterLine(StringBuilder str, DataType type, string key)
+        private void AppendExporterLine(StringBuilder str, DataType type, string key, int col)
         {
             if (type == DataType.Int)
             {
-                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetIntFieldValue(cellStr);\r\n", key);
+                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetIntFieldValue(lineData[{1}]);\r\n", key, col);
             }
             else if (type == DataType.String)
             {
-                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetStringFieldValue(cellStr);\r\n", key);
+                str.AppendFormat("\t\t\t\tcfg.{0} = ProtoDataExpoter.GetStringFieldValue(lineData[{1}]);\r\n", key, col);
             }
             else if (type == DataType.Array)
             {
 
-                str.AppendFormat(@"                 var t = ProtoDataExpoter.GetArrayFieldValue(cellStr); 
+                str.AppendFormat(@"                 var t = ProtoDataExpoter.GetArrayFieldValue(lineData[{1}]); 
                 for(int m = 0;m<t.Length;m++)
                 {{
                     cfg.{0}.Add(t[m]);
-                }}", key);
+                }}", key, col);
             }
         }
 
@@ -196,7 +190,7 @@ public class {0}Export
             {
                 if (fi.FieldType == FieldType.Comment || fi.FieldType == FieldType.Undefine)
                     continue;
-                AppendExporterLine(str, fi.DataType, fi.FiledName);
+                AppendExporterLine(str, fi.DataType, fi.FiledName, fi.Col);
             }
 
             string file = string.Format(PbExportStr, sheetName, str.ToString());
@@ -454,9 +448,9 @@ namespace TableProto
         private void Load{0}Redefine()
         {{
             {0}KeyMap.Clear();
-            for (int i =0;i<tb_{0}.Count;i++)
+            foreach (KeyValuePair<int, {0}> kv in tb_{0})
             {{
-                var cfg = tb_{0}[i];
+                var cfg = kv.Value;
                 int uniqueKey = cfg.{1};
                 string unitKey = string.Format(""{2}"", {3});
                 if (!{0}KeyMap.ContainsKey(unitKey))
@@ -484,7 +478,7 @@ namespace TableProto
                     mKeyFields.Add(fi);
                 }
 
-                if(fi.FieldType == FieldType.Unique)
+                if (fi.FieldType == FieldType.Unique)
                 {
                     uniqueKey = fi.FiledName;
                 }
@@ -492,7 +486,7 @@ namespace TableProto
 
             if (mKeyFields.Count == 0)
                 return string.Format(@"
-         private void Load{0}Redefine(){{}}",es.SheetName);
+         private void Load{0}Redefine(){{}}", es.SheetName);
 
             StringBuilder s1 = new StringBuilder();
             StringBuilder s2 = new StringBuilder();
@@ -551,7 +545,7 @@ namespace TableProto
                 ExportSingleTableReader(sheet);
             }
 
-            string file = string.Format(DataTableReader, loadStr.ToString(),clearStr.ToString(), redefineLoadStr.ToString());
+            string file = string.Format(DataTableReader, loadStr.ToString(), clearStr.ToString(), redefineLoadStr.ToString());
             string filePath = Path.Combine(Define.DataTableCSDir, "DataTables.cs");
             File.WriteAllText(filePath, file, Encoding.UTF8);
         }

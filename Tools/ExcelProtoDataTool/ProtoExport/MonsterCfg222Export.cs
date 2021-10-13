@@ -74,16 +74,6 @@ public class MonsterCfg222Export
                         uniqueKeyMap.Add(uniqueKey, row);
                     }
                 }
-
-                if (col >= 0 && col < lineData.Count)
-                {
-                    cellStr = lineData[col];
-                }
-				cfg.ID = ProtoDataExpoter.GetIntFieldValue(cellStr);
-				cfg.NAME = ProtoDataExpoter.GetStringFieldValue(cellStr);
-				cfg.ATK = ProtoDataExpoter.GetIntFieldValue(cellStr);
-				cfg.HP = ProtoDataExpoter.GetIntFieldValue(cellStr);
-
             }
 
             string uk = unitKey.ToString();
@@ -100,6 +90,10 @@ public class MonsterCfg222Export
                     keyMap.Add(uk, row);
                 }
             }
+				cfg.ID = ProtoDataExpoter.GetIntFieldValue(lineData[0]);
+				cfg.NAME = ProtoDataExpoter.GetStringFieldValue(lineData[1]);
+				cfg.ATK = ProtoDataExpoter.GetIntFieldValue(lineData[2]);
+				cfg.HP = ProtoDataExpoter.GetIntFieldValue(lineData[3]);
 
             tb.Data.Add(cfg);
         }

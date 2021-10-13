@@ -59,9 +59,9 @@ namespace TableProto
         private void LoadTest2Redefine()
         {
             Test2KeyMap.Clear();
-            for (int i =0;i<tb_Test2.Count;i++)
+            foreach (KeyValuePair<int, Test2> kv in tb_Test2)
             {
-                var cfg = tb_Test2[i];
+                var cfg = kv.Value;
                 int uniqueKey = cfg.ID;
                 string unitKey = string.Format("{0}_{1}", cfg.Name,cfg.Age);
                 if (!Test2KeyMap.ContainsKey(unitKey))

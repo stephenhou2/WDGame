@@ -59,9 +59,9 @@ namespace TableProto
         private void LoadTestSheetRedefine()
         {
             TestSheetKeyMap.Clear();
-            for (int i =0;i<tb_TestSheet.Count;i++)
+            foreach (KeyValuePair<int, TestSheet> kv in tb_TestSheet)
             {
-                var cfg = tb_TestSheet[i];
+                var cfg = kv.Value;
                 int uniqueKey = cfg.ID;
                 string unitKey = string.Format("{0}_{1}", cfg.Name,cfg.Age);
                 if (!TestSheetKeyMap.ContainsKey(unitKey))
