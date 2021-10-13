@@ -74,11 +74,13 @@ echo.
 echo 删除原有proto定义和加载文件
 del ..\..\WDGame\Assets\Scripts\Proto\ProtoDef\ /F /Q
 del ..\..\WDGame\Assets\Scripts\Table\ /F /Q
+del ..\..\WDGame\Data\TableData\ /F /Q
 echo ----------------------------------------
 echo.
 
 echo 复制新的proto定义和加载文件
 copy .\output\protoCs\*.cs ..\..\WDGame\Assets\Scripts\Proto\ProtoDef /Y
 copy .\output\datatable_cs\*.cs ..\..\WDGame\Assets\Scripts\Table /Y
+copy .\output\pbbytes\*.bin ..\..\WDGame\Data\TableData /Y
 
 pause

@@ -56,7 +56,7 @@ public class MonsterCfg222Export
                 
                 if(fi.FieldType == FieldType.Key)
                 {
-                    unitKey.AppendFormat("|{0}", fi.FiledName);
+                    unitKey.AppendFormat("|{0}",  lineData[col]);
                 }
 
                 string cellStr = string.Empty;
