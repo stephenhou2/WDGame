@@ -8,15 +8,15 @@ public static class GameDefine
 
 public static class CoreDefine
 {
-    public const int BitTypeMaxSize = 128; //最多支持的类型数量
-    public const int BitTypeBufferSize = BitTypeMaxSize / sizeof(int);
+    public const int BitTypeModuleBufferSize = 64; //最多支持64个模块定义
+    public const int BitTypeEventBufferSize     = 128; //最多支持128种事件类型定义
 }
 
 public static class ModuleDef
 {
-    public static BitType SceneModule = BitType.CreateBitType(0, "SceneModule");
-    public static BitType InputModule = BitType.CreateBitType(1, "InputModule");
-    public static BitType MapEditorModule = BitType.CreateBitType(2, "MapEditorModule");
+    public static BitType SceneModule = BitTypeCreator.CreateModuleBitType(0);
+    public static BitType InputModule = BitTypeCreator.CreateModuleBitType(1);
+    public static BitType MapEditorModule = BitTypeCreator.CreateModuleBitType(2);
 }
 
 public static class SceneDef

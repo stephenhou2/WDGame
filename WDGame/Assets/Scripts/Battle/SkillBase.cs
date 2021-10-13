@@ -1,6 +1,5 @@
 ﻿public abstract class SkillBase : ISkill
 {
-    //private string _skillName;
     private int _manaConsume;
 
     public abstract int GetSkillId();
