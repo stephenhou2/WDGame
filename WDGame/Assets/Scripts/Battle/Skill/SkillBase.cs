@@ -11,5 +11,5 @@
 
     public abstract int GetSkillType();
 
-    public abstract bool OnSkillCaster(Agent caster, Agent[] targets);
+    public abstract void OnSkillCastered(Agent caster, Agent[] targets);
 }

@@ -5,32 +5,40 @@ namespace GameEngine
 {
     public class GameManager:MonoBehaviour
     {
-        private CoroutineManager _coroutineMgr;           // 协程管理器
-        private UIManager _UIMgr;                                      // UI管理器
-        private ResourceMgr _resMgr;                                // 资源加载管理器
-        private LuaManager _luaMgr;                                 // lua脚本管理器
-        private GameSceneManager _sceneMgr;             // 场景管理器
-        private CameraManager _cameraMgr;                 // 相机管理器
-        private InputManager _inputMgr;                         // 输入控制管理器
+        private CoroutineManager            _coroutineMgr;           // 协程管理器
+        private UIManager                          _UIMgr;                        // UI管理器
+        private ResourceMgr                      _resMgr;                      // 资源加载管理器
+        private LuaManager                       _luaMgr;                      // lua脚本管理器
+        private GameSceneManager        _sceneMgr;                // 场景管理器
+        private CameraManager               _cameraMgr;             // 相机管理器
+        private InputManager                   _inputMgr;                 // 输入控制管理器
 
         private void Awake()
         {
             InitializeAllModules();
 
-            BitType state = BitType.BindBitTypes(new List<BitType>
-            {
-                AgentStateDefine.INTERACT_FLAG,
-                AgentStateDefine.MAGIC_IMMUNE_FLAG,
-                AgentStateDefine.PHYSICAL_IMMUNE_FLAG,
-                AgentStateDefine.MAGIC_FLAG,
-                AgentStateDefine.VISIBLE_FLAG,
-            });
+            Hero hero = new Hero(1, 1);
+            hero.OnAlive();
 
-            Log.Logic(LogLevel.Hint, "state full type:{0}", state.ToString());
+            BitType state = hero.GetAgentState();
+            if(state != null)
+            {
+                Log.Error(ErrorLevel.Hint, "111111111heroState:{0}", state.ToString());
+            }
+
+            hero.AddState(AgentStateDefine.MAGIC_IMMUNE_FLAG);
+            hero.RemoveState(AgentStateDefine.INTERACT_FLAG);
+            hero.RemoveState(AgentStateDefine.MOVE_FLAG);
+
+            if (state != null)
+            {
+                Log.Error(ErrorLevel.Hint, "2222222222heroState:{0}", state.ToString());
+            }
         }
 
         private void InitializeAllModules()
         {
+            TableProto.DataTables.CreateDataTables();
             _coroutineMgr = CoroutineManager.Ins;
             _UIMgr = UIManager.Ins;
             _resMgr = ResourceMgr.Ins;
@@ -42,10 +50,6 @@ namespace GameEngine
 
             _luaMgr = LuaManager.Ins;
             _luaMgr.CreateLuaEnv();
-
-            TableProto.DataTables.CreateDataTables();
-            var cfg = TableProto.DataTables.Ins.GetTestSheet(1);
-            Log.Logic(LogLevel.Normal, "name:{0}", cfg.Name);
         }
 
         private void DisposeAllModules()

@@ -39,6 +39,14 @@ public static class CameraDef
     public const string MapEditorCamCtl = "MapEditorCamCtl";
 }
 
+public static class AgentTypeDef
+{
+    public const int AGENT_TYPE_HERO = 0;
+    public const int AGENT_TYPE_MONSTER = 1;
+    public const int AGENT_TYPE_NPC = 1;
+}
+
+
 public class PlatformDef
 {
     public const string Android = "android";

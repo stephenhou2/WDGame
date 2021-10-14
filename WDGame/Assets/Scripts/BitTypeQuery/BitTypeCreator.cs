@@ -11,7 +11,7 @@ public class BitTypeCreator
             return null;
         }
 
-        return new BitType(index, ModuleBitTypeQuery.Ins);
+        return new BitType(index, ModuleBitTypeQuery.Ins, false);
     }
 
     public static BitType CreateEventModuleBitType(int index)
@@ -23,7 +23,7 @@ public class BitTypeCreator
             return null;
         }
 
-        return new BitType(index, EventBitTypeQuery.Ins);
+        return new BitType(index, EventBitTypeQuery.Ins, false);
     }
 
 
@@ -36,7 +36,7 @@ public class BitTypeCreator
             return null;
         }
 
-        return new BitType(index, AgentStateBitTypeQuery.Ins);
+        return new BitType(index, AgentStateBitTypeQuery.Ins, true);
 
     }
 }

@@ -5,6 +5,7 @@ namespace GameEngine
 {
     public delegate void BitTypeHandle(BitType type);
 
+#pragma warning disable CS0659 // 类型重写 Object.Equals(object o)，但不重写 Object.GetHashCode()
     public class BitType
     {
         /*
@@ -13,6 +14,7 @@ namespace GameEngine
          * 00000100 -module3 
          * ...
          */
+        private bool _canModify;
         private int[] mBuffer;
         private IBitTypeQuery mBitTypeQuery;
 
@@ -21,8 +23,9 @@ namespace GameEngine
             return mBitTypeQuery;
         }
 
-        public BitType(int index,IBitTypeQuery bt)
+        public BitType(int index,IBitTypeQuery bt,bool canModify)
         {
+            _canModify = canModify; 
             int maxSize = bt.GetBufferMaxSize();
             mBitTypeQuery = bt;
             mBuffer = new int[maxSize];
@@ -40,10 +43,11 @@ namespace GameEngine
                 Log.Error(ErrorLevel.Fatal, "BiTypeBuffer Create failed,index \'{0}\' out of range!", index);
             }
         }
-        private BitType(int[] buffer,IBitTypeQuery bt)
+        private BitType(int[] buffer,IBitTypeQuery bt,bool canModify)
         {
             mBuffer = buffer;
             mBitTypeQuery = bt;
+            _canModify = canModify;
         }
 
         private int[] GetTypeBuffer()
@@ -72,7 +76,60 @@ namespace GameEngine
             return string.Empty;
         }
 
-        public static BitType BindBitTypes(BitType type1, BitType type2)
+        private bool ModifyCheck(BitType targetType)
+        {
+            if (!_canModify)
+            {
+                Log.Error(ErrorLevel.Critical, "ModifyCheck Error, CAN NOT MODIFY!");
+                return false;
+            }
+
+            if (targetType == null)
+            {
+                Log.Error(ErrorLevel.Critical, "ModifyCheck Error, targetType is null!");
+                return false;
+            }
+
+            var targetBitTypeQuery = targetType.GetBitTypeQuery();
+
+            if (mBitTypeQuery == null || targetBitTypeQuery == null)
+            {
+                Log.Error(ErrorLevel.Critical, "ModifyCheck Error,BitTypeQuery is null!");
+                return false;
+            }
+
+            if (mBitTypeQuery.GetHashCode() != targetBitTypeQuery.GetHashCode())
+            {
+                Log.Error(ErrorLevel.Critical, "ModifyCheck Error, can not modify bitType with different BitTypeQuery!");
+                return false;
+            }
+
+            return true;
+        }
+
+        public void RemoveBitType(BitType targetType)
+        {
+            if (!ModifyCheck(targetType))
+                return;
+
+            for (int i = 0; i < mBuffer.Length; i++)
+            {
+                mBuffer[i] &= ~targetType.GetTypeBufferAt(i);
+            }
+        }
+
+        public void BindBitType(BitType targetType)
+        {
+            if (!ModifyCheck(targetType))
+                return;
+
+            for (int i = 0; i < mBuffer.Length; i++)
+            {
+                mBuffer[i] |= targetType.GetTypeBufferAt(i);
+            }
+        }
+
+        public static BitType BindWithBitTypes(BitType type1, BitType type2, bool canModify)
         {
             if (type1 == null || type2 == null)
             {
@@ -89,7 +146,7 @@ namespace GameEngine
                 return null;
             }
 
-            if(btQuery1.GetHashCode() !=  btQuery2.GetHashCode())
+            if (btQuery1.GetHashCode() != btQuery2.GetHashCode())
             {
                 Log.Error(ErrorLevel.Critical, "BindBitTypes Error, can not bind bitType with different bitTypeQuery!");
                 return null;
@@ -101,20 +158,20 @@ namespace GameEngine
             {
                 buffer[i] = type1.GetTypeBufferAt(i) | type2.GetTypeBufferAt(i);
             }
-            return new BitType(buffer, btQuery1);
+            return new BitType(buffer, btQuery1, canModify);
         }
 
-        public static BitType BindBitTypes(List<BitType> bts)
+        public static BitType BindWithBitTypes(BitType[] bts, bool canModify)
         {
             if (bts == null) return null;
-            if (bts.Count == 0) return null;
-            if (bts.Count == 1) return bts[0];
+            if (bts.Length == 0) return null;
+            if (bts.Length == 1) return bts[0];
 
-            for(int i = 0;i<bts.Count - 1;i++)
+            for (int i = 0; i < bts.Length - 1; i++)
             {
                 IBitTypeQuery foward = bts[i].GetBitTypeQuery();
                 IBitTypeQuery backward = bts[i + 1].GetBitTypeQuery();
-                if(foward == null || backward == null)
+                if (foward == null || backward == null)
                 {
                     Log.Error(ErrorLevel.Critical, "BindBitTypes Error, can not bind bitType with different bitTypeQuery!");
                     return null;
@@ -124,7 +181,7 @@ namespace GameEngine
             IBitTypeQuery btQuery = bts[0].GetBitTypeQuery();
             int maxSize = btQuery.GetBufferMaxSize();
             int[] buffer = new int[maxSize];
-            for (int i = 0; i < bts.Count; i++)
+            for (int i = 0; i < bts.Length; i++)
             {
                 BitType src = bts[i];
                 for (int j = 0; j < maxSize; j++)
@@ -132,7 +189,7 @@ namespace GameEngine
                     buffer[j] |= src.GetTypeBufferAt(j);
                 }
             }
-            return new BitType(buffer, btQuery);
+            return new BitType(buffer, btQuery, canModify);
         }
 
         public bool HasEvent(BitType evt)
@@ -148,7 +205,7 @@ namespace GameEngine
             return false;
         }
 
-        public BitType Clone()
+        public BitType Clone(bool canModify)
         {
             int maxSize = mBitTypeQuery.GetBufferMaxSize();
             int[] buffer = new int[maxSize];
@@ -157,7 +214,7 @@ namespace GameEngine
             {
                 buffer[i] = mBuffer[i];
             }
-            return new BitType(buffer, mBitTypeQuery);
+            return new BitType(buffer, mBitTypeQuery, canModify);
         }
 
 
@@ -171,7 +228,7 @@ namespace GameEngine
             {
                 int maxSize = mBitTypeQuery.GetBufferMaxSize();
                 int[] tempBuffer = new int[maxSize];
-                mTempBitType = new BitType(tempBuffer,mBitTypeQuery);
+                mTempBitType = new BitType(tempBuffer,mBitTypeQuery,false);
             }
 
             return mTempBitType;
@@ -227,7 +284,7 @@ namespace GameEngine
                     int[] buffer = new int[maxSize];
 
                     buffer[i] = bit;
-                    BitType bt = new BitType(buffer, mBitTypeQuery);
+                    BitType bt = new BitType(buffer, mBitTypeQuery,false);
                     handle(bt);
 
                     // 剔除最后一位非零位
