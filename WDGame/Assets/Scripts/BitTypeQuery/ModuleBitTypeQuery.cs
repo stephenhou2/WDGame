@@ -21,7 +21,6 @@ public class ModuleBitTypeQuery : IBitTypeQuery
         }
     }
 
-
     private void BitTypeEmmurator(BitType bt)
     {
         if(bt.Equals(ModuleDef.SceneModule))
