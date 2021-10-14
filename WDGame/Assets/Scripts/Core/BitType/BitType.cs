@@ -26,11 +26,10 @@ namespace GameEngine
             int maxSize = bt.GetBufferMaxSize();
             mBitTypeQuery = bt;
             mBuffer = new int[maxSize];
-            int index_1 = index / sizeof(int);
-            int index_2 = index % sizeof(int);
+            int index_1 = index / CoreDefine.buffeSizeOfInt;
+            int index_2 = index % CoreDefine.buffeSizeOfInt;
 
             int value = (int)(1 << index_2);
-
 
             if (index_1 >= 0 && index_1 < maxSize)
             {
@@ -52,9 +51,9 @@ namespace GameEngine
             return mBuffer;
         }
 
-        private int GetTypeBufferAt(int index)
+        public int GetTypeBufferAt(int index)
         {
-            if (index < 0 || index > mBuffer.Length)
+            if (index < 0 || index >= mBuffer.Length)
             {
                 Log.Error(ErrorLevel.Fatal, "GetTypeBufferAt Error,index out of range!");
                 return 0;
@@ -63,9 +62,9 @@ namespace GameEngine
             return mBuffer[index];
         }
 
-        public string GetFullTypeName()
+        public override string ToString()
         {
-            if(mBitTypeQuery != null)
+            if (mBitTypeQuery != null)
             {
                 return mBitTypeQuery.BitTypeTranslate(this);
             }
@@ -130,7 +129,7 @@ namespace GameEngine
                 BitType src = bts[i];
                 for (int j = 0; j < maxSize; j++)
                 {
-                    buffer[j] |= src.GetTypeBufferAt(i);
+                    buffer[j] |= src.GetTypeBufferAt(j);
                 }
             }
             return new BitType(buffer, btQuery);
@@ -235,6 +234,30 @@ namespace GameEngine
                     data = data ^ bit;
                 }
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            BitType target = obj as BitType;
+            if (null == target)
+                return false;
+
+            if(GetHashCode() == target.GetHashCode())
+                return true;
+
+            if (mBitTypeQuery.GetHashCode() != target.GetBitTypeQuery().GetHashCode())
+                return false;
+
+            int maxSize = mBitTypeQuery.GetBufferMaxSize();
+            for (int i = 0; i < maxSize; i++)
+            {
+                if(GetTypeBufferAt(i) != target.GetTypeBufferAt(i))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

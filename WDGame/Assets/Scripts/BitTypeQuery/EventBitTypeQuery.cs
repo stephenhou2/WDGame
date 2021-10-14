@@ -25,6 +25,6 @@ public class EventBitTypeQuery : IBitTypeQuery
 
     public int GetBufferMaxSize()
     {
-        return CoreDefine.BitTypeEventBufferSize / sizeof(int);
+        return CoreDefine.BitTypeEventBufferSize / CoreDefine.buffeSizeOfInt;
     }
 }

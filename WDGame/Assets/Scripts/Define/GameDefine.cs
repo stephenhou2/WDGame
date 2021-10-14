@@ -8,8 +8,11 @@ public static class GameDefine
 
 public static class CoreDefine
 {
-    public const int BitTypeModuleBufferSize = 64; //最多支持64个模块定义
+    public const int buffeSizeOfInt = sizeof(int) * 8;
+
+    public const int BitTypeModuleBufferSize = 32; //最多支持64个模块定义
     public const int BitTypeEventBufferSize     = 128; //最多支持128种事件类型定义
+    public const int BitTypeAgentStateBufferSize = 32;// 最多支持32中角色状态
 }
 
 public static class ModuleDef

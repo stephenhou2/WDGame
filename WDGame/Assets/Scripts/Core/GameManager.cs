@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace GameEngine
 {
@@ -15,6 +16,17 @@ namespace GameEngine
         private void Awake()
         {
             InitializeAllModules();
+
+            BitType state = BitType.BindBitTypes(new List<BitType>
+            {
+                AgentStateDefine.INTERACT_FLAG,
+                AgentStateDefine.MAGIC_IMMUNE_FLAG,
+                AgentStateDefine.PHYSICAL_IMMUNE_FLAG,
+                AgentStateDefine.MAGIC_FLAG,
+                AgentStateDefine.VISIBLE_FLAG,
+            });
+
+            Log.Logic(LogLevel.Hint, "state full type:{0}", state.ToString());
         }
 
         private void InitializeAllModules()
