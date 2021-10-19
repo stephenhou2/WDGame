@@ -4,7 +4,12 @@ public class Hero : Agent
 {
     private int _heroId;
 
-    public Hero(int entityId,int heroId)
+    public Hero(int entityId, int heroId)
+    {
+        Initialize(entityId, heroId);
+    }
+
+    public void Initialize(int entityId, int heroId)
     {
         _entityId = entityId;
         _heroId = heroId;
@@ -36,21 +41,33 @@ public class Hero : Agent
         return _entityId;
     }
 
-    public override void OnAlive()
+    private void InitializeState()
     {
         BitType clearState = BitType.BindWithBitTypes(new BitType[]
         {
-                    AgentStateDefine.INTERACT_FLAG,
-                    AgentStateDefine.MOVE_FLAG,
-                    AgentStateDefine.VISIBLE_FLAG,
-                    AgentStateDefine.RECOVER_FLAG,
-                    AgentStateDefine.HURTABLE_FLAG,
-                    AgentStateDefine.MAGIC_FLAG,
-                    AgentStateDefine.PHYSICAL_FLAG,
-                    AgentStateDefine.TARGET_FLAG,
+                AgentStateDefine.INTERACT_FLAG,
+                AgentStateDefine.MOVE_FLAG,
+                AgentStateDefine.VISIBLE_FLAG,
+                AgentStateDefine.RECOVER_FLAG,
+                AgentStateDefine.HURTABLE_FLAG,
+                AgentStateDefine.MAGIC_FLAG,
+                AgentStateDefine.PHYSICAL_FLAG,
+                AgentStateDefine.TARGET_FLAG,
         }, true);
 
         _state.SetAgentState(clearState);
+    }
+
+    public override void OnAlive()
+    {
+        InitializeState();
+        ForEachSkill((ISkill skill) =>
+        {
+            if (skill.GetSkillType() == SkillDef.PASSIVE_SKILL)
+            {
+                skill.OnSkillFirstAdd(this);
+            }
+        });
     }
 
     public override void OnDead()
@@ -63,10 +80,8 @@ public class Hero : Agent
         
     }
 
-    public override void OnUpdate()
+    public override void Update()
     {
         
     }
-
-
 }

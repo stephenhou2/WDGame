@@ -46,6 +46,10 @@ public static class AgentTypeDef
     public const int AGENT_TYPE_NPC = 1;
 }
 
+public class EquipDef
+{
+    public const int MaxEquipNum = 6;
+}
 
 public class PlatformDef
 {
