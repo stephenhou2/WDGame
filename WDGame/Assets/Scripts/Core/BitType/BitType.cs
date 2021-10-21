@@ -192,7 +192,7 @@ namespace GameEngine
             return new BitType(buffer, btQuery, canModify);
         }
 
-        public bool HasEvent(BitType evt)
+        public bool HasType(BitType evt)
         {
             int maxSize = mBitTypeQuery.GetBufferMaxSize();
             for (int i = 0; i < maxSize; i++)

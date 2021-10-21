@@ -55,7 +55,7 @@ public class Hero : Agent
                 AgentStateDefine.TARGET_FLAG,
         }, true);
 
-        _state.SetAgentState(clearState);
+        _state.InitializeAgentDefaultState(clearState);
     }
 
     public override void OnAlive()

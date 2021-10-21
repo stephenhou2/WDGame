@@ -37,35 +37,12 @@ public abstract class Agent : IAgent
     public abstract void OnDead();
     public abstract void OnLateUpdate();
 
-    private List<BitType> _toRemoveStateTimestamps = new List<BitType>();
-
-    private void UpdateStateTimestamps()
-    {
-        float now = Time.realtimeSinceStartup;
-
-        _toRemoveStateTimestamps.Clear();
-        foreach (KeyValuePair<BitType, float> kv in _state_timestamps)
-        {
-            if (now >= kv.Value)
-            {
-                RemoveState(kv.Key);
-                _toRemoveStateTimestamps.Add(kv.Key);
-            }
-        }
-
-        for(int i = 0;i<_toRemoveStateTimestamps.Count;i++)
-        {
-            BitType type = _toRemoveStateTimestamps[i];
-            if (_state_timestamps.ContainsKey(type))
-            {
-                _state_timestamps.Remove(type);
-            }
-        }
-    }
-
     public void OnUpdate()
     {
-        UpdateStateTimestamps();
+        ;if(_state != null)
+        {
+            _state.Update();
+        }
 
         Update();
     }
