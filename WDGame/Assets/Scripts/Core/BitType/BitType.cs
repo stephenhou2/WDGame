@@ -197,7 +197,8 @@ namespace GameEngine
             int maxSize = mBitTypeQuery.GetBufferMaxSize();
             for (int i = 0; i < maxSize; i++)
             {
-                int temp = mBuffer[i] &= evt.GetTypeBuffer()[i];
+                int data = mBuffer[i];
+                int temp = data &= evt.GetTypeBuffer()[i];
                 if (temp > 0)
                     return true;
             }

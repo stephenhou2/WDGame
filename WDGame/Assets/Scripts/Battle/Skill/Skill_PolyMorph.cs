@@ -20,10 +20,10 @@ public class Skill_PolyMorph : SkillBase
 
     public override void OnSkillCastered(Agent caster, Agent[] targets)
     {
-        
+        PolyMorph(caster, targets);
     }
 
-    private IEnumerator PolyMorph(Agent caster, Agent[] targets)
+    private void PolyMorph(Agent caster, Agent[] targets)
     {
         for(int i =0;i<targets.Length;i++)
         {
@@ -32,17 +32,17 @@ public class Skill_PolyMorph : SkillBase
             {
                 agent.RemoveState(AgentStateDefine.INTERACT_FLAG);
                 agent.RemoveState(AgentStateDefine.MOVE_FLAG);
+
+                agent.SetStateTimer(AgentStateDefine.INTERACT_FLAG, AgentStateTimer.Create(3));
+                agent.SetStateTimer(AgentStateDefine.MOVE_FLAG, AgentStateTimer.Create(5));
             }
         }
-
-        yield return new WaitForSeconds(1);
-
 
     }
 
     public override void OnSkillFirstAdd(Agent target)
     {
-        _skillCoroutine = null;
+        
     }
 
     public override void Update()

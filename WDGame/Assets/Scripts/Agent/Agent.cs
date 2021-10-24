@@ -15,11 +15,6 @@ public abstract class Agent : IAgent
     protected AgentState _state;
 
     /// <summary>
-    /// 状态结束时间戳
-    /// </summary>
-    protected Dictionary<BitType,float> _state_timestamps = new Dictionary<BitType, float>();
-
-    /// <summary>
     /// 装备列表
     /// </summary>
     protected Equip[] _equips = new Equip[EquipDef.MaxEquipNum];
@@ -29,36 +24,59 @@ public abstract class Agent : IAgent
     /// </summary>
     protected BaseProperty _property;
 
-    protected List<ISkill> _allSkills = new List<ISkill>();
+    protected Dictionary<int,ISkill> _allSkills = new Dictionary<int, ISkill>();
 
     public abstract int GetEntityId();
     public abstract int GetAgentType();
     public abstract void OnAlive();
     public abstract void OnDead();
-    public abstract void OnLateUpdate();
+    public abstract void OnLateUpdate(float deltaTime);
 
-    public void OnUpdate()
+    public abstract void OnUpdate(float deltaTime);
+
+    public  void Update(float deltaTime)
     {
-        ;if(_state != null)
+        if (_state != null)
         {
-            _state.Update();
+            _state.Update(deltaTime);
         }
 
-        Update();
+        OnUpdate(deltaTime);
     }
 
-    public abstract void Update();
+    public  void LateUpdate(float deltaTime)
+    {
+        OnLateUpdate(deltaTime);
+    }
+
+    public void AddSkill(ISkill skill)
+    {
+        int skillId = skill.GetSkillId();
+        if(_allSkills.ContainsKey(skillId))
+        {
+            Log.Error(ErrorLevel.Critical,"Readd Skill is not allowed, skill id: {0}", skillId);
+            return;
+        }
+
+        _allSkills.Add(skillId, skill);
+    }
 
     protected void ForEachSkill(SkillEnumerator call)
     {
-        foreach(ISkill skill in _allSkills)
+        foreach(KeyValuePair <int,ISkill> kv in _allSkills)
         {
+            int skillId = kv.Key;
+            ISkill skill = kv.Value;
             call(skill);
         }
 
-        foreach(Equip eqp in _equips)
+        for (int i =0;i<_equips.Length;i++)
         {
-            eqp.ForEachSkill(call);
+            var eqp = _equips[i];
+            if(eqp != null)
+            {
+                eqp.ForEachSkill(call);
+            }
         }
     }
 
@@ -77,18 +95,8 @@ public abstract class Agent : IAgent
         _state.RemoveState(state);
     }
 
-    public virtual void AddStateTimer(BitType state,float newStamp)
+    public virtual void SetStateTimer(BitType state,AgentStateTimer timer)
     {
-        if (_state_timestamps.TryGetValue(state, out float stamp))
-        {
-            if(newStamp > stamp)
-            {
-                _state_timestamps[state] = newStamp;
-            }
-        }
-        else
-        {
-            _state_timestamps.Add(state, newStamp);
-        }
+        _state.AddStateTimer(state, timer);
     }
 }

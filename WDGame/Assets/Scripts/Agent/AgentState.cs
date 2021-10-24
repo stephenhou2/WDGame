@@ -13,6 +13,7 @@ public class AgentState
     {
         _state = state;
         _defaultState = state.Clone(false);
+        Log.Logic(LogLevel.Hint, "InitializeAgentDefaultState State:{0}", state.ToString());
     }
 
     public BitType GetAgentState()
@@ -24,12 +25,16 @@ public class AgentState
     {
         if(_state != null)
             _state.BindBitType(state);
+
+        Log.Logic(LogLevel.Hint, "Add State:{0}, cur State:{1}", state.ToString(),_state.ToString());
     }
 
     public void RemoveState(BitType state)
     {
         if(_state != null)
             _state.RemoveBitType(state);
+
+        Log.Logic(LogLevel.Hint, "RemoveState State:{0}, cur State:{1}", state.ToString(), _state.ToString());
     }
 
     public AgentStateTimer GetStateTimer(BitType state)
@@ -49,9 +54,9 @@ public class AgentState
         {
             _stateTimers.Add(state, timer);
         }
-        else
+        else if(_timer.GetEndTime() < timer.GetEndTime())
         {
-            
+            _stateTimers[state] = timer;
         }
     }
 
@@ -81,13 +86,14 @@ public class AgentState
 
         foreach (KeyValuePair<BitType, AgentStateTimer> kv in _stateTimers)
         {
-            //BitType state = kv.Key;
-            //AgentStateTimer timer = kv.Value;
-            //if (timer != null && timer.TimerCheck())
-            //{
-            //    DefaultActionOnStateEnd(state);
-            //    _toRemoveStateTimers.Add(kv.Key);
-            //}
+            BitType state = kv.Key;
+            AgentStateTimer timer = kv.Value;
+
+            if (timer != null && timer.TimerCheck(TimeMgr.Now))
+            {
+                DefaultActionOnStateEnd(state);
+                _toRemoveStateTimers.Add(kv.Key);
+            }
         }
 
         for (int i = 0; i < _toRemoveStateTimers.Count; i++)
@@ -97,7 +103,7 @@ public class AgentState
         }
     }
 
-    public void Update()
+    public void Update(float deltaTime)
     {
         UpdateStateTimeTimers();
     }

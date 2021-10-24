@@ -10,28 +10,19 @@ public class GameManager:MonoBehaviour
     private GameSceneManager        _sceneMgr;                // 场景管理器
     private CameraManager               _cameraMgr;             // 相机管理器
     private InputManager                   _inputMgr;                 // 输入控制管理器
+    private AgentManager                  _agentMgr;                 // 角色管理器
 
     private void Awake()
     {
         InitializeAllModules();
 
-        Hero hero = new Hero(1, 1);
+        Hero hero = _agentMgr.CreateHero(1);
         hero.OnAlive();
+        Hero hero2 = _agentMgr.CreateHero(2);
+        hero2.OnAlive();
 
-        BitType state = hero.GetAgentState();
-        if(state != null)
-        {
-            Log.Error(ErrorLevel.Hint, "111111111heroState:{0}", state.ToString());
-        }
-
-        hero.AddState(AgentStateDefine.MAGIC_IMMUNE_FLAG);
-        hero.RemoveState(AgentStateDefine.INTERACT_FLAG);
-        hero.RemoveState(AgentStateDefine.MOVE_FLAG);
-
-        if (state != null)
-        {
-            Log.Error(ErrorLevel.Hint, "2222222222heroState:{0}", state.ToString());
-        }
+        ISkill skill = new Skill_PolyMorph();
+        skill.OnSkillCastered(hero,new Agent[] { hero2});
     }
 
     private void InitializeAllModules()
@@ -42,6 +33,7 @@ public class GameManager:MonoBehaviour
         _resMgr = ResourceMgr.Ins;
         _cameraMgr = CameraManager.Ins;
         _inputMgr = InputManager.Ins;
+        _agentMgr = AgentManager.Ins;
 
         _sceneMgr = GameSceneManager.Ins;
         _sceneMgr.InitializeSceneManager();
@@ -81,6 +73,7 @@ public class GameManager:MonoBehaviour
         _luaMgr.Update(deltaTime);
         _UIMgr.Update(deltaTime);
         _cameraMgr.Update(deltaTime);
+        _agentMgr.Update(deltaTime);
     }
 
     private void LateUpdate()
@@ -93,6 +86,7 @@ public class GameManager:MonoBehaviour
         _luaMgr.LateUpdate(deltaTime);
         _UIMgr.LateUpdate(deltaTime);
         _cameraMgr.LateUpdate(deltaTime);
+        _agentMgr.LateUpdate(deltaTime);
     }
 
     private void OnDestroy()

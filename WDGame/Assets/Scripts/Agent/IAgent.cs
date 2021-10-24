@@ -5,6 +5,6 @@ public interface IAgent
     int GetAgentType();
     void OnAlive();
     void OnDead();
-    void OnUpdate();
-    void OnLateUpdate();
+    void OnUpdate(float deltaTime);
+    void OnLateUpdate(float deltaTime);
 }

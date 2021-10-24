@@ -75,12 +75,12 @@ public class Hero : Agent
         
     }
 
-    public override void OnLateUpdate()
+    public override void OnLateUpdate(float deltaTime)
     {
         
     }
 
-    public override void Update()
+    public override void OnUpdate(float deltaTime)
     {
         
     }

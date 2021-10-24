@@ -1,12 +1,17 @@
-﻿using GameEngine;
-
-
+﻿/// <summary>
+/// 使用时间的状态定时器
+/// </summary>
 public class AgentStateTimer
 {
     private float _startTime;
     private float _endTime;
 
-    public void InitAgentStateTimer(float startTime, float endTime)
+    public static AgentStateTimer Create(float duration)
+    {
+        return new AgentStateTimer(TimeMgr.Now, TimeMgr.Now + duration);
+    }
+
+    public AgentStateTimer(float startTime, float endTime)
     {
         _startTime = startTime;
         _endTime = endTime;
