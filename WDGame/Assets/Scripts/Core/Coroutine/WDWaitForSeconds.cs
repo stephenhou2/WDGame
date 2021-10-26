@@ -1,10 +1,10 @@
 ﻿namespace GameEngine
 {
-    public class WaitForSeconds : IWait
+    public class WDWaitForSeconds : IWait
     {
         private float _waitTime;
         private float _timer;
-        public WaitForSeconds(float seconds)
+        public WDWaitForSeconds(float seconds)
         {
             _timer = 0;
             _waitTime = seconds;

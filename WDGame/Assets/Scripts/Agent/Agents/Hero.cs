@@ -4,31 +4,9 @@ public class Hero : Agent
 {
     private int _heroId;
 
-    public Hero(int entityId, int heroId)
+    public Hero(int entityId, int heroId, HeroData heroData, AgentStateTimerPool stateTimerPool)
     {
-        Initialize(entityId, heroId);
-    }
-
-    public void Initialize(int entityId, int heroId)
-    {
-        _entityId = entityId;
-        _heroId = heroId;
-        _state = new AgentState();
-    }
-
-    public override void AddState(BitType state)
-    {
-        _state.AddState(state);
-    }
-
-    public override void RemoveState(BitType state)
-    {
-        _state.RemoveState(state);
-    }
-
-    public override BitType GetAgentState()
-    {
-        return _state.GetAgentState();
+        InitializeHero(entityId, heroId, heroData, stateTimerPool);
     }
 
     public override int GetAgentType()
@@ -36,31 +14,17 @@ public class Hero : Agent
         return AgentTypeDef.AGENT_TYPE_HERO;
     }
 
-    public override int GetEntityId()
+    public void InitializeHero(int entityId, int heroId, HeroData heroData, AgentStateTimerPool stateTimerPool)
     {
-        return _entityId;
-    }
-
-    private void InitializeState()
-    {
-        BitType clearState = BitType.BindWithBitTypes(new BitType[]
-        {
-                AgentStateDefine.INTERACT_FLAG,
-                AgentStateDefine.MOVE_FLAG,
-                AgentStateDefine.VISIBLE_FLAG,
-                AgentStateDefine.RECOVER_FLAG,
-                AgentStateDefine.HURTABLE_FLAG,
-                AgentStateDefine.MAGIC_FLAG,
-                AgentStateDefine.PHYSICAL_FLAG,
-                AgentStateDefine.TARGET_FLAG,
-        }, true);
-
-        _state.InitializeAgentDefaultState(clearState);
+        _entityId = entityId;
+        _heroId = heroId;
+        _agentData = heroData;
+        _stateTimerPool = stateTimerPool;
     }
 
     public override void OnAlive()
     {
-        InitializeState();
+        // 添加被动技能效果
         ForEachSkill((ISkill skill) =>
         {
             if (skill.GetSkillType() == SkillDef.PASSIVE_SKILL)

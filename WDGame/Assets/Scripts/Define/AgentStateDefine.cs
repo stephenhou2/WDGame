@@ -60,4 +60,17 @@ public static class AgentStateDefine
     /// 是否对物理伤害免疫
     /// </summary>
     public static BitType PHYSICAL_IMMUNE_FLAG = BitTypeCreator.CreateAgentStateBitType(11);
+
+
+    public static BitType HERO_DEFAULT_STATE = BitType.BindWithBitTypes(new BitType[]
+        {
+                INTERACT_FLAG,
+                MOVE_FLAG,
+                VISIBLE_FLAG,
+                RECOVER_FLAG,
+                HURTABLE_FLAG,
+                MAGIC_FLAG,
+                PHYSICAL_FLAG,
+                TARGET_FLAG,
+        }, true);
 }

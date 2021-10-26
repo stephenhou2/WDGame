@@ -28,7 +28,10 @@ public class GameManager:MonoBehaviour
     private void InitializeAllModules()
     {
         TableProto.DataTables.CreateDataTables();
+
         _coroutineMgr = CoroutineManager.Ins;
+        _coroutineMgr.InitializeCoroutineManager();
+
         _UIMgr = UIManager.Ins;
         _resMgr = ResourceMgr.Ins;
         _cameraMgr = CameraManager.Ins;

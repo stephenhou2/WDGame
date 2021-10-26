@@ -5,42 +5,37 @@ using System.Collections.Generic;
 public abstract class Agent : IAgent
 {
     /// <summary>
-    /// agent唯一id
+    /// Agent 唯一id
     /// </summary>
     protected int _entityId;
 
     /// <summary>
-    /// agent 状态
+    /// Agent 数据层
     /// </summary>
-    protected AgentState _state;
+    protected AgentData _agentData;
 
     /// <summary>
-    /// 装备列表
+    /// Agent 状态定时器池子
     /// </summary>
-    protected Equip[] _equips = new Equip[EquipDef.MaxEquipNum];
+    protected AgentStateTimerPool _stateTimerPool;
 
-    /// <summary>
-    ///  agent 基础属性
-    /// </summary>
-    protected BaseProperty _property;
-
-    protected Dictionary<int,ISkill> _allSkills = new Dictionary<int, ISkill>();
-
-    public abstract int GetEntityId();
+    public int GetEntityId()
+    {
+        return _entityId;
+    }
     public abstract int GetAgentType();
     public abstract void OnAlive();
     public abstract void OnDead();
     public abstract void OnLateUpdate(float deltaTime);
-
     public abstract void OnUpdate(float deltaTime);
+
 
     public  void Update(float deltaTime)
     {
-        if (_state != null)
+        if (_stateTimerPool != null)
         {
-            _state.Update(deltaTime);
+            _stateTimerPool.Update(deltaTime,_agentData.GetAgentStateData());
         }
-
         OnUpdate(deltaTime);
     }
 
@@ -51,52 +46,50 @@ public abstract class Agent : IAgent
 
     public void AddSkill(ISkill skill)
     {
-        int skillId = skill.GetSkillId();
-        if(_allSkills.ContainsKey(skillId))
+        if(_agentData != null)
         {
-            Log.Error(ErrorLevel.Critical,"Readd Skill is not allowed, skill id: {0}", skillId);
-            return;
+            _agentData.AddSkill(skill);
         }
-
-        _allSkills.Add(skillId, skill);
     }
 
-    protected void ForEachSkill(SkillEnumerator call)
+    public void ForEachSkill(SkillEnumerator call)
     {
-        foreach(KeyValuePair <int,ISkill> kv in _allSkills)
+        if(_agentData != null)
         {
-            int skillId = kv.Key;
-            ISkill skill = kv.Value;
-            call(skill);
-        }
-
-        for (int i =0;i<_equips.Length;i++)
-        {
-            var eqp = _equips[i];
-            if(eqp != null)
-            {
-                eqp.ForEachSkill(call);
-            }
+            _agentData.ForEachSkill(call);
         }
     }
 
     public virtual BitType GetAgentState()
     {
-        return _state.GetAgentState();
+        if (_agentData != null)
+        {
+            _agentData.GetAgentState();
+        }
+        return null;
     }
 
     public virtual void AddState(BitType state)
     {
-        _state.AddState(state);
+        if(_agentData != null)
+        {
+            _agentData.AddState(state);
+        }
     }
 
     public virtual void RemoveState(BitType state)
     {
-        _state.RemoveState(state);
-    }
-
+        if(_agentData != null)
+        {
+            _agentData.RemoveState(state);
+        }
+    }  
+    
     public virtual void SetStateTimer(BitType state,AgentStateTimer timer)
     {
-        _state.AddStateTimer(state, timer);
+        if(_stateTimerPool != null)
+        {
+            _stateTimerPool.SetStateTimer(state,timer);
+        }
     }
 }

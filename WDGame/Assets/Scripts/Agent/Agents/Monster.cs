@@ -8,11 +8,6 @@ public class Monster : Agent
         throw new System.NotImplementedException();
     }
 
-    public override int GetEntityId()
-    {
-        throw new System.NotImplementedException();
-    }
-
     public override void OnAlive()
     {
         throw new System.NotImplementedException();

@@ -41,9 +41,10 @@ public static class CameraDef
 
 public static class AgentTypeDef
 {
-    public const int AGENT_TYPE_HERO = 0;
-    public const int AGENT_TYPE_MONSTER = 1;
-    public const int AGENT_TYPE_NPC = 1;
+    public const int AGENT_TYPE_UNDEFINED = 0;
+    public const int AGENT_TYPE_HERO = 1;
+    public const int AGENT_TYPE_MONSTER = 2;
+    public const int AGENT_TYPE_NPC = 3;
 }
 
 public class EquipDef

@@ -2,11 +2,11 @@
 
 namespace GameEngine
 {
-    public class Coroutine
+    public class GameCoroutine
     {
         private IEnumerator _routine;
 
-        public Coroutine(IEnumerator routine)
+        public GameCoroutine(IEnumerator routine)
         {
             _routine = routine;
         }

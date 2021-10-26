@@ -2,11 +2,11 @@
 {
     public delegate bool WaitDelegate();
 
-    public class WaitUntil : IWait
+    public class WDWaitUntil : IWait
     {
         private WaitDelegate _waitCheck;
 
-        public WaitUntil(WaitDelegate wait)
+        public WDWaitUntil(WaitDelegate wait)
         {
             _waitCheck = wait;
         }

@@ -85,11 +85,11 @@ public class AgentManager : Singleton<AgentManager>
         Hero hero = _heroPool.PopObj();
         if (hero == null)
         {
-            hero = new Hero(entityId, heroId);
+            hero = new Hero(entityId, heroId,new HeroData(heroId),new AgentStateTimerPool());
         }
         else
         {
-            hero.Initialize(entityId, heroId);
+            hero.InitializeHero(entityId, heroId,new HeroData(heroId),new AgentStateTimerPool());
         }
 
         if (!_heros.ContainsKey(entityId))

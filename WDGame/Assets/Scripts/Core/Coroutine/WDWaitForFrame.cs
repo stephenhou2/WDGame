@@ -1,10 +1,10 @@
 ﻿namespace GameEngine
 {
-    public class WaitForFrame : IWait
+    public class WDWaitForFrame : IWait
     {
         private int _waitFrame;
         private int _counter;
-        public WaitForFrame(int frame)
+        public WDWaitForFrame(int frame)
         {
             _counter = 0;
             _waitFrame = frame;
