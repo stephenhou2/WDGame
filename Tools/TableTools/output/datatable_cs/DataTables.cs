@@ -15,6 +15,7 @@ namespace TableProto
 
         private void LoadAllDataTables()
         {
+			LoadHeroDataCfg();
 			LoadTestSheet();
 			LoadTest2();
 			LoadMonsterCfg();
@@ -24,6 +25,7 @@ namespace TableProto
 
         public void ClearAllDataTables()
         {
+			ClearHeroDataCfg();
 			ClearTestSheet();
 			ClearTest2();
 			ClearMonsterCfg();
@@ -33,6 +35,7 @@ namespace TableProto
 
         public void LoadAllTableRedefines()
         {
+			LoadHeroDataCfgRedefine();
 			LoadTestSheetRedefine();
 			LoadTest2Redefine();
 			LoadMonsterCfgRedefine();

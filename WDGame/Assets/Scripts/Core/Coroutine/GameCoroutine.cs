@@ -36,11 +36,10 @@ namespace GameEngine
             }
         }
 
-        public void Reset()
+        public void Dispose()
         {
             _routine = null;
         }
     }
-
 }
 

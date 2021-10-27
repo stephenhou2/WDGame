@@ -1,0 +1,20 @@
+﻿syntax =  "proto3";
+package TableProto;
+
+message HeroDataCfg
+{
+	int32 ID = 1;
+	string NAME = 2;
+	int32 BaseStrength = 3;
+	int32 StrengthGrowth = 4;
+	int32 BaseAgility = 5;
+	int32 AgilityGrowth = 6;
+	int32 BaseIntelligence = 7;
+	int32 IntelligenceGrowth = 8;
+
+}
+
+message TB_HeroDataCfg
+{
+    repeated HeroDataCfg data = 1;
+}

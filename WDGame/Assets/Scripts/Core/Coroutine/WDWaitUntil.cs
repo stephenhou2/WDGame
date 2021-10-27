@@ -1,12 +1,12 @@
 ﻿namespace GameEngine
 {
-    public delegate bool WaitDelegate();
+    public delegate bool WDWaitDelegate();
 
     public class WDWaitUntil : IWait
     {
-        private WaitDelegate _waitCheck;
+        private WDWaitDelegate _waitCheck;
 
-        public WDWaitUntil(WaitDelegate wait)
+        public WDWaitUntil(WDWaitDelegate wait)
         {
             _waitCheck = wait;
         }

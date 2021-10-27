@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-
 namespace GameEngine
 {
     public class CoroutineManager : Singleton<CoroutineManager>
@@ -58,7 +57,7 @@ namespace GameEngine
                 return null;
             }
 
-            if (_coroutines != null)
+            if (_coroutines == null)
             {
                 Log.Error(ErrorLevel.Hint, "StartCoroutine Failed,_coroutines is null!");
                 return null;
@@ -100,7 +99,6 @@ namespace GameEngine
             _coroutines = null;
             _toStopCoroutines = null;
         }
-
     }
 }
 

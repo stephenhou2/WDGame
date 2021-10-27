@@ -2,6 +2,8 @@
 
 public interface IBuff
 {
+    void OnEnterBattle(Agent agent);
+    void OnExitBattle(Agent agent);
     void OnRoundEnter();
     void OnRoundExit();
     void OnBuffFirstAdd();
@@ -9,4 +11,6 @@ public interface IBuff
     void OnUpdate();
     void Dispose();
     BitType GetBuffType();
+    int GetBuffNum();
+    void Merge(IBuff buff);
 }

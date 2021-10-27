@@ -12,29 +12,36 @@ public class ExcelExportRegister
             ConsoleLog.Error(log); 
             return -1;
         }
-	    TestSheetExport v0 = new TestSheetExport();
+	    HeroDataCfgExport v0 = new HeroDataCfgExport();
 		if(v0.Export(reader) < 0)
+        {
+            log = "Export Proto Data failed, sheet : HeroDataCfg";
+            ConsoleLog.Error(log);
+            return -2;
+        }
+	    TestSheetExport v1 = new TestSheetExport();
+		if(v1.Export(reader) < 0)
         {
             log = "Export Proto Data failed, sheet : TestSheet";
             ConsoleLog.Error(log);
             return -2;
         }
-	    Test2Export v1 = new Test2Export();
-		if(v1.Export(reader) < 0)
+	    Test2Export v2 = new Test2Export();
+		if(v2.Export(reader) < 0)
         {
             log = "Export Proto Data failed, sheet : Test2";
             ConsoleLog.Error(log);
             return -2;
         }
-	    MonsterCfgExport v2 = new MonsterCfgExport();
-		if(v2.Export(reader) < 0)
+	    MonsterCfgExport v3 = new MonsterCfgExport();
+		if(v3.Export(reader) < 0)
         {
             log = "Export Proto Data failed, sheet : MonsterCfg";
             ConsoleLog.Error(log);
             return -2;
         }
-	    MonsterCfg222Export v3 = new MonsterCfg222Export();
-		if(v3.Export(reader) < 0)
+	    MonsterCfg222Export v4 = new MonsterCfg222Export();
+		if(v4.Export(reader) < 0)
         {
             log = "Export Proto Data failed, sheet : MonsterCfg222";
             ConsoleLog.Error(log);

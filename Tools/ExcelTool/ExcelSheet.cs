@@ -184,8 +184,12 @@ public class ExcelSheet
                     ConsoleLog.Error(log);
                     return -5;
                 }
-                mFieldMap.Add(fieldName, fi);
-                sheetFieldInfos.Add(fi);
+
+                if(fi.FieldType != FieldType.Comment && fi.FieldType != FieldType.Undefine)
+                {
+                    mFieldMap.Add(fieldName, fi);
+                    sheetFieldInfos.Add(fi);
+                }
             }
         }
 

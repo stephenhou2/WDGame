@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class Agent : IAgent
+public abstract class Agent : IAgent, IBattle
 {
     /// <summary>
     /// Agent 唯一id
@@ -19,6 +19,8 @@ public abstract class Agent : IAgent
     /// </summary>
     protected AgentStateTimerPool _stateTimerPool;
 
+    protected Dictionary<BitType,IBuff> _buffDict;
+
     public int GetEntityId()
     {
         return _entityId;
@@ -28,6 +30,11 @@ public abstract class Agent : IAgent
     public abstract void OnDead();
     public abstract void OnLateUpdate(float deltaTime);
     public abstract void OnUpdate(float deltaTime);
+    public abstract void OnEnterBattle();
+    public abstract void OnExitBattle();
+    public abstract void CasterSkill(ISkill skill,Agent[] targets);
+    public abstract void AddBuff(IBuff buff);
+    public abstract void RemoveBuff(BitType buffType);
 
 
     public  void Update(float deltaTime)
@@ -42,6 +49,16 @@ public abstract class Agent : IAgent
     public  void LateUpdate(float deltaTime)
     {
         OnLateUpdate(deltaTime);
+    }
+
+    public BaseProperty GetBaseProperty()
+    {
+        if(_agentData == null)
+        {
+            return null;
+        }
+
+        return _agentData.GetAgentBaseProperty();
     }
 
     public void AddSkill(ISkill skill)
@@ -92,4 +109,6 @@ public abstract class Agent : IAgent
             _stateTimerPool.SetStateTimer(state,timer);
         }
     }
+
+
 }

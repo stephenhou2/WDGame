@@ -5,6 +5,9 @@ public static class BasePropertyHelper
     {
         BaseProperty bp = new BaseProperty();
 
+        var heroCfg = TableProto.DataTables.Ins.GetHeroDataCfg(heroId);
+
+        //bp.HP = heroCfg.
         
 
         return bp;
