@@ -90,7 +90,7 @@ namespace GameEngine
 
             if(_toStopCoroutines != null)
             {
-                _coroutines.Clear();
+                _toStopCoroutines.Clear();
             }
         }
 
