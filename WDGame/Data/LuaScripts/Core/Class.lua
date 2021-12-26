@@ -30,8 +30,10 @@ function class(className,superName)
     cls_static.__cls=cls
     _G[className] = cls_static
 
+
     cls_static.New = function(...)
         local instance = setmetatable({},{__index=cls})
+        instance.__initialize(instance,...)
         return instance
     end
 
