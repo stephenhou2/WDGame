@@ -1,4 +1,4 @@
-local cls_BTreeDecRepeatNode= classV2("BTreeDecRepeatNode","BTreeNode")
+local cls_BTreeDecRepeatNode= classV2("BTreeDecRepeatNode","BTreeDecNode")
 ---@class BTreeDecRepeatNode:BTreeDecNode
 
 function cls_BTreeDecRepeatNode.__initialize(self,targetRepeatCount)
@@ -15,23 +15,21 @@ function cls_BTreeDecRepeatNode.Tick(self,deltaTime)
     end
 
     local node = self._nodeStack[1]
-    if node._type == BTreeDef.BTREE_NODE_ACTION then
-        BTreeNode.BTreeLog("BTreeLog Tick Action Node:" ..tostring(node._node_name))
-    end
     local ret = node:Tick(deltaTime)
-    if self.targetRepeatCount == 0 then
-        return BTreeDef.STATUS_RUNNING
-    end
-
+    BTreeLog.LogNodeTickRet(node,ret)
     if ret == BTreeDef.STATUS_SUCCESS then
         self.count = self.count+1
+    end
+    
+    if self.targetRepeatCount == 0 then
+        return BTreeDef.STATUS_RUNNING
     end
 
     if self.count >= self.targetRepeatCount then
         return BTreeDef.STATUS_SUCCESS
     end
 
-    return BTreeDef.STATUS_RUNNING
+    return ret
 end
 
 function cls_BTreeDecRepeatNode.__reset(self)

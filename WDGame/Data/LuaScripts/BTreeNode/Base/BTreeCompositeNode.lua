@@ -12,9 +12,8 @@ end
 local function Tick_Composite(self,deltaTime)
     for k,v in ipairs(self._nodeStack) do
         local ret = v:Tick(deltaTime)
-        if v._type == BTreeDef.BTREE_NODE_ACTION then
-            BTreeNode.BTreeLog("BTreeLog Tick Action Node:" ..tostring(v._node_name) ..",ret:" ..tostring(ret))
-        end
+        BTreeLog.LogNodeTickRet(v,ret)
+
         if ret == BTreeDef.STATUS_RUNNING then
             return BTreeDef.STATUS_RUNNING
         elseif ret == BTreeDef.STATUS_FAILURE then

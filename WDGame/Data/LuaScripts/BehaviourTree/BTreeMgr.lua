@@ -32,6 +32,21 @@ function BTreeMgr:RefreshEnableUpdate()
     -- Log.Error("RefreshEnableUpdate---activeTreeCnt:" ..tostring(activeTreeCnt))
 end
 
+--- 测试用 打印树行结构
+local function CreateMap(node)
+    local nodeInfo = {}
+    nodeInfo.clsName = node.__name
+    local subNodes = {}
+    if node:IsEmpty() == false then
+        for k,v in ipairs(node._nodeStack) do
+            table.insert(subNodes,CreateMap(v))
+        end
+    end
+    nodeInfo.subNodes = subNodes
+    nodeInfo.nodeType = node._type
+    return nodeInfo
+end
+
 function BTreeMgr:ActiveTree(treeName,context)
     local tree = self.allBTrees[treeName]
     if tree == nil then
@@ -68,6 +83,7 @@ function BTreeMgr:AddTree(rootNode,treeName)
     self.allBTrees[treeName] = tree
     self.enableUpdate = true
     Log.Log("AddTree = " ..tostring(treeName))
+    -- Log.Error("-------------------------" ..vardump(CreateMap(tree.rootNode)))
 end
 
 function BTreeMgr:RemoveTree(treeName)
@@ -78,21 +94,6 @@ function BTreeMgr:RemoveTree(treeName)
     self.allBTrees[treeName] = nil
 end 
 
---- 测试用 打印树行结构
-local function CreateMap(node)
-    local nodeInfo = {}
-    nodeInfo.clsName = node.__name
-    local subNodes = {}
-    if node:IsEmpty() == false then
-        for k,v in ipairs(node._nodeStack) do
-            table.insert(subNodes,CreateMap(v))
-        end
-    end
-    nodeInfo.subNodes = subNodes
-    nodeInfo.nodeType = node._type
-    return nodeInfo
-end
-
 function BTreeMgr:ResetTree(treeName)
     local tree = self.allBTrees[treeName]
     if tree == nil then
@@ -100,8 +101,6 @@ function BTreeMgr:ResetTree(treeName)
     end
 
     tree:ResetTree()
-
-    -- Log.Error("-------------------------" ..vardump(CreateMap(tree.rootNode)))
     self:RefreshEnableUpdate()
 end 
 

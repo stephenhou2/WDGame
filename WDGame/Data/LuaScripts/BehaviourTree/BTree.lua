@@ -35,8 +35,8 @@ function BTree:ActiveTree(context)
     Log.Log("ActiveTree treeName:" ..tostring(self.treeName))
     local rootNode = self.rootNode
     if rootNode ~= nil then
-        rootNode:ActiveNode()
         rootNode:SetContext(context)
+        rootNode:ActiveNode()
     end
     self.active = true
 end

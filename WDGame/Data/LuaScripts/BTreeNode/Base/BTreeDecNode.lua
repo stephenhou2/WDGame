@@ -15,17 +15,17 @@ function cls_BTreeDecNode.PushToStack(self,node)
     end
 
     if not node._isBTreeNode then
-        Log.Error("PushToStack Failed,push invalid type node")
+        Log.Error("PushToStack Failed,push invalid type node, current node name:" ..tostring(self._node_name) ..",push node name:" ..tostring(node._node_name))
         return
     end
 
     if #self._nodeStack > 0 then
-        Log.Error("PushToStack Failed,BTreeDecNode can only add one child node")
+        Log.Error("PushToStack Failed,BTreeDecNode can only add one child node, current node name:" ..tostring(self._node_name) ..",push node name:" ..tostring(node._node_name))
         return
     end
 
     table.insert(self._nodeStack,node)
-    Log.Log("PushToStack Succeed")
+    BTreeLog.Log("PushToStack Succeed, current node name:" ..tostring(self._node_name) ..",push node name:" ..tostring(node._node_name))
 end
 
 

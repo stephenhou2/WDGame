@@ -1,4 +1,4 @@
-local cls_BTreeDecInvertNode= classV2("BTreeDecInvertNode","BTreeNode")
+local cls_BTreeDecInvertNode= classV2("BTreeDecInvertNode","BTreeDecNode")
 ---@class BTreeDecInvertNode:BTreeDecNode
 
 function cls_BTreeDecInvertNode.__initialize(self)
@@ -14,9 +14,7 @@ function cls_BTreeDecInvertNode.Tick(self,deltaTime)
 
     local node = self._nodeStack[1]
     local ret = node:Tick(deltaTime)
-    if node._type == BTreeDef.BTREE_NODE_ACTION then
-        BTreeNode.BTreeLog("BTreeLog Tick Action Node:" ..tostring(node._node_name) ..",ret:" ..tostring(ret))
-    end
+    BTreeLog.LogNodeTickRet(node,ret)
     if ret == BTreeDef.STATUS_SUCCESS then
         return BTreeDef.STATUS_FAILURE
     elseif ret == BTreeDef.STATUS_RUNNING then

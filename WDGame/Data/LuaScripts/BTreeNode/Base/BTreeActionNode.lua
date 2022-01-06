@@ -1,5 +1,5 @@
 local cls_BTreeActionNode= classV2("BTreeActionNode","BTreeNode")
----@class BTreeActionNode:BTreeDecNode
+---@class BTreeActionNode:BTreeNode
 
 cls_BTreeActionNode._type = BTreeDef.BTREE_NODE_ACTION
 

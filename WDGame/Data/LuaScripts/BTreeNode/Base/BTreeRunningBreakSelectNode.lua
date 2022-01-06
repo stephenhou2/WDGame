@@ -1,15 +1,14 @@
-local cls_BTreeSelectNode = classV2("BTreeSelectNode","BTreeNode")
----@class BTreeSelectNode:BTreeNode
+local cls_BTreeRunningBreakSelectNode = classV2("BTreeRunningBreakSelectNode","BTreeNode")
+---@class BTreeRunningBreakSelectNode:BTreeSelectNode
 
-cls_BTreeSelectNode._type = BTreeDef.BTREE_NODE_SELECT
-
-function cls_BTreeSelectNode.__initialize(self,tickType)
+function cls_BTreeRunningBreakSelectNode.__initialize(self,tickType)
     self._tick_type = tickType or BTreeDef.BTree_TICK_SEQUENCE
-    self._node_name = "BTreeSelectNode"
+    self._node_name = "BTreeRunningBreakSelectNode"
     self._nodeStack = {}
 end
 
-function cls_BTreeSelectNode.Tick_Select(self,deltaTime)
+function cls_BTreeRunningBreakSelectNode.Tick_Select(self,deltaTime)
+    local hasRuningChild = false
     for k,v in ipairs(self._nodeStack) do
         local ret = v:Tick(deltaTime)
         BTreeLog.LogNodeTickRet(v,ret)
@@ -24,7 +23,7 @@ function cls_BTreeSelectNode.Tick_Select(self,deltaTime)
 end
 
 
-function cls_BTreeSelectNode.Tick(self,deltaTime)
+function cls_BTreeRunningBreakSelectNode.Tick(self,deltaTime)
     if self._tick_type == BTreeDef.BTree_TICK_SEQUENCE then
         return self.Tick_Select(self,deltaTime)
     elseif self._tick_type == BTreeDef.BTree_TICK_RANDOM then
@@ -35,4 +34,4 @@ function cls_BTreeSelectNode.Tick(self,deltaTime)
     return BTreeDef.STATUS_SUCCESS
 end
 
-return cls_BTreeSelectNode
+return cls_BTreeRunningBreakSelectNode

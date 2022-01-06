@@ -49,12 +49,12 @@ function cls_BTreeNode.PushToStack(self,node)
     end
 
     if not node._isBTreeNode then
-        Log.Error("PushToStack Failed,push invalid type node")
+        Log.Error("PushToStack Failed,push invalid type node, current node name:" ..tostring(self._node_name) ..",push node name:" ..tostring(node._node_name))
         return
     end
 
     table.insert(self._nodeStack,node)
-    Log.Log("PushToStack Succeed")
+    BTreeLog.Log("PushToStack Succeed, current node name:" ..tostring(self._node_name) ..",push node name:" ..tostring(node._node_name))
     -- Log.Error("stack:" ..vardump(self._nodeStack))
 end
 
@@ -95,12 +95,8 @@ function cls_BTreeNode.GetNodeType(self)
     return self._type
 end
 
-BTreeNode.LogEnable = true
---- 行为树运行日志
-function BTreeNode.BTreeLog(str)
-    if BTreeNode.LogEnable then
-        Util.EditorLogDebug("<color=white>" ..str.."</color>")
-    end
+function cls_BTreeNode.GetNodeName(self)
+    return self._node_name
 end
 
 return cls_BTreeNode
