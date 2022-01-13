@@ -17,6 +17,11 @@ function cls_BTreeDecRepeatNode.Tick(self,deltaTime)
     local node = self._nodeStack[1]
     local ret = node:Tick(deltaTime)
     BTreeLog.LogNodeTickRet(node,ret)
+
+    if ret == BTreeDef.STATUS_EXIT then
+        return BTreeDef.STATUS_EXIT
+    end
+
     if ret == BTreeDef.STATUS_SUCCESS then
         self.count = self.count+1
     end

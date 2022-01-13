@@ -15,7 +15,9 @@ function cls_BTreeDecInvertNode.Tick(self,deltaTime)
     local node = self._nodeStack[1]
     local ret = node:Tick(deltaTime)
     BTreeLog.LogNodeTickRet(node,ret)
-    if ret == BTreeDef.STATUS_SUCCESS then
+    if ret == BTreeDef.STATUS_EXIT then
+        return BTreeDef.STATUS_EXIT
+    elseif ret == BTreeDef.STATUS_SUCCESS then
         return BTreeDef.STATUS_FAILURE
     elseif ret == BTreeDef.STATUS_RUNNING then
         return BTreeDef.STATUS_RUNNING

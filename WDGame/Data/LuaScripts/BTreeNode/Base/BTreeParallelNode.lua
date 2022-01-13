@@ -8,6 +8,10 @@ function cls_BTreeParallelNode.Tick(self,deltaTime)
     for k,v in ipairs(self._nodeStack) do
         local ret = v:Tick(deltaTime)
         BTreeLog.LogNodeTickRet(v,ret)
+        if ret == BTreeDef.STATUS_EXIT then
+            return BTreeDef.STATUS_EXIT
+        end
+
         if ret ~= BTreeDef.STATUS_SUCCESS then
             allSucc = false
         end

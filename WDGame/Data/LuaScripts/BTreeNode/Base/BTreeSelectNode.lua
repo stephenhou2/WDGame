@@ -13,7 +13,9 @@ function cls_BTreeSelectNode.Tick_Select(self,deltaTime)
     for k,v in ipairs(self._nodeStack) do
         local ret = v:Tick(deltaTime)
         BTreeLog.LogNodeTickRet(v,ret)
-        if ret == BTreeDef.STATUS_SUCCESS then
+        if ret == BTreeDef.STATUS_EXIT then
+            return BTreeDef.STATUS_EXIT
+        elseif ret == BTreeDef.STATUS_SUCCESS then
             return BTreeDef.STATUS_SUCCESS
         elseif ret == BTreeDef.STATUS_RUNNING then
             return BTreeDef.STATUS_RUNNING

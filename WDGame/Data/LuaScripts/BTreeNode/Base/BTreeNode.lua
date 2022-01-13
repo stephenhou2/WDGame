@@ -1,4 +1,4 @@
-local cls_BTreeNode = classV2("BTreeNode")
+﻿local cls_BTreeNode = classV2("BTreeNode")
 ---@class BTreeNode
 
 
@@ -88,7 +88,7 @@ end
 --- @param deltaTime number
 function cls_BTreeNode.Tick(self,deltaTime)
     Log.Error("not implement Node Tick func,please check! cur node = " ..tostring(self._node_name))
-    return BTreeDef.STATUS_FAILURE
+    return BTreeDef.STATUS_EXIT
 end
 
 function cls_BTreeNode.GetNodeType(self)

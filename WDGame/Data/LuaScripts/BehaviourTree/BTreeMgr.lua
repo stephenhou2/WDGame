@@ -1,4 +1,4 @@
----@class BTreeMgr
+﻿---@class BTreeMgr
 BTreeMgr = {}
 BTreeMgr.__index = BTreeMgr
 
@@ -10,18 +10,7 @@ function BTreeMgr:Init()
     RegisterUpdater(self,"BTreeUpdate")
 end
 
-function BTreeMgr:RegisterAllTrees()
-    for treeName,tree in pairs(self.allBTrees) do
-        self:RemoveTree(treeName)
-    end
-    for _,rigster in ipairs(BTreeDef.RIGSTER_LIST) do
-        if type(BTreeRegister[rigster]) == "function" then
-            BTreeRegister[rigster]()
-        end
-    end
-end
-
-function BTreeMgr:RefreshEnableUpdate()
+function BTreeMgr:RefreshUpdateEnable()
     local activeTreeCnt = 0
     for _,tree in pairs(self.allBTrees) do
         if tree:IsActive() == true then
@@ -29,7 +18,6 @@ function BTreeMgr:RefreshEnableUpdate()
         end
     end
     self.enableUpdate = (activeTreeCnt > 0)
-    -- Log.Error("RefreshEnableUpdate---activeTreeCnt:" ..tostring(activeTreeCnt))
 end
 
 --- 测试用 打印树行结构
@@ -50,11 +38,12 @@ end
 function BTreeMgr:ActiveTree(treeName,context)
     local tree = self.allBTrees[treeName]
     if tree == nil then
+        Log.Error("ActiveTree Failed,行为树未注册,treeName:" ..tostring(treeName))
         return
     end
 
     tree:ActiveTree(context)
-    self:RefreshEnableUpdate()
+    self:RefreshUpdateEnable()
 end
 
 function BTreeMgr:AddTree(rootNode,treeName)
@@ -101,14 +90,14 @@ function BTreeMgr:ResetTree(treeName)
     end
 
     tree:ResetTree()
-    self:RefreshEnableUpdate()
+    self:RefreshUpdateEnable()
 end 
 
 function BTreeMgr:Tick(deltaTime)
     for name,tree in pairs(self.allBTrees) do
         if tree:IsActive() == true then
             local ret = tree:Update(deltaTime)
-            if ret == BTreeDef.STATUS_SUCCESS then
+            if ret == BTreeDef.STATUS_EXIT then
                 self.toResetTrees[name] = true
             end
         end

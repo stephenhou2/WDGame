@@ -14,7 +14,9 @@ local function Tick_Composite(self,deltaTime)
         local ret = v:Tick(deltaTime)
         BTreeLog.LogNodeTickRet(v,ret)
 
-        if ret == BTreeDef.STATUS_RUNNING then
+        if ret == BTreeDef.STATUS_EXIT then
+            return BTreeDef.STATUS_EXIT
+        elseif ret == BTreeDef.STATUS_RUNNING then
             return BTreeDef.STATUS_RUNNING
         elseif ret == BTreeDef.STATUS_FAILURE then
             return BTreeDef.STATUS_FAILURE
