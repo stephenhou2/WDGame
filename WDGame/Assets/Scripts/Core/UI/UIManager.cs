@@ -18,7 +18,7 @@ namespace GameEngine
         /// <summary>
         /// 所有UI挂载的layer root
         /// </summary>
-        private Dictionary<string, GameObject> mLayers = new Dictionary<string, GameObject>();
+        private  Dictionary<string, GameObject> mLayers = new Dictionary<string, GameObject>();
 
         /// <summary>
         /// 所有已经打开的面板 
@@ -388,7 +388,7 @@ namespace GameEngine
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="openArgs"></param>
-        public void OpenPanel<T>(string panelPath, UILoadFinishCall call = null, bool isAsync = true) where T : UIPanel, new()
+        public void OpenPanel<T>(string panelPath, Dictionary<string,object> openArgs = null, UILoadFinishCall call = null, bool isAsync = true) where T : UIPanel, new()
         {
             if (CheckPanelOpen<T>())
             {
@@ -396,8 +396,6 @@ namespace GameEngine
                 return;
             }
 
-            T panel = GetUIEntity<T>();
-            string UILayerPath = panel.GetPanelLayerPath();
 
             if (string.IsNullOrEmpty(panelPath))
             {
@@ -405,6 +403,14 @@ namespace GameEngine
                 return;
             }
 
+            T panel = GetUIEntity<T>();
+            if (!panel.CheckCanOpen(openArgs))
+            {
+                Log.Error(ErrorLevel.Critical, "OpenPanel {0} Failed, Check Can Open Failed!", typeof(T));
+                return;
+            }
+
+            string UILayerPath = panel.GetPanelLayerPath();
             GameObject layer = GetLayer(UILayerPath);
             if (layer == null)
             {
@@ -469,12 +475,12 @@ namespace GameEngine
         /// 资源加载+绑定control
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="holder">control 的持有者，可以是Panel，也可以是另一个Control，但不能是自己</param>
+        /// <param name="holder">control 的持有者，可以是Panel，也可以是另一个Control，但不能是被加载的control自己</param>
         /// <param name="uiPath">control 的资源路径</param>
         /// <param name="parent">挂载在哪个父物体下</param>
         /// <param name="call">加载结束后的回调</param>
         /// <param name="isAsync">是否开启异步加载</param>
-        public void AddControl<T>(UIEntity holder, string uiPath, GameObject parent, UILoadFinishCall call = null, bool isAsync = true)
+        public void AddControl<T>(UIEntity holder, string uiPath, GameObject parent, Dictionary<string,object> openArgs = null, UILoadFinishCall call = null, bool isAsync = true)
             where T : UIControl, new()
         {
             if (holder == null)
@@ -496,6 +502,12 @@ namespace GameEngine
             }
 
             T control = GetUIEntity<T>();
+            if (!control.CheckCanOpen(openArgs))
+            {
+                Log.Error(ErrorLevel.Critical, "AddControl {0} Failed, Check Can Open Failed!", typeof(T));
+                return;
+            }
+
             UILoadAction action = new UILoadAction(holder, control, uiPath, parent, call, isAsync);
             mToAddControls.Enqueue(action);
         }

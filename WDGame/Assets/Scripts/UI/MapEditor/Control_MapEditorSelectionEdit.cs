@@ -1,4 +1,5 @@
 ﻿using GameEngine;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Control_MapEditorSelectionEdit : UIControl
@@ -20,7 +21,12 @@ public class Control_MapEditorSelectionEdit : UIControl
         
     }
 
-    protected override void OnOpen()
+    public override bool CheckCanOpen(Dictionary<string, object> openArgs)
+    {
+        return true;
+    }
+
+    protected override void OnOpen(Dictionary<string,object> openArgs)
     {
         
     }

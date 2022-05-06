@@ -1,9 +1,11 @@
 ﻿using GameEngine;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Control_Test : UIControl
 {
-    private GameObject Button_Test;
+    private Button Button_Test;
 
     private void OnTestButtonClick()
     {
@@ -11,7 +13,7 @@ public class Control_Test : UIControl
 
         //UIManager.Ins.RemoveControl(mHolder,this);
 
-        UIManager.Ins.AddControl<Control_Test2>(this, "UI/MapEditor/Control_Test2", mUIRoot);
+        UIManager.Ins.AddControl<Control_Test2>(this, "UIPrefab/MapEditor/Control_Test2", mUIRoot);
     }
     
     protected override void BindUINodes()
@@ -24,7 +26,12 @@ public class Control_Test : UIControl
         Log.Logic("Control_Test OnClose");
     }
 
-    protected override void OnOpen()
+    public override bool CheckCanOpen(Dictionary<string, object> openArgs)
+    {
+        return true;
+    }
+
+    protected override void OnOpen(Dictionary<string,object> openArgs)
     {
         Log.Logic("Control_Test OnOpen");
     }

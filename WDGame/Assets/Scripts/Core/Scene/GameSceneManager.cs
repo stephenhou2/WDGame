@@ -12,8 +12,11 @@ namespace GameEngine
 
         public void InitializeSceneManager()
         {
-            mSceneMap.Add(SceneDef.MapEditorScene, new MapEditorScene());
             mSceneMap.Add(SceneDef.LoginScene, new LoginScene());
+            mSceneMap.Add(SceneDef.MapEditorScene, new MapEditorScene());
+            mSceneMap.Add(SceneDef.PlotEditorScene, new PlotEditorScene());
+
+
 
             EmitterBus.AddListener(ModuleDef.SceneModule, "SwitchToScene", (evtArgs) =>
             {
@@ -43,7 +46,7 @@ namespace GameEngine
             var op = SceneManager.LoadSceneAsync(sceneName);
             while (!op.isDone)
             {
-                Log.Logic(LogLevel.Hint, "load scene progress:{0}", op.progress);
+                Log.Logic(LogLevel.Hint, "loading scene {0} ...... progress:{1}", sceneName, op.progress);
                 yield return null;
             }
 

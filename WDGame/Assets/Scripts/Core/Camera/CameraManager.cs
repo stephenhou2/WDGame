@@ -7,7 +7,7 @@ namespace GameEngine
         public Camera MainCam;
         public CameraManager()
         {
-            MainCam = Camera.main;
+            MainCam = GameObject.Find("_MAIN_CAMERA").GetComponent<Camera>();
         }
 
         public void ChangeMainCam(Camera cam)

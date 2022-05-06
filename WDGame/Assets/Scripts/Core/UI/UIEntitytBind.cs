@@ -44,13 +44,35 @@ namespace GameEngine
             return 0;
         }
 
-        protected int BindButtonNode(ref GameObject go, string node, UnityAction call = null)
+        protected int BindImageNode(ref Image img,string node,Sprite defaultSprite = null)
         {
+            GameObject go = null;
             int ret = BindNode(ref go, node);
             if (ret < 0) // 节点绑定失败
                 return ret;
 
-            Button btn = go.GetComponent<Button>();
+            img = go.GetComponent<Image>();
+            if (img == null) //没有Image组件
+            {
+                Log.Error(ErrorLevel.Critical, "BindImageNode failed,Image component is Required! node={0}", node);
+                return -3;
+            }
+
+            if (defaultSprite != null)
+                img.sprite = defaultSprite;
+
+            return 0;
+        }
+
+
+        protected int BindButtonNode(ref Button btn, string node, UnityAction call = null)
+        {
+            GameObject go = null;
+            int ret = BindNode(ref go, node);
+            if (ret < 0) // 节点绑定失败
+                return ret;
+
+            btn = go.GetComponent<Button>();
             if (btn == null) //没有Button组件
             {
                 Log.Error(ErrorLevel.Critical, "BindButtonNode failed,Button component is Required! node={0}", node);
@@ -66,21 +88,47 @@ namespace GameEngine
             return 0;
         }
 
-        protected int BindInputFieldNode(ref GameObject go, string node, string defaultText = null)
+        protected int BindTextNode(ref TMP_Text tmp_text, string node, string defaultText = null)
         {
+            GameObject go = null;
             int ret = BindNode(ref go, node);
             if (ret < 0) // 节点绑定失败
                 return ret;
 
-            TMP_InputField field = go.GetComponent<TMP_InputField>();
-            if (field == null) //没有TMP_InputField组件
+            tmp_text = go.GetComponent<TMP_Text>();
+            if (tmp_text == null) //没有TMP_Text组件
+            {
+                Log.Error(ErrorLevel.Critical, "BindTextNode failed,TMP_Text component is Required! node={0}", node);
+                return -3;
+            }
+
+            if (defaultText != null)
+                tmp_text.text = defaultText;
+
+            return 0;
+        }
+
+        protected int BindInputFieldNode(ref TMP_InputField tmp_field, string node, string defaultText = null, UnityAction<string> valueChangeCb = null)
+        {
+            GameObject go = null;
+            int ret = BindNode(ref go, node);
+            if (ret < 0) // 节点绑定失败
+                return ret;
+
+            tmp_field = go.GetComponent<TMP_InputField>();
+            if (tmp_field == null) //没有TMP_InputField组件
             {
                 Log.Error(ErrorLevel.Critical, "BindInputFieldNode failed,TMP_InputField component is Required! node={0}", node);
                 return -3;
             }
 
+            if(valueChangeCb != null)
+            {
+                tmp_field.onValueChanged.AddListener(valueChangeCb);
+            }
+
             if (defaultText != null)
-                field.text = defaultText;
+                tmp_field.text = defaultText;
 
             return 0;
         }

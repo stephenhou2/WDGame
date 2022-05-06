@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using GameEngine;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class LoginPanel : UIPanel
 {
-    private GameObject Button_EnterMapEditor;
+    private Button Button_EnterMapEditor;
+    private Button Button_EnterPlotEditor;
 
     public override void CustomClear()
     {
@@ -20,17 +23,30 @@ public class LoginPanel : UIPanel
         EmitterBus.Fire(ModuleDef.SceneModule, "SwitchToScene", new GameEventArgs_String(SceneDef.MapEditorScene));
     }
 
+    private void OnClickEnterPlotEditor()
+    {
+        EmitterBus.Fire(ModuleDef.SceneModule, "SwitchToScene", new GameEventArgs_String(SceneDef.PlotEditorScene));
+    }
+
     protected override void BindUINodes()
     {
         BindButtonNode(ref Button_EnterMapEditor, "Button_EnterMapEditor", OnClickEnterMapEditor);
+        BindButtonNode(ref Button_EnterPlotEditor, "Button_EnterPlotEditor", OnClickEnterPlotEditor);
     }
+
+
 
     protected override void OnClose()
     {
         
     }
 
-    protected override void OnOpen()
+    public override bool CheckCanOpen(Dictionary<string, object> openArgs)
+    {
+        return true;
+    }
+
+    protected override void OnOpen(Dictionary<string,object> openArgs)
     {
         
     }

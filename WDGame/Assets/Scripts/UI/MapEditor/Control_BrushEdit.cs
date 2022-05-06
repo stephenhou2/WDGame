@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using GameEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class Control_BrushEdit : UIControl
 {
-    private GameObject _Button_BrushEdit;
+    private Button _Button_BrushEdit;
     private GameObject _Node_Slider_Brush;
     private GameObject _Node_Image_BrushSize;
     private GameObject _Node_Text_BrushSize;
@@ -37,7 +39,12 @@ public class Control_BrushEdit : UIControl
         
     }
 
-    protected override void OnOpen()
+    public override bool CheckCanOpen(Dictionary<string, object> openArgs)
+    {
+        return true;
+    }
+
+    protected override void OnOpen(Dictionary<string,object> openArgs)
     {
         InitializeBrushSlider();
     }

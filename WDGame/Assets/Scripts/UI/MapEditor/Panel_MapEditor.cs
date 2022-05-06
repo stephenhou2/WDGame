@@ -1,5 +1,5 @@
 ﻿using GameEngine;
-
+using System.Collections.Generic;
 
 public class Panel_MapEditor : UIPanel
 {
@@ -12,7 +12,12 @@ public class Panel_MapEditor : UIPanel
         return UIPathDef.UI_LAYER_BOTTOM_STATIC;
     }
 
-    protected override void OnOpen()
+    public override bool CheckCanOpen(Dictionary<string, object> openArgs)
+    {
+        return true;
+    }
+
+    protected override void OnOpen(Dictionary<string,object> openArgs)
     {
 
     }

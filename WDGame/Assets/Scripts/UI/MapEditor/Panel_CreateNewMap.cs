@@ -2,15 +2,16 @@
 using UnityEngine;
 using TMPro;
 using GameEngine;
+using UnityEngine.UI;
 
 public class Panel_CreateNewMap : UIPanel
 {
-    private GameObject _Node_InputField_MapWidth;
-    private GameObject _Node_InputField_MapHeight;
-    private GameObject _Node_InputField_CellSize;
+    private TMP_InputField _Node_InputField_MapWidth;
+    private TMP_InputField _Node_InputField_MapHeight;
+    private TMP_InputField _Node_InputField_CellSize;
     private GameObject _Node_Selection_Direction;
-    private GameObject _Node_Button_CreateMap;
-    private GameObject _Node_Button_Back;
+    private Button _Node_Button_CreateMap;
+    private Button _Node_Button_Back;
 
     private string mMapId;
 
@@ -19,7 +20,12 @@ public class Panel_CreateNewMap : UIPanel
         return UIPathDef.UI_LAYER_NORMAL_STATIC;
     }
 
-    protected override void OnOpen()
+    public override bool CheckCanOpen(Dictionary<string, object> openArgs)
+    {
+        return true;
+    }
+
+    protected override void OnOpen(Dictionary<string,object> openArgs)
     {
         
     }
@@ -100,4 +106,6 @@ public class Panel_CreateNewMap : UIPanel
     {
 
     }
+
+
 }

@@ -47,7 +47,14 @@ namespace GameEngine
         /// <summary>
         /// panel 打开时调用
         /// </summary>
-        protected abstract void OnOpen();
+        protected abstract void OnOpen(Dictionary<string,object> openArgs);
+
+        /// <summary>
+        /// 检查传入的参数是否正确，如果传入参数有问题就不打开UI
+        /// </summary>
+        /// <param name="openArgs"></param>
+        /// <returns></returns>
+        public abstract bool CheckCanOpen(Dictionary<string, object> openArgs);
 
         /// <summary>
         /// panel关闭前调用
@@ -82,7 +89,7 @@ namespace GameEngine
             ClearAll();
         }
 
-        public void UIEntityOnOpen(string uiPath, UIEntity holder)
+        public void UIEntityOnOpen(string uiPath, UIEntity holder,Dictionary<string,object> openArgs = null)
         {
             mUIPath = uiPath;
 
@@ -98,7 +105,7 @@ namespace GameEngine
                     holder.AddChildUIEntity(this);
                 }
             }
-            OnOpen();
+            OnOpen(openArgs);
         }
 
         public void AddChildUIEntity(UIEntity uiEntity)

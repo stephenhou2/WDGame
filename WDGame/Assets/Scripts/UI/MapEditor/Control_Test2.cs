@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using GameEngine;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Control_Test2 : UIControl
 {
-    private GameObject Button_Test;
+    private Button Button_Test;
 
     private void OnTestButtonClick()
     {
@@ -29,7 +31,12 @@ public class Control_Test2 : UIControl
         Log.Logic("Control_Test OnClose 2222222222");
     }
 
-    protected override void OnOpen()
+    public override bool CheckCanOpen(Dictionary<string, object> openArgs)
+    {
+        return true;
+    }
+
+    protected override void OnOpen(Dictionary<string, object> openArgs)
     {
         Log.Logic("Control_Test OnOpen 22222222222");
     }

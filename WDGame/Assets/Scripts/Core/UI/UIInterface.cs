@@ -16,6 +16,12 @@ public static class UIInterface
         }
 
         Transform target = null;
+        target = rootNode.Find(name);
+        if(target != null)
+        {
+            return target;
+        }
+
         for(int i=0;i< rootNode.transform.childCount;i++)
         {
             Transform child = rootNode.transform.GetChild(i);
@@ -35,15 +41,15 @@ public static class UIInterface
         return null;
     }
 
-    public static string GetInputFieldString(GameObject go)
+    public static string GetInputFieldString(TMP_InputField inputField)
     {
-        if (go == null)
-        {
-            Log.Error(ErrorLevel.Critical, "GetInputFieldString Error, go is null!");
-            return string.Empty;
-        }
+        //if (go == null)
+        //{
+        //    Log.Error(ErrorLevel.Critical, "GetInputFieldString Error, go is null!");
+        //    return string.Empty;
+        //}
 
-        var inputField = go.GetComponent<TMP_InputField>();
+        //var inputField = go.GetComponent<TMP_InputField>();
         if(inputField == null)
         {
             Log.Error(ErrorLevel.Critical, "GetInputFieldString Error, InputField component is required!");
