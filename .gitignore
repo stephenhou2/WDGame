@@ -2,6 +2,9 @@ Library/
 Logs/
 MapEditor.sln
 obj/
+.p4root/
+p4config.txt
+p4ignore.txt
 Packages/
 Temp/
 .vs/MapEditor/
