@@ -18,7 +18,7 @@ public class Skill_PolyMorph : SkillBase
         return SkillDef.ACTIVE_SKILL;
     }
 
-    public override void OnSkillCastered(Agent caster, Agent[] targets)
+    public override void OnSkillTrigger(Agent caster, Agent[] targets)
     {
         PolyMorph(caster, targets);
     }

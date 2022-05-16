@@ -21,10 +21,10 @@ public abstract class AgentData
     /// <summary>
     /// 所有技能字典
     /// </summary>
-    protected Dictionary<int, ISkill> _allSkills;
+    protected Dictionary<int, ISkillEffect> _allSkills;
 
 
-    public void AddSkill(ISkill skill)
+    public void AddSkill(ISkillEffect skill)
     {
         int skillId = skill.GetSkillId();
         if (_allSkills.ContainsKey(skillId))
@@ -38,10 +38,10 @@ public abstract class AgentData
 
     public void ForEachSkill(SkillEnumerator call)
     {
-        foreach (KeyValuePair<int, ISkill> kv in _allSkills)
+        foreach (KeyValuePair<int, ISkillEffect> kv in _allSkills)
         {
             int skillId = kv.Key;
-            ISkill skill = kv.Value;
+            ISkillEffect skill = kv.Value;
             call(skill);
         }
 

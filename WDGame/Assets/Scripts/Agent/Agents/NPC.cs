@@ -9,7 +9,7 @@ public class NPC : Agent
         throw new System.NotImplementedException();
     }
 
-    public override void CasterSkill(ISkill skill, Agent[] targets)
+    public override void CasterSkill(ISkillEffect skill, Agent[] targets)
     {
         throw new System.NotImplementedException();
     }

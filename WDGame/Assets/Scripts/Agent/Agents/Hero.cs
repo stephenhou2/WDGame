@@ -53,7 +53,7 @@ public class Hero : Agent
         }
     }
 
-    public override void CasterSkill(ISkill skill, Agent[] targets)
+    public override void CasterSkill(ISkillEffect skill, Agent[] targets)
     {
         throw new System.NotImplementedException();
     }
@@ -74,7 +74,7 @@ public class Hero : Agent
     public override void OnAlive()
     {
         // 添加被动技能效果
-        ForEachSkill((ISkill skill) =>
+        ForEachSkill((ISkillEffect skill) =>
         {
             if (skill.GetSkillType() == SkillDef.PASSIVE_SKILL)
             {

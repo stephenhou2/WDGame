@@ -32,7 +32,7 @@ public abstract class Agent : IAgent, IBattle
     public abstract void OnUpdate(float deltaTime);
     public abstract void OnEnterBattle();
     public abstract void OnExitBattle();
-    public abstract void CasterSkill(ISkill skill,Agent[] targets);
+    public abstract void CasterSkill(ISkillEffect skill,Agent[] targets);
     public abstract void AddBuff(IBuff buff);
     public abstract void RemoveBuff(BitType buffType);
 
@@ -61,7 +61,7 @@ public abstract class Agent : IAgent, IBattle
         return _agentData.GetAgentBaseProperty();
     }
 
-    public void AddSkill(ISkill skill)
+    public void AddSkill(ISkillEffect skill)
     {
         if(_agentData != null)
         {

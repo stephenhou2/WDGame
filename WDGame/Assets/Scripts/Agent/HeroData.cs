@@ -8,6 +8,6 @@ public class HeroData : AgentData
         _agentStateData = new AgentStateData(AgentStateDefine.HERO_DEFAULT_STATE);
         _equips = new Equip[EquipDef.MaxEquipNum];
         _baseProperty = new BaseProperty();
-        _allSkills = new Dictionary<int, ISkill>();
+        _allSkills = new Dictionary<int, ISkillEffect>();
     }
 }

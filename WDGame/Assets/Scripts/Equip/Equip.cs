@@ -4,7 +4,7 @@ public class Equip
 {
     private int _equipId;
     private BaseProperty _property;
-    private List<ISkill> _allSkills = new List<ISkill>();
+    private List<ISkillEffect> _allSkills = new List<ISkillEffect>();
     
     public int GetEquipId()
     {
@@ -18,7 +18,7 @@ public class Equip
 
     public void ForEachSkill(SkillEnumerator call)
     {
-        foreach(ISkill skill in _allSkills)
+        foreach(ISkillEffect skill in _allSkills)
         {
             call(skill);
         }
